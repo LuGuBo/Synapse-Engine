@@ -1,0 +1,14 @@
+{
+  "name": "bmad-harness-workspace",
+  "version": "1.0.0",
+  "description": "Ambiente de Desenvolvimento Core do BMAD Harness",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "harness:tdd": "node .agent/bin/tdd-gate.js",
+    "harness:status": "node .agent/bin/state-manager.js"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
