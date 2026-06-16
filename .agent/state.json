@@ -9,9 +9,9 @@
   },
   "validation_status": {
     "gears_validated": true,
-    "tdd_test_exists": false,
-    "tdd_test_executed": false,
-    "tdd_test_failed": false,
+    "tdd_test_exists": true,
+    "tdd_test_executed": true,
+    "tdd_test_failed": true,
     "implementation_passed": false
   }
 }
