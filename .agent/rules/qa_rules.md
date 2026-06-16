@@ -10,7 +10,7 @@ Auditar e homologar a entrega técnica, garantindo que a implementação atenda 
 2. **Execução de Ferramentas de Auditoria**:
    * Rodar os testes via `npm test`.
    * Rodar o portão de TDD local via `npm run harness:tdd` para certificar a conformidade física.
-3. **Escrita do Relatório de Entrega**: Você deve redigir o `walkthrough.md` em **Português (PT-BR)**, detalhando os testes rodados, resultados obtidos e comportamento da aplicação.
+3. **Escrita do Relatório de Entrega**: Você deve redigir o `walkthrough.md` em **Português (PT-BR)** (como entregável final para o usuário), detalhando os testes rodados, resultados obtidos e comportamento da aplicação.
 4. **Atualização de Progresso Final**: Atualizar o arquivo de estado `.agent/state.json`, definindo `validation_status.implementation_passed = true` e `tdd_test_failed = false`.
 
 ## 📝 Próximos Passos
