@@ -1,0 +1,122 @@
+{
+  ".agent/bin/state-manager.js": {
+    "mtime": 1781574102.1786885,
+    "ast_hash": "b01d42025b73a5610ab2eda3542a0db7",
+    "semantic_hash": ""
+  },
+  ".agent/bin/tdd-gate.js": {
+    "mtime": 1781574095.0113702,
+    "ast_hash": "d2c0831d00d777a7eb57c569a2ca684e",
+    "semantic_hash": ""
+  },
+  ".agent/skills/grill-and-evolve/examples/golden_case_refactoring.py": {
+    "mtime": 1781792712.6024542,
+    "ast_hash": "d91f29997417d76d4a1c382e17b66876",
+    "semantic_hash": ""
+  },
+  ".agent/skills/grill-and-evolve/scripts/analyze_project_metrics.py": {
+    "mtime": 1781792737.6363366,
+    "ast_hash": "58ea6aa1c98615ec6db061a39dbe47ec",
+    "semantic_hash": ""
+  },
+  ".agent/state.json": {
+    "mtime": 1781792718.4626627,
+    "ast_hash": "f7c94313555f154a187876ed8faa2db8",
+    "semantic_hash": ""
+  },
+  "package.json": {
+    "mtime": 1781574082.0494263,
+    "ast_hash": "338db30d6fefb2af9578a55353f0df62",
+    "semantic_hash": ""
+  },
+  "src/passwordValidator.js": {
+    "mtime": 1781575004.1283169,
+    "ast_hash": "ef512ff94e831b898ce1fab38087d741",
+    "semantic_hash": ""
+  },
+  "tests/analyze_project_metrics.test.js": {
+    "mtime": 1781792683.520782,
+    "ast_hash": "0d3d74939bb1973f98c04713d0eb751c",
+    "semantic_hash": ""
+  },
+  "tests/passwordValidator.test.js": {
+    "mtime": 1781574985.7733207,
+    "ast_hash": "0c24f0f1eace5b318ec1ddfe81106c52",
+    "semantic_hash": ""
+  },
+  ".agent/rules/architect_rules.md": {
+    "mtime": 1781793534.5459096,
+    "ast_hash": "019492929fc36aec632df4efb45cedef",
+    "semantic_hash": ""
+  },
+  ".agent/rules/developer_rules.md": {
+    "mtime": 1781793553.1614225,
+    "ast_hash": "6f2c43b8434f968f55a22225dd7d9c10",
+    "semantic_hash": ""
+  },
+  ".agent/rules/pm_rules.md": {
+    "mtime": 1781793539.7709417,
+    "ast_hash": "148a67752bf2797c1346bb78304bb925",
+    "semantic_hash": ""
+  },
+  ".agent/rules/qa_rules.md": {
+    "mtime": 1781793573.5160358,
+    "ast_hash": "57961b4b3c15c64ad3b21a61668a22ea",
+    "semantic_hash": ""
+  },
+  ".agent/skills/grill-and-evolve/SKILL.md": {
+    "mtime": 1781793580.112614,
+    "ast_hash": "313a9442a470b70445b81493f9e3b49a",
+    "semantic_hash": ""
+  },
+  ".agent/skills/harness_dynamic_index/SKILL.md": {
+    "mtime": 1781793585.655762,
+    "ast_hash": "626b5cdf525d6097e5ef12d62ca11e49",
+    "semantic_hash": ""
+  },
+  ".agent/templates/PLAN.md": {
+    "mtime": 1781574140.4748204,
+    "ast_hash": "e90fc1efe2c50e0bd213de5087c596aa",
+    "semantic_hash": ""
+  },
+  ".agent/templates/SPEC.md": {
+    "mtime": 1781574134.4348862,
+    "ast_hash": "d96d73b314c4df8799676ad05570c983",
+    "semantic_hash": ""
+  },
+  "00_docs/PLAN.md": {
+    "mtime": 1781793517.1954203,
+    "ast_hash": "660919bc6aacf0303a15edc004b6cbc4",
+    "semantic_hash": ""
+  },
+  "00_docs/README.md": {
+    "mtime": 1781574146.4129198,
+    "ast_hash": "f3f0dbf93f250f75c2576f27a40760c1",
+    "semantic_hash": ""
+  },
+  "00_docs/SPEC.md": {
+    "mtime": 1781793509.950925,
+    "ast_hash": "67ed2f467d769b9a88aab6e224fb64cd",
+    "semantic_hash": ""
+  },
+  "00_docs/walkthrough.md": {
+    "mtime": 1782217866.5481615,
+    "ast_hash": "6dcb31e7c0e3c3eab89267ba9c03a513",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1781793498.5142233,
+    "ast_hash": "f55284a972c51aa394ceef38a956d37c",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1781793502.8698523,
+    "ast_hash": "f55284a972c51aa394ceef38a956d37c",
+    "semantic_hash": ""
+  },
+  "prompt.md": {
+    "mtime": 1782615587.504669,
+    "ast_hash": "d479ae21f10fac4987985d3c8d06a2aa",
+    "semantic_hash": ""
+  }
+}

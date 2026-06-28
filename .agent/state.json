@@ -1,11 +1,11 @@
 {
   "current_sprint_id": "sprint-001",
-  "active_task_id": "task-0001",
+  "active_task_id": "task-0002",
   "active_persona": "QA",
   "surgical_target": {
     "file_path": "src/passwordValidator.js",
     "line_range_start": 1,
-    "line_range_end": 35
+    "line_range_end": 45
   },
   "validation_status": {
     "gears_validated": true,
