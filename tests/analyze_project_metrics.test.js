@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 describe('analyze_project_metrics.py integration tests', () => {
-  const scriptPath = path.join(__dirname, '..', '.agent', 'skills', 'grill-and-evolve', 'scripts', 'analyze_project_metrics.py');
+  const scriptPath = path.join(__dirname, '..', '.agents', 'skills', 'grill-and-evolve', 'scripts', 'analyze_project_metrics.py');
 
   const runPythonScript = (args = '') => {
     // Try virtual environment python executable first

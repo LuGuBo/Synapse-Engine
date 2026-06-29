@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "harness:tdd": "node .agent/bin/tdd-gate.js",
-    "harness:status": "node .agent/bin/state-manager.js"
+    "harness:tdd": "node .agents/bin/tdd-gate.js",
+    "harness:status": "node .agents/bin/state-manager.js"
   },
   "devDependencies": {
     "jest": "^29.7.0"

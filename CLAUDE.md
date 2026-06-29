@@ -18,7 +18,7 @@ This project strictly inherits the global governance and behavior guidelines:
 
 ## Local Persona Shift Loop
 Operational transitions follow the global persona loop using the local state:
-* **PM**: Validate local specifications in `00_docs/SPEC.md` (EN-US). Update `.agent/state.json` (`validation_status.gears_validated = true`).
+* **PM**: Validate local specifications in `00_docs/SPEC.md` (EN-US). Update `.agents/state.json` (`validation_status.gears_validated = true`).
 * **ARCHITECT**: Structure local design files in `00_docs/PLAN.md` (EN-US) and ADRs. Mape space boundaries in `state.json` under `surgical_target`.
 * **DEVELOPER**: Implement code in `src/` under TDD writing failing tests in `tests/` first.
 * **QA**: Validate physical compliance by running tests and gates. Produce local `00_docs/walkthrough.md`.
@@ -27,7 +27,7 @@ Operational transitions follow the global persona loop using the local state:
 * **Run Jest Tests**: `npm test`
 * **Run TDD Gate Verification**: `npm run harness:tdd`
 * **Check Harness Telemetry Status**: `npm run harness:status`
-* **Update Telemetry State**: `node .agent/bin/state-manager.js [args]`
+* **Update Telemetry State**: `node .agents/bin/state-manager.js [args]`
 
 ## Commit Attribution
 All commits made by the AI agent MUST include:

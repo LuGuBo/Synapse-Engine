@@ -10,7 +10,7 @@
   - For frontend-centric tasks containing UI modifications, invoke: `--roles core,ui` (PM, Architect, Developer, QA, UI Designer).
   - For backend/database/infrastructure tasks, invoke: `--roles core,devops` (PM, Architect, Developer, QA, DevOps).
   - For simple refactorings and bug fixes, limit execution to: `--roles core` (Architect, Developer, QA).
-- **Offline Skills Repository Integration**: All agents operating under the `/boss` runtime MUST proactively check the global master index at `C:\Users\lgbon\.gemini\config\skills\ag_master_index\SKILL.md` or `C:\AG SKILLS\ag_master_index\SKILL.md` and the local domain index at `.agent/skills/harness_dynamic_index/SKILL.md`. They must load and execute the target offline skill manifest (`SKILL.md`) matching their active task before writing code or designing architectures to ensure strict alignment with existing engineering guidelines.
+- **Offline Skills Repository Integration**: All agents operating under the `/boss` runtime MUST proactively check the global master index at `C:\Users\lgbon\.gemini\config\skills\ag_master_index\SKILL.md` or `C:\AG SKILLS\ag_master_index\SKILL.md` and the local domain index at `.agents/skills/harness_dynamic_index/SKILL.md`. They must load and execute the target offline skill manifest (`SKILL.md`) matching their active task before writing code or designing architectures to ensure strict alignment with existing engineering guidelines.
 - **Audit-Ready Artifacts**: Ensure all step-by-step deliverables (PRDs, architecture documents, task sheets) are written to and persisted inside the `.boss/<feature_name>/` workspace based on BMAD (Breakthrough Method for AI-Driven Development) standards.
 
 ## 3. Strict Verification Gates
