@@ -19,6 +19,9 @@ Audit the delivery of new code changes, ensuring that they conform to specificat
 2. **Delivery Documentation:**
    - Create or update the technical report `walkthrough.md` in the user-requested language (**Portuguese - PT-BR**).
    - Detail what was modified, how it was verified, and embed test logs/results.
+   - **Rastreabilidade de Agentes e Skills:** O relatório DEVE incluir uma seção dedicada especificando:
+     - **Agentes Utilizados:** Quais agentes e personas (ex: PM, Architect, Developer, QA, ou subagentes específicos) executaram cada etapa da tarefa. Caso nenhum tenha sido usado, marcar que não foi usado.
+     - **Skills Invocadas:** Quais skills locais ou globais (ex: `valuation_triad_v2`, `portfolio_manager`, `qa`, etc.) foram carregadas e aplicadas pelos respectivos agentes. Caso nenhuma tenha sido usada, marcar que não foi usada.
 3. **Telemetry Alignment:**
    - Update `.agents/state.json` to register the status:
      - `validation_status.implementation_passed = true`

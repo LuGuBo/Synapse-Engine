@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "harness:tdd": "node .agents/bin/tdd-gate.js",
-    "harness:status": "node .agents/bin/state-manager.js"
+    "harness:status": "node .agents/bin/state-manager.js",
+    "harness:graphify": "graphify update ."
   },
   "devDependencies": {
     "jest": "^29.7.0"

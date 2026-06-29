@@ -1,4 +1,5 @@
-# BMADHARNESS Workspace and Skill Orchestration Guidelines
+# Synapse Engine Workspace and Skill Orchestration Guidelines
+
 
 ## 1. Codebase Navigation via Graphify
 - **Map-First Querying**: Do not perform blind recursive text searches (e.g., recursive grep) over the codebase. You must inspect `./graphify-out/graph.json` first to understand module imports, dependencies, and connections.
@@ -11,7 +12,7 @@
   - For backend/database/infrastructure tasks, invoke: `--roles core,devops` (PM, Architect, Developer, QA, DevOps).
   - For simple refactorings and bug fixes, limit execution to: `--roles core` (Architect, Developer, QA).
 - **Offline Skills Repository Integration**: All agents operating under the `/boss` runtime MUST proactively check the global master index at `C:\Users\lgbon\.gemini\config\skills\ag_master_index\SKILL.md` or `C:\AG SKILLS\ag_master_index\SKILL.md` and the local domain index at `.agents/skills/harness_dynamic_index/SKILL.md`. They must load and execute the target offline skill manifest (`SKILL.md`) matching their active task before writing code or designing architectures to ensure strict alignment with existing engineering guidelines.
-- **Audit-Ready Artifacts**: Ensure all step-by-step deliverables (PRDs, architecture documents, task sheets) are written to and persisted inside the `.boss/<feature_name>/` workspace based on BMAD (Breakthrough Method for AI-Driven Development) standards.
+- **Audit-Ready Artifacts**: Ensure all step-by-step deliverables (PRDs, architecture documents, task sheets, and the final `walkthrough.md`) are written to and persisted inside the `.boss/<feature_name>/` workspace based on BMAD (Breakthrough Method for AI-Driven Development) standards. The `walkthrough.md` report MUST include dedicated sections listing the agents used and the specific offline, global, or local skills invoked during execution. If none were used, they must be explicitly marked as not used.
 
 ## 3. Strict Verification Gates
 - **Compilation check**: No code changes shall be marked as complete without first running the workspace linter.

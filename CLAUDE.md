@@ -1,14 +1,14 @@
 ---
 bmad_version: 2.0.0
 inherits: "Global BMAD (GEMINI.md + bmad-core-methodology)"
-scope: "Local Domain (BmadHarness)"
-last_updated: "2026-06-16"
+scope: "Local Domain (Synapse Engine)"
+last_updated: "2026-06-29"
 ---
 
-# Agent Instructions - BMAD Harness
+# Agent Instructions - Synapse Engine
 
 ## Overview
-This repository uses the local **BMAD Harness** framework integrated with the global **BMAD Core Methodology**.
+This repository uses the local **Synapse Engine** framework integrated with the global **BMAD Core Methodology**.
 
 ## Governance & Inheritance
 This project strictly inherits the global governance and behavior guidelines:
@@ -28,6 +28,7 @@ Operational transitions follow the global persona loop using the local state:
 * **Run TDD Gate Verification**: `npm run harness:tdd`
 * **Check Harness Telemetry Status**: `npm run harness:status`
 * **Update Telemetry State**: `node .agents/bin/state-manager.js [args]`
+* **Update Graphify Graph**: `npm run harness:graphify`
 
 ## Commit Attribution
 All commits made by the AI agent MUST include:

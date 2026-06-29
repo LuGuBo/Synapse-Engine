@@ -7,3 +7,6 @@ coverage/
 *.log
 .venv/
 venv/
+
+# Graphify outputs
+graphify-out/
