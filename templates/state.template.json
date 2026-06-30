@@ -1,0 +1,17 @@
+{
+  "current_sprint_id": "sprint-001",
+  "active_task_id": "task-0001",
+  "active_persona": "PM",
+  "surgical_target": {
+    "file_path": "",
+    "line_range_start": 0,
+    "line_range_end": 0
+  },
+  "validation_status": {
+    "gears_validated": false,
+    "tdd_test_exists": false,
+    "tdd_test_executed": false,
+    "tdd_test_failed": false,
+    "implementation_passed": false
+  }
+}

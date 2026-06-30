@@ -124,7 +124,7 @@ decision_maker: AI Agent & Tech Lead
             if result.returncode == 0 or "graphify" in result.stdout.lower():
                 graphify_installed = True
         except Exception:
-            pass
+            graphify_installed = False
 
         # If not in standard PATH, check local .local/bin
         if not graphify_installed:

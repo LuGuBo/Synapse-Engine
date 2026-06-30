@@ -304,6 +304,236 @@
       "norm_label": "recursively scans the directory for python files, excluding system/temp dirs."
     },
     {
+      "label": "state-manager.js",
+      "file_type": "code",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "bin_state_manager",
+      "community": 35,
+      "norm_label": "state-manager.js"
+    },
+    {
+      "label": "fs",
+      "file_type": "code",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "bin_state_manager_fs",
+      "community": 35,
+      "norm_label": "fs"
+    },
+    {
+      "label": "path",
+      "file_type": "code",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "bin_state_manager_path",
+      "community": 35,
+      "norm_label": "path"
+    },
+    {
+      "label": "STATE_FILE_PATH",
+      "file_type": "code",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "bin_state_manager_state_file_path",
+      "community": 35,
+      "norm_label": "state_file_path"
+    },
+    {
+      "label": "readState()",
+      "file_type": "code",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "bin_state_manager_readstate",
+      "community": 35,
+      "norm_label": "readstate()"
+    },
+    {
+      "label": "writeState()",
+      "file_type": "code",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "bin_state_manager_writestate",
+      "community": 35,
+      "norm_label": "writestate()"
+    },
+    {
+      "label": "printUsage()",
+      "file_type": "code",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "bin_state_manager_printusage",
+      "community": 35,
+      "norm_label": "printusage()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "bin_state_manager_main",
+      "community": 35,
+      "norm_label": "main()"
+    },
+    {
+      "label": "synapse-cli.js",
+      "file_type": "code",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "bin_synapse_cli",
+      "community": 36,
+      "norm_label": "synapse-cli.js"
+    },
+    {
+      "label": "{ Command }",
+      "file_type": "code",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "bin_synapse_cli_command",
+      "community": 36,
+      "norm_label": "{ command }"
+    },
+    {
+      "label": "fs",
+      "file_type": "code",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "bin_synapse_cli_fs",
+      "community": 36,
+      "norm_label": "fs"
+    },
+    {
+      "label": "path",
+      "file_type": "code",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "bin_synapse_cli_path",
+      "community": 36,
+      "norm_label": "path"
+    },
+    {
+      "label": "{ execSync, fork }",
+      "file_type": "code",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "bin_synapse_cli_execsync_fork",
+      "community": 36,
+      "norm_label": "{ execsync, fork }"
+    },
+    {
+      "label": "program",
+      "file_type": "code",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "bin_synapse_cli_program",
+      "community": 36,
+      "norm_label": "program"
+    },
+    {
+      "label": "TEMPLATES_DIR",
+      "file_type": "code",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "bin_synapse_cli_templates_dir",
+      "community": 36,
+      "norm_label": "templates_dir"
+    },
+    {
+      "label": "CORE_AGENTS_DIR",
+      "file_type": "code",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "bin_synapse_cli_core_agents_dir",
+      "community": 36,
+      "norm_label": "core_agents_dir"
+    },
+    {
+      "label": "tdd-gate.js",
+      "file_type": "code",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "bin_tdd_gate",
+      "community": 37,
+      "norm_label": "tdd-gate.js"
+    },
+    {
+      "label": "fs",
+      "file_type": "code",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "bin_tdd_gate_fs",
+      "community": 37,
+      "norm_label": "fs"
+    },
+    {
+      "label": "path",
+      "file_type": "code",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "bin_tdd_gate_path",
+      "community": 37,
+      "norm_label": "path"
+    },
+    {
+      "label": "{ execSync }",
+      "file_type": "code",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "bin_tdd_gate_execsync",
+      "community": 37,
+      "norm_label": "{ execsync }"
+    },
+    {
+      "label": "getStagedFiles()",
+      "file_type": "code",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "bin_tdd_gate_getstagedfiles",
+      "community": 37,
+      "norm_label": "getstagedfiles()"
+    },
+    {
+      "label": "getTrackedFiles()",
+      "file_type": "code",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "bin_tdd_gate_gettrackedfiles",
+      "community": 37,
+      "norm_label": "gettrackedfiles()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "bin_tdd_gate_main",
+      "community": 37,
+      "norm_label": "main()"
+    },
+    {
       "label": "package.json",
       "file_type": "code",
       "source_file": "package.json",
@@ -354,10 +584,30 @@
       "norm_label": "main"
     },
     {
-      "label": "scripts",
+      "label": "bin",
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L6",
+      "_origin": "ast",
+      "id": "package_bin",
+      "community": 0,
+      "norm_label": "bin"
+    },
+    {
+      "label": "synapse",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "package_bin_synapse",
+      "community": 0,
+      "norm_label": "synapse"
+    },
+    {
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "package_scripts",
       "community": 0,
@@ -367,47 +617,37 @@
       "label": "test",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L7",
+      "source_location": "L10",
       "_origin": "ast",
       "id": "package_scripts_test",
       "community": 0,
       "norm_label": "test"
     },
     {
-      "label": "harness:tdd",
+      "label": "dependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L8",
+      "source_location": "L12",
       "_origin": "ast",
-      "id": "package_scripts_harness_tdd",
+      "id": "package_dependencies",
       "community": 0,
-      "norm_label": "harness:tdd"
+      "norm_label": "dependencies"
     },
     {
-      "label": "harness:status",
+      "label": "commander",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L9",
+      "source_location": "L13",
       "_origin": "ast",
-      "id": "package_scripts_harness_status",
+      "id": "package_dependencies_commander",
       "community": 0,
-      "norm_label": "harness:status"
-    },
-    {
-      "label": "harness:graphify",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "package_scripts_harness_graphify",
-      "community": 0,
-      "norm_label": "harness:graphify"
+      "norm_label": "commander"
     },
     {
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L12",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "package_devdependencies",
       "community": 0,
@@ -417,7 +657,7 @@
       "label": "jest",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L13",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "package_devdependencies_jest",
       "community": 0,
@@ -642,6 +882,46 @@
       "id": "tests_passwordvalidator_test_validatepassword",
       "community": 17,
       "norm_label": "{ validatepassword }"
+    },
+    {
+      "label": "synapse_cli.test.js",
+      "file_type": "code",
+      "source_file": "tests/synapse_cli.test.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_synapse_cli_test",
+      "community": 18,
+      "norm_label": "synapse_cli.test.js"
+    },
+    {
+      "label": "{ execSync }",
+      "file_type": "code",
+      "source_file": "tests/synapse_cli.test.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_synapse_cli_test_execsync",
+      "community": 18,
+      "norm_label": "{ execsync }"
+    },
+    {
+      "label": "path",
+      "file_type": "code",
+      "source_file": "tests/synapse_cli.test.js",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "tests_synapse_cli_test_path",
+      "community": 18,
+      "norm_label": "path"
+    },
+    {
+      "label": "fs",
+      "file_type": "code",
+      "source_file": "tests/synapse_cli.test.js",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "tests_synapse_cli_test_fs",
+      "community": 18,
+      "norm_label": "fs"
     },
     {
       "label": "synapse_forge.test.js",
@@ -1984,6 +2264,106 @@
       "norm_label": "\ud83e\uddea acceptance criteria"
     },
     {
+      "label": "global_setup_guide.md",
+      "file_type": "document",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "00_docs_global_setup_guide",
+      "community": 34,
+      "norm_label": "global_setup_guide.md"
+    },
+    {
+      "label": "\ud83c\udf10 Guia de Configura\u00e7\u00e3o Global do Synapse Engine",
+      "file_type": "document",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "00_docs_global_setup_guide_guia_de_configura\u00e7\u00e3o_global_do_synapse_engine",
+      "community": 34,
+      "norm_label": "\ud83c\udf10 guia de configuracao global do synapse engine"
+    },
+    {
+      "label": "\ud83c\udfdb\ufe0f 1. Como Funciona a Customiza\u00e7\u00e3o Global",
+      "file_type": "document",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "00_docs_global_setup_guide_1_como_funciona_a_customiza\u00e7\u00e3o_global",
+      "community": 34,
+      "norm_label": "\ud83c\udfdb\ufe0f 1. como funciona a customizacao global"
+    },
+    {
+      "label": "Arquivos Cr\u00edticos de Configura\u00e7\u00e3o:",
+      "file_type": "document",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "00_docs_global_setup_guide_arquivos_cr\u00edticos_de_configura\u00e7\u00e3o",
+      "community": 34,
+      "norm_label": "arquivos criticos de configuracao:"
+    },
+    {
+      "label": "\ud83d\udce6 2. O Reposit\u00f3rio de Habilidades Compartilhado (`C:\\AG SKILLS\\`)",
+      "file_type": "document",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "00_docs_global_setup_guide_2_o_reposit\u00f3rio_de_habilidades_compartilhado_c_ag_skills",
+      "community": 34,
+      "norm_label": "\ud83d\udce6 2. o repositorio de habilidades compartilhado (`c:\\ag skills\\`)"
+    },
+    {
+      "label": "\ud83d\udee0\ufe0f 3. Passo a Passo do Setup Manual (Alternativa \u00e0 CLI)",
+      "file_type": "document",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "00_docs_global_setup_guide_3_passo_a_passo_do_setup_manual_alternativa_\u00e0_cli",
+      "community": 34,
+      "norm_label": "\ud83d\udee0\ufe0f 3. passo a passo do setup manual (alternativa a cli)"
+    },
+    {
+      "label": "Passo A: Criar a Estrutura de Pastas",
+      "file_type": "document",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "00_docs_global_setup_guide_passo_a_criar_a_estrutura_de_pastas",
+      "community": 34,
+      "norm_label": "passo a: criar a estrutura de pastas"
+    },
+    {
+      "label": "Passo B: Injetar Regras Globais (`AGENTS.md`)",
+      "file_type": "document",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "00_docs_global_setup_guide_passo_b_injetar_regras_globais_agents_md",
+      "community": 34,
+      "norm_label": "passo b: injetar regras globais (`agents.md`)"
+    },
+    {
+      "label": "Passo C: Configurar o Mapeador de Skills (`skills.json`)",
+      "file_type": "document",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L64",
+      "_origin": "ast",
+      "id": "00_docs_global_setup_guide_passo_c_configurar_o_mapeador_de_skills_skills_json",
+      "community": 34,
+      "norm_label": "passo c: configurar o mapeador de skills (`skills.json`)"
+    },
+    {
+      "label": "\ud83d\udcbb 4. Verifica\u00e7\u00e3o do Setup",
+      "file_type": "document",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L79",
+      "_origin": "ast",
+      "id": "00_docs_global_setup_guide_4_verifica\u00e7\u00e3o_do_setup",
+      "community": 34,
+      "norm_label": "\ud83d\udcbb 4. verificacao do setup"
+    },
+    {
       "label": "walkthrough.md",
       "file_type": "document",
       "source_file": "00_docs/walkthrough.md",
@@ -2202,6 +2582,426 @@
       "id": "gemini_3_optimization_based_on_perfect_context_and_extractive_knowledge_graphify_mappings",
       "community": 24,
       "norm_label": "3. optimization based on perfect context and extractive knowledge (graphify mappings)"
+    },
+    {
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme",
+      "community": 34,
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "\u26a1 Synapse Engine V2",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme_synapse_engine_v2",
+      "community": 34,
+      "norm_label": "\u26a1 synapse engine v2"
+    },
+    {
+      "label": "\ud83d\ude80 Como Instalar",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "readme_como_instalar",
+      "community": 34,
+      "norm_label": "\ud83d\ude80 como instalar"
+    },
+    {
+      "label": "\ud83d\udee0\ufe0f Comandos Dispon\u00edveis",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "readme_comandos_dispon\u00edveis",
+      "community": 34,
+      "norm_label": "\ud83d\udee0\ufe0f comandos disponiveis"
+    },
+    {
+      "label": "1. `synapse init`",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "readme_1_synapse_init",
+      "community": 34,
+      "norm_label": "1. `synapse init`"
+    },
+    {
+      "label": "2. `synapse update`",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "readme_2_synapse_update",
+      "community": 34,
+      "norm_label": "2. `synapse update`"
+    },
+    {
+      "label": "3. `synapse setup --global`",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "readme_3_synapse_setup_global",
+      "community": 34,
+      "norm_label": "3. `synapse setup --global`"
+    },
+    {
+      "label": "4. `synapse status [args]`",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L56",
+      "_origin": "ast",
+      "id": "readme_4_synapse_status_args",
+      "community": 34,
+      "norm_label": "4. `synapse status [args]`"
+    },
+    {
+      "label": "5. `synapse tdd`",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "readme_5_synapse_tdd",
+      "community": 34,
+      "norm_label": "5. `synapse tdd`"
+    },
+    {
+      "label": "\ud83c\udfdb\ufe0f Documenta\u00e7\u00e3o de Arquitetura",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L74",
+      "_origin": "ast",
+      "id": "readme_documenta\u00e7\u00e3o_de_arquitetura",
+      "community": 34,
+      "norm_label": "\ud83c\udfdb\ufe0f documentacao de arquitetura"
+    },
+    {
+      "label": "bmad-master.md",
+      "file_type": "document",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "core_agents_bmad_master",
+      "community": 39,
+      "norm_label": "bmad-master.md"
+    },
+    {
+      "label": "BMAD Master Core Methodology",
+      "file_type": "document",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "core_agents_bmad_master_bmad_master_core_methodology",
+      "community": 39,
+      "norm_label": "bmad master core methodology"
+    },
+    {
+      "label": "1. Informational Authority & Integration",
+      "file_type": "document",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "core_agents_bmad_master_1_informational_authority_integration",
+      "community": 39,
+      "norm_label": "1. informational authority & integration"
+    },
+    {
+      "label": "2. Bilingual Protocol",
+      "file_type": "document",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "core_agents_bmad_master_2_bilingual_protocol",
+      "community": 39,
+      "norm_label": "2. bilingual protocol"
+    },
+    {
+      "label": "3. Sandboxing & Temporary Environments",
+      "file_type": "document",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "core_agents_bmad_master_3_sandboxing_temporary_environments",
+      "community": 39,
+      "norm_label": "3. sandboxing & temporary environments"
+    },
+    {
+      "label": "4. Context Window Optimization (Surgical Actions)",
+      "file_type": "document",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "core_agents_bmad_master_4_context_window_optimization_surgical_actions",
+      "community": 39,
+      "norm_label": "4. context window optimization (surgical actions)"
+    },
+    {
+      "label": "local-guardrails-policy.md",
+      "file_type": "document",
+      "source_file": "core/agents/local-guardrails-policy.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "core_agents_local_guardrails_policy",
+      "community": 40,
+      "norm_label": "local-guardrails-policy.md"
+    },
+    {
+      "label": "Local Guardrails & Quality Policies",
+      "file_type": "document",
+      "source_file": "core/agents/local-guardrails-policy.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "core_agents_local_guardrails_policy_local_guardrails_quality_policies",
+      "community": 40,
+      "norm_label": "local guardrails & quality policies"
+    },
+    {
+      "label": "1. Exception Handling Constraints",
+      "file_type": "document",
+      "source_file": "core/agents/local-guardrails-policy.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "core_agents_local_guardrails_policy_1_exception_handling_constraints",
+      "community": 40,
+      "norm_label": "1. exception handling constraints"
+    },
+    {
+      "label": "2. Test-Driven Development (TDD) Gate",
+      "file_type": "document",
+      "source_file": "core/agents/local-guardrails-policy.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "core_agents_local_guardrails_policy_2_test_driven_development_tdd_gate",
+      "community": 40,
+      "norm_label": "2. test-driven development (tdd) gate"
+    },
+    {
+      "label": "qa.md",
+      "file_type": "document",
+      "source_file": "core/agents/qa.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "core_agents_qa",
+      "community": 41,
+      "norm_label": "qa.md"
+    },
+    {
+      "label": "QA Engineer Role & Guidelines",
+      "file_type": "document",
+      "source_file": "core/agents/qa.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "core_agents_qa_qa_engineer_role_guidelines",
+      "community": 41,
+      "norm_label": "qa engineer role & guidelines"
+    },
+    {
+      "label": "\ud83c\udfaf Phase Goal",
+      "file_type": "document",
+      "source_file": "core/agents/qa.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "core_agents_qa_phase_goal",
+      "community": 41,
+      "norm_label": "\ud83c\udfaf phase goal"
+    },
+    {
+      "label": "\ud83d\udcdc Governance Rules",
+      "file_type": "document",
+      "source_file": "core/agents/qa.md",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "core_agents_qa_governance_rules",
+      "community": 41,
+      "norm_label": "\ud83d\udcdc governance rules"
+    },
+    {
+      "label": "sm.md",
+      "file_type": "document",
+      "source_file": "core/agents/sm.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "core_agents_sm",
+      "community": 42,
+      "norm_label": "sm.md"
+    },
+    {
+      "label": "Scrum Master Role & Guidelines",
+      "file_type": "document",
+      "source_file": "core/agents/sm.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "core_agents_sm_scrum_master_role_guidelines",
+      "community": 42,
+      "norm_label": "scrum master role & guidelines"
+    },
+    {
+      "label": "\ud83c\udfaf Phase Goal",
+      "file_type": "document",
+      "source_file": "core/agents/sm.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "core_agents_sm_phase_goal",
+      "community": 42,
+      "norm_label": "\ud83c\udfaf phase goal"
+    },
+    {
+      "label": "\ud83d\udcdc Governance Rules",
+      "file_type": "document",
+      "source_file": "core/agents/sm.md",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "core_agents_sm_governance_rules",
+      "community": 42,
+      "norm_label": "\ud83d\udcdc governance rules"
+    },
+    {
+      "label": "ux-expert.md",
+      "file_type": "document",
+      "source_file": "core/agents/ux-expert.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "core_agents_ux_expert",
+      "community": 43,
+      "norm_label": "ux-expert.md"
+    },
+    {
+      "label": "UX/UI Expert Role & Guidelines",
+      "file_type": "document",
+      "source_file": "core/agents/ux-expert.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "core_agents_ux_expert_ux_ui_expert_role_guidelines",
+      "community": 43,
+      "norm_label": "ux/ui expert role & guidelines"
+    },
+    {
+      "label": "\ud83c\udfaf Phase Goal",
+      "file_type": "document",
+      "source_file": "core/agents/ux-expert.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "core_agents_ux_expert_phase_goal",
+      "community": 43,
+      "norm_label": "\ud83c\udfaf phase goal"
+    },
+    {
+      "label": "\ud83d\udcdc Design Guidelines",
+      "file_type": "document",
+      "source_file": "core/agents/ux-expert.md",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "core_agents_ux_expert_design_guidelines",
+      "community": 43,
+      "norm_label": "\ud83d\udcdc design guidelines"
+    },
+    {
+      "label": "AGENTS.template.md",
+      "file_type": "document",
+      "source_file": "templates/AGENTS.template.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "templates_agents_template",
+      "community": 44,
+      "norm_label": "agents.template.md"
+    },
+    {
+      "label": "Local Agent Rules ({{PROJECT_NAME}})",
+      "file_type": "document",
+      "source_file": "templates/AGENTS.template.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "templates_agents_template_local_agent_rules_project_name",
+      "community": 44,
+      "norm_label": "local agent rules ({{project_name}})"
+    },
+    {
+      "label": "Local Governance Rules",
+      "file_type": "document",
+      "source_file": "templates/AGENTS.template.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "templates_agents_template_local_governance_rules",
+      "community": 44,
+      "norm_label": "local governance rules"
+    },
+    {
+      "label": "CLAUDE.template.md",
+      "file_type": "document",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "templates_claude_template",
+      "community": 38,
+      "norm_label": "claude.template.md"
+    },
+    {
+      "label": "Agent Instructions - {{PROJECT_NAME}}",
+      "file_type": "document",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "templates_claude_template_agent_instructions_project_name",
+      "community": 38,
+      "norm_label": "agent instructions - {{project_name}}"
+    },
+    {
+      "label": "Overview",
+      "file_type": "document",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "templates_claude_template_overview",
+      "community": 38,
+      "norm_label": "overview"
+    },
+    {
+      "label": "Codebase Navigation via Graphify",
+      "file_type": "document",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "templates_claude_template_codebase_navigation_via_graphify",
+      "community": 38,
+      "norm_label": "codebase navigation via graphify"
+    },
+    {
+      "label": "Governance & State Machine (Persona Shift Loop)",
+      "file_type": "document",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "templates_claude_template_governance_state_machine_persona_shift_loop",
+      "community": 38,
+      "norm_label": "governance & state machine (persona shift loop)"
+    },
+    {
+      "label": "Physical & Mechanical Commands",
+      "file_type": "document",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "templates_claude_template_physical_mechanical_commands",
+      "community": 38,
+      "norm_label": "physical & mechanical commands"
+    },
+    {
+      "label": "Commit Attribution",
+      "file_type": "document",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "templates_claude_template_commit_attribution",
+      "community": 38,
+      "norm_label": "commit attribution"
     }
   ],
   "links": [
@@ -2578,6 +3378,314 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "bin_state_manager",
+      "target": "bin_state_manager_fs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "bin_state_manager",
+      "target": "bin_state_manager_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "bin_state_manager",
+      "target": "bin_state_manager_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "bin_state_manager",
+      "target": "bin_state_manager_printusage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "bin_state_manager",
+      "target": "bin_state_manager_readstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "bin_state_manager",
+      "target": "bin_state_manager_state_file_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "bin_state_manager",
+      "target": "bin_state_manager_writestate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "bin_state_manager",
+      "target": "path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "bin_state_manager_main",
+      "target": "bin_state_manager_readstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L75",
+      "weight": 1.0,
+      "source": "bin_state_manager_main",
+      "target": "bin_state_manager_writestate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/state-manager.js",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "bin_state_manager_main",
+      "target": "bin_state_manager_printusage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "bin_synapse_cli",
+      "target": "bin_synapse_cli_command",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "bin_synapse_cli",
+      "target": "bin_synapse_cli_core_agents_dir",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "bin_synapse_cli",
+      "target": "bin_synapse_cli_execsync_fork",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "bin_synapse_cli",
+      "target": "bin_synapse_cli_fs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "bin_synapse_cli",
+      "target": "bin_synapse_cli_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "bin_synapse_cli",
+      "target": "bin_synapse_cli_program",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "bin_synapse_cli",
+      "target": "bin_synapse_cli_templates_dir",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/synapse-cli.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "bin_synapse_cli",
+      "target": "path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "bin_tdd_gate",
+      "target": "bin_tdd_gate_execsync",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "bin_tdd_gate",
+      "target": "bin_tdd_gate_fs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "bin_tdd_gate",
+      "target": "bin_tdd_gate_getstagedfiles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "bin_tdd_gate",
+      "target": "bin_tdd_gate_gettrackedfiles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "bin_tdd_gate",
+      "target": "bin_tdd_gate_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "bin_tdd_gate",
+      "target": "bin_tdd_gate_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "bin_tdd_gate",
+      "target": "path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "bin_tdd_gate_main",
+      "target": "bin_tdd_gate_getstagedfiles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "bin/tdd-gate.js",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "bin_tdd_gate_main",
+      "target": "bin_tdd_gate_gettrackedfiles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_bin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_dependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "package.json",
       "source_location": "L4",
       "weight": 1.0,
@@ -2589,7 +3697,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L12",
+      "source_location": "L15",
       "weight": 1.0,
       "source": "package",
       "target": "package_devdependencies",
@@ -2619,7 +3727,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L6",
+      "source_location": "L9",
       "weight": 1.0,
       "source": "package",
       "target": "package_scripts",
@@ -2639,37 +3747,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L10",
-      "weight": 1.0,
-      "source": "package_scripts",
-      "target": "package_scripts_harness_graphify",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L9",
-      "weight": 1.0,
-      "source": "package_scripts",
-      "target": "package_scripts_harness_status",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "package_scripts",
-      "target": "package_scripts_harness_tdd",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
       "source_location": "L7",
+      "weight": 1.0,
+      "source": "package_bin",
+      "target": "package_bin_synapse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L10",
       "weight": 1.0,
       "source": "package_scripts",
       "target": "package_scripts_test",
@@ -2680,6 +3768,16 @@
       "confidence": "EXTRACTED",
       "source_file": "package.json",
       "source_location": "L13",
+      "weight": 1.0,
+      "source": "package_dependencies",
+      "target": "package_dependencies_commander",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L16",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_jest",
@@ -2888,6 +3986,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "tests/synapse_cli.test.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_synapse_cli_test",
+      "target": "path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "tests/synapse_forge.test.js",
       "source_location": "L2",
       "weight": 1.0,
@@ -2985,6 +4094,36 @@
       "weight": 1.0,
       "source": "tests_passwordvalidator_test",
       "target": "tests_passwordvalidator_test_validatepassword",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/synapse_cli.test.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "tests_synapse_cli_test",
+      "target": "tests_synapse_cli_test_execsync",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/synapse_cli.test.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "tests_synapse_cli_test",
+      "target": "tests_synapse_cli_test_fs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/synapse_cli.test.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_synapse_cli_test",
+      "target": "tests_synapse_cli_test_path",
       "confidence_score": 1.0
     },
     {
@@ -4100,6 +5239,106 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "00_docs_global_setup_guide",
+      "target": "00_docs_global_setup_guide_guia_de_configura\u00e7\u00e3o_global_do_synapse_engine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "readme",
+      "target": "00_docs_global_setup_guide",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "00_docs_global_setup_guide_guia_de_configura\u00e7\u00e3o_global_do_synapse_engine",
+      "target": "00_docs_global_setup_guide_1_como_funciona_a_customiza\u00e7\u00e3o_global",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "00_docs_global_setup_guide_guia_de_configura\u00e7\u00e3o_global_do_synapse_engine",
+      "target": "00_docs_global_setup_guide_2_o_reposit\u00f3rio_de_habilidades_compartilhado_c_ag_skills",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "00_docs_global_setup_guide_guia_de_configura\u00e7\u00e3o_global_do_synapse_engine",
+      "target": "00_docs_global_setup_guide_3_passo_a_passo_do_setup_manual_alternativa_\u00e0_cli",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L79",
+      "weight": 1.0,
+      "source": "00_docs_global_setup_guide_guia_de_configura\u00e7\u00e3o_global_do_synapse_engine",
+      "target": "00_docs_global_setup_guide_4_verifica\u00e7\u00e3o_do_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "00_docs_global_setup_guide_1_como_funciona_a_customiza\u00e7\u00e3o_global",
+      "target": "00_docs_global_setup_guide_arquivos_cr\u00edticos_de_configura\u00e7\u00e3o",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "00_docs_global_setup_guide_3_passo_a_passo_do_setup_manual_alternativa_\u00e0_cli",
+      "target": "00_docs_global_setup_guide_passo_a_criar_a_estrutura_de_pastas",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "00_docs_global_setup_guide_3_passo_a_passo_do_setup_manual_alternativa_\u00e0_cli",
+      "target": "00_docs_global_setup_guide_passo_b_injetar_regras_globais_agents_md",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/global_setup_guide.md",
+      "source_location": "L64",
+      "weight": 1.0,
+      "source": "00_docs_global_setup_guide_3_passo_a_passo_do_setup_manual_alternativa_\u00e0_cli",
+      "target": "00_docs_global_setup_guide_passo_c_configurar_o_mapeador_de_skills_skills_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "00_docs/walkthrough.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -4276,8 +5515,348 @@
       "source": "gemini_antigravity_global_harness_control_plane_synapse_engine_hybrid_core_initialization",
       "target": "gemini_3_optimization_based_on_perfect_context_and_extractive_knowledge_graphify_mappings",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "readme",
+      "target": "readme_synapse_engine_v2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "readme_synapse_engine_v2",
+      "target": "readme_comandos_dispon\u00edveis",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "readme_synapse_engine_v2",
+      "target": "readme_como_instalar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L74",
+      "weight": 1.0,
+      "source": "readme_synapse_engine_v2",
+      "target": "readme_documenta\u00e7\u00e3o_de_arquitetura",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "readme_comandos_dispon\u00edveis",
+      "target": "readme_1_synapse_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "readme_comandos_dispon\u00edveis",
+      "target": "readme_2_synapse_update",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "readme_comandos_dispon\u00edveis",
+      "target": "readme_3_synapse_setup_global",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L56",
+      "weight": 1.0,
+      "source": "readme_comandos_dispon\u00edveis",
+      "target": "readme_4_synapse_status_args",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "readme_comandos_dispon\u00edveis",
+      "target": "readme_5_synapse_tdd",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "core_agents_bmad_master",
+      "target": "core_agents_bmad_master_bmad_master_core_methodology",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "core_agents_bmad_master_bmad_master_core_methodology",
+      "target": "core_agents_bmad_master_1_informational_authority_integration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "core_agents_bmad_master_bmad_master_core_methodology",
+      "target": "core_agents_bmad_master_2_bilingual_protocol",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "core_agents_bmad_master_bmad_master_core_methodology",
+      "target": "core_agents_bmad_master_3_sandboxing_temporary_environments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/bmad-master.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "core_agents_bmad_master_bmad_master_core_methodology",
+      "target": "core_agents_bmad_master_4_context_window_optimization_surgical_actions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/local-guardrails-policy.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "core_agents_local_guardrails_policy",
+      "target": "core_agents_local_guardrails_policy_local_guardrails_quality_policies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/local-guardrails-policy.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "core_agents_local_guardrails_policy_local_guardrails_quality_policies",
+      "target": "core_agents_local_guardrails_policy_1_exception_handling_constraints",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/local-guardrails-policy.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "core_agents_local_guardrails_policy_local_guardrails_quality_policies",
+      "target": "core_agents_local_guardrails_policy_2_test_driven_development_tdd_gate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/qa.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "core_agents_qa",
+      "target": "core_agents_qa_qa_engineer_role_guidelines",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/qa.md",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "core_agents_qa_qa_engineer_role_guidelines",
+      "target": "core_agents_qa_governance_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/qa.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "core_agents_qa_qa_engineer_role_guidelines",
+      "target": "core_agents_qa_phase_goal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/sm.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "core_agents_sm",
+      "target": "core_agents_sm_scrum_master_role_guidelines",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/sm.md",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "core_agents_sm_scrum_master_role_guidelines",
+      "target": "core_agents_sm_governance_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/sm.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "core_agents_sm_scrum_master_role_guidelines",
+      "target": "core_agents_sm_phase_goal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/ux-expert.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "core_agents_ux_expert",
+      "target": "core_agents_ux_expert_ux_ui_expert_role_guidelines",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/ux-expert.md",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "core_agents_ux_expert_ux_ui_expert_role_guidelines",
+      "target": "core_agents_ux_expert_design_guidelines",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "core/agents/ux-expert.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "core_agents_ux_expert_ux_ui_expert_role_guidelines",
+      "target": "core_agents_ux_expert_phase_goal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "templates/AGENTS.template.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "templates_agents_template",
+      "target": "templates_agents_template_local_agent_rules_project_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "templates/AGENTS.template.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "templates_agents_template",
+      "target": "templates_agents_template_local_governance_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "templates_claude_template",
+      "target": "templates_claude_template_agent_instructions_project_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "templates_claude_template_agent_instructions_project_name",
+      "target": "templates_claude_template_codebase_navigation_via_graphify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "templates_claude_template_agent_instructions_project_name",
+      "target": "templates_claude_template_commit_attribution",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "templates_claude_template_agent_instructions_project_name",
+      "target": "templates_claude_template_governance_state_machine_persona_shift_loop",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "templates_claude_template_agent_instructions_project_name",
+      "target": "templates_claude_template_overview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "templates/CLAUDE.template.md",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "templates_claude_template_agent_instructions_project_name",
+      "target": "templates_claude_template_physical_mechanical_commands",
+      "confidence_score": 1.0
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "8c389bbc20e91f90439c8df87a8204eab0710808"
+  "built_at_commit": "b050f77d3f4d91dd88e59442636f52aeb5468097"
 }

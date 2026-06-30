@@ -1,16 +1,16 @@
 # Graph Report - Synapse Engine  (2026-06-29)
 
 ## Corpus Check
-- 37 files · ~14,128 words
+- 51 files · ~18,786 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 220 nodes · 205 edges · 34 communities (31 shown, 3 thin omitted)
+- 300 nodes · 282 edges · 45 communities (41 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8c389bbc`
+- Built from commit: `b050f77d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -49,18 +49,29 @@
 - [[_COMMUNITY_Community 31|Community 31]]
 - [[_COMMUNITY_Community 32|Community 32]]
 - [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 38|Community 38]]
+- [[_COMMUNITY_Community 39|Community 39]]
+- [[_COMMUNITY_Community 40|Community 40]]
+- [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 43|Community 43]]
+- [[_COMMUNITY_Community 44|Community 44]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `SynapseEngineHybridEngine` - 7 edges
 2. `**Engenharia de Harness Avançada para Sistemas Multi-Agente: A Evolução do Método BMAD e a Integração Híbrida no Antigravity**` - 7 edges
 3. `Agent Instructions - Synapse Engine` - 6 edges
-4. `scripts` - 5 edges
-5. `BMAD Master Core Methodology` - 5 edges
-6. `**2\. A Evolução do Ecossistema: Da Rigidez Metodológica ao Hibridismo Dinâmico**` - 5 edges
-7. `**4\. Governança de Workspace e Padrões Metodológicos (Implementações Extraídas)**` - 5 edges
-8. `main()` - 4 edges
-9. `run_codebase_audit()` - 4 edges
-10. `Execution Guidelines - Local Software Architect` - 4 edges
+4. `🛠️ Comandos Disponíveis` - 6 edges
+5. `Agent Instructions - {{PROJECT_NAME}}` - 6 edges
+6. `BMAD Master Core Methodology` - 5 edges
+7. `**2\. A Evolução do Ecossistema: Da Rigidez Metodológica ao Hibridismo Dinâmico**` - 5 edges
+8. `**4\. Governança de Workspace e Padrões Metodológicos (Implementações Extraídas)**` - 5 edges
+9. `🌐 Guia de Configuração Global do Synapse Engine` - 5 edges
+10. `BMAD Master Core Methodology` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
@@ -68,11 +79,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (34 total, 3 thin omitted)
+## Communities (45 total, 4 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.17
-Nodes (11): description, devDependencies, jest, main, name, scripts, harness:graphify, harness:status (+3 more)
+Cohesion: 0.15
+Nodes (12): bin, synapse, dependencies, commander, description, devDependencies, jest, main (+4 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.20
@@ -139,8 +150,8 @@ Cohesion: 0.40
 Nodes (4): Execution Guidelines - Local Software Architect, 📜 Local Governance Rules, 📝 Next Steps, 🎯 Phase Goal
 
 ### Community 18 - "Community 18"
-Cohesion: 0.12
-Nodes (13): Path, Validates, installs, and runs Graphify for repository mapping., Orchestrates skill deployment based on metadata scope., Parses YAML frontmatter manually to avoid external dependencies like PyYAML., Deploys a skill manifest (SKILL.md) in the target directory folder., Creates semantic taxonomy directories and provides the MADR 4.0.0 template., SynapseEngineHybridEngine, { execSync } (+5 more)
+Cohesion: 0.10
+Nodes (16): Path, Validates, installs, and runs Graphify for repository mapping., Orchestrates skill deployment based on metadata scope., Parses YAML frontmatter manually to avoid external dependencies like PyYAML., Deploys a skill manifest (SKILL.md) in the target directory folder., Creates semantic taxonomy directories and provides the MADR 4.0.0 template., SynapseEngineHybridEngine, { execSync } (+8 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.40
@@ -194,19 +205,61 @@ Nodes (3): 📜 Governance Rules, 🎯 Phase Goal, Scrum Master Role & Guideline
 Cohesion: 0.50
 Nodes (3): 📜 Design Guidelines, 🎯 Phase Goal, UX/UI Expert Role & Guidelines
 
+### Community 34 - "Community 34"
+Cohesion: 0.10
+Nodes (18): 🏛️ 1. Como Funciona a Customização Global, 📦 2. O Repositório de Habilidades Compartilhado (`C:\AG SKILLS\`), 🛠️ 3. Passo a Passo do Setup Manual (Alternativa à CLI), 💻 4. Verificação do Setup, Arquivos Críticos de Configuração:, 🌐 Guia de Configuração Global do Synapse Engine, Passo A: Criar a Estrutura de Pastas, Passo B: Injetar Regras Globais (`AGENTS.md`) (+10 more)
+
+### Community 35 - "Community 35"
+Cohesion: 0.36
+Nodes (7): fs, main(), path, printUsage(), readState(), STATE_FILE_PATH, writeState()
+
+### Community 36 - "Community 36"
+Cohesion: 0.25
+Nodes (7): { Command }, CORE_AGENTS_DIR, { execSync, fork }, fs, path, program, TEMPLATES_DIR
+
+### Community 37 - "Community 37"
+Cohesion: 0.38
+Nodes (6): { execSync }, fs, getStagedFiles(), getTrackedFiles(), main(), path
+
+### Community 38 - "Community 38"
+Cohesion: 0.29
+Nodes (6): Agent Instructions - {{PROJECT_NAME}}, Codebase Navigation via Graphify, Commit Attribution, Governance & State Machine (Persona Shift Loop), Overview, Physical & Mechanical Commands
+
+### Community 39 - "Community 39"
+Cohesion: 0.33
+Nodes (5): 1. Informational Authority & Integration, 2. Bilingual Protocol, 3. Sandboxing & Temporary Environments, 4. Context Window Optimization (Surgical Actions), BMAD Master Core Methodology
+
+### Community 40 - "Community 40"
+Cohesion: 0.50
+Nodes (3): 1. Exception Handling Constraints, 2. Test-Driven Development (TDD) Gate, Local Guardrails & Quality Policies
+
+### Community 41 - "Community 41"
+Cohesion: 0.50
+Nodes (3): 📜 Governance Rules, 🎯 Phase Goal, QA Engineer Role & Guidelines
+
+### Community 42 - "Community 42"
+Cohesion: 0.50
+Nodes (3): 📜 Governance Rules, 🎯 Phase Goal, Scrum Master Role & Guidelines
+
+### Community 43 - "Community 43"
+Cohesion: 0.50
+Nodes (3): 📜 Design Guidelines, 🎯 Phase Goal, UX/UI Expert Role & Guidelines
+
 ## Knowledge Gaps
-- **109 isolated node(s):** `fs`, `path`, `STATE_FILE_PATH`, `fs`, `path` (+104 more)
+- **156 isolated node(s):** `fs`, `path`, `STATE_FILE_PATH`, `fs`, `path` (+151 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `**Engenharia de Harness Avançada para Sistemas Multi-Agente: A Evolução do Método BMAD e a Integração Híbrida no Antigravity**` connect `Community 2` to `Community 3`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+  _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **What connects `fs`, `path`, `STATE_FILE_PATH` to the rest of the system?**
-  _119 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _166 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.11764705882352941 - nodes in this community are weakly interconnected._
 - **Should `Community 18` be split into smaller, more focused modules?**
-  _Cohesion score 0.12121212121212122 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09846153846153846 - nodes in this community are weakly interconnected._
+- **Should `Community 34` be split into smaller, more focused modules?**
+  _Cohesion score 0.1 - nodes in this community are weakly interconnected._

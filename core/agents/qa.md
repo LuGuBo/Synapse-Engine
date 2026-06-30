@@ -1,6 +1,6 @@
 ---
 name: qa
-description: QA Engineer skill for BMAD development. Handles verification gates, execution of test suites, and writing delivery reports.
+description: "QA Engineer skill for BMAD development. Handles verification gates, execution of test suites, and writing delivery reports."
 scope: local
 always_on: false
 ---

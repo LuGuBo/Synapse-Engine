@@ -1,7 +1,7 @@
 {
   "package.json": {
-    "mtime": 1782738597.2594912,
-    "ast_hash": "39718dad2e699b62a6ca737b8c0a5b9b",
+    "mtime": 1782778388.7427006,
+    "ast_hash": "edcb221674bbe09a36f85379c934a3bc",
     "semantic_hash": ""
   },
   "src/passwordValidator.js": {
@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1782736810.4874277,
-    "ast_hash": "f864d6e9a1750375dab7a5f1d813b439",
+    "mtime": 1782771218.1513138,
+    "ast_hash": "238323afd722ee4e65a7a013a89c5d08",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -75,8 +75,8 @@
     "semantic_hash": ""
   },
   "src/synapse_forge.py": {
-    "mtime": 1782738584.9486551,
-    "ast_hash": "67104dfadf46cf6803a5561115b49d33",
+    "mtime": 1782778586.8617914,
+    "ast_hash": "df61cab0c01010f2834e88cd5f284ce2",
     "semantic_hash": ""
   },
   "tests/synapse_forge.test.js": {
@@ -115,22 +115,22 @@
     "semantic_hash": ""
   },
   ".agents/skills/local-guardrails-policy/SKILL.md": {
-    "mtime": 1782736824.5283103,
+    "mtime": 1782778546.4221606,
     "ast_hash": "3d37d51d5c5805ceb19edc0de53679bc",
     "semantic_hash": ""
   },
   ".agents/skills/qa/SKILL.md": {
-    "mtime": 1782736824.5283103,
+    "mtime": 1782778546.4221606,
     "ast_hash": "fddcb21f377418e0958d802c980f86df",
     "semantic_hash": ""
   },
   ".agents/skills/sm/SKILL.md": {
-    "mtime": 1782736824.5283103,
+    "mtime": 1782778546.4221606,
     "ast_hash": "f5cd24c1b680e23fcb915d986de19c52",
     "semantic_hash": ""
   },
   ".agents/skills/ux-expert/SKILL.md": {
-    "mtime": 1782736824.5283103,
+    "mtime": 1782778546.4221606,
     "ast_hash": "b2efdc99fd18c2df59ce32a1c5e55f5a",
     "semantic_hash": ""
   },
@@ -182,6 +182,76 @@
   "GEMINI.md": {
     "mtime": 1782734980.9187384,
     "ast_hash": "80502c314caed34f77f31b5b8799a6f1",
+    "semantic_hash": ""
+  },
+  "bin/state-manager.js": {
+    "mtime": 1782778469.7182276,
+    "ast_hash": "0de95e91ecae17892c2ddc177c79e17a",
+    "semantic_hash": ""
+  },
+  "bin/synapse-cli.js": {
+    "mtime": 1782778486.3919969,
+    "ast_hash": "5750116a2b27d0fcfeb050648cd08066",
+    "semantic_hash": ""
+  },
+  "bin/tdd-gate.js": {
+    "mtime": 1782778473.862915,
+    "ast_hash": "ecb815ab290041b7eb617ad76f3432f6",
+    "semantic_hash": ""
+  },
+  "templates/state.template.json": {
+    "mtime": 1782778414.5064807,
+    "ast_hash": "01d27864372ef55905301434303d69b1",
+    "semantic_hash": ""
+  },
+  "tests/synapse_cli.test.js": {
+    "mtime": 1782778536.3407803,
+    "ast_hash": "3bc89248f91063aa76315d3b2b767d94",
+    "semantic_hash": ""
+  },
+  "00_docs/global_setup_guide.md": {
+    "mtime": 1782778492.6787403,
+    "ast_hash": "2da7ee775e2a451b82563af73a31b800",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1782778503.1120496,
+    "ast_hash": "e58e4263a1f68a5f570d199cf6ef3021",
+    "semantic_hash": ""
+  },
+  "core/agents/bmad-master.md": {
+    "mtime": 1782735016.4971497,
+    "ast_hash": "382c645d753524fdbfad3800246a1a65",
+    "semantic_hash": ""
+  },
+  "core/agents/local-guardrails-policy.md": {
+    "mtime": 1782735042.028656,
+    "ast_hash": "0c08441466ae5c2e1708dee6d7eac08f",
+    "semantic_hash": ""
+  },
+  "core/agents/qa.md": {
+    "mtime": 1782735022.5281415,
+    "ast_hash": "8351f688a8c50c0459973ce1f6642553",
+    "semantic_hash": ""
+  },
+  "core/agents/sm.md": {
+    "mtime": 1782735030.2499106,
+    "ast_hash": "be759aa5e3bdcdddbdf92fe96eeb0655",
+    "semantic_hash": ""
+  },
+  "core/agents/ux-expert.md": {
+    "mtime": 1782735036.2925684,
+    "ast_hash": "f16da9730ce08cf706de9039fd09a07a",
+    "semantic_hash": ""
+  },
+  "templates/AGENTS.template.md": {
+    "mtime": 1782778423.9935338,
+    "ast_hash": "e450e01d6a15fca65a902c7080f283c2",
+    "semantic_hash": ""
+  },
+  "templates/CLAUDE.template.md": {
+    "mtime": 1782778419.3195632,
+    "ast_hash": "7bd009ad6a0ddc77b1c5738bd0c09c54",
     "semantic_hash": ""
   }
 }
