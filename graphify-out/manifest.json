@@ -19,24 +19,9 @@
     "ast_hash": "0c24f0f1eace5b318ec1ddfe81106c52",
     "semantic_hash": ""
   },
-  "00_docs/PLAN.md": {
-    "mtime": 1781793517.1954203,
-    "ast_hash": "660919bc6aacf0303a15edc004b6cbc4",
-    "semantic_hash": ""
-  },
   "00_docs/README.md": {
     "mtime": 1781574146.4129198,
     "ast_hash": "f3f0dbf93f250f75c2576f27a40760c1",
-    "semantic_hash": ""
-  },
-  "00_docs/SPEC.md": {
-    "mtime": 1781793509.950925,
-    "ast_hash": "67ed2f467d769b9a88aab6e224fb64cd",
-    "semantic_hash": ""
-  },
-  "00_docs/walkthrough.md": {
-    "mtime": 1782217866.5481615,
-    "ast_hash": "6dcb31e7c0e3c3eab89267ba9c03a513",
     "semantic_hash": ""
   },
   "AGENTS.md": {
@@ -105,32 +90,32 @@
     "semantic_hash": ""
   },
   ".agents/skills/grill-and-evolve/SKILL.md": {
-    "mtime": 1781793580.112614,
-    "ast_hash": "313a9442a470b70445b81493f9e3b49a",
+    "mtime": 1783107816.9987447,
+    "ast_hash": "f7952db3ae9e619e7e306e057eb8dee7",
     "semantic_hash": ""
   },
   ".agents/skills/harness_dynamic_index/SKILL.md": {
-    "mtime": 1781793585.655762,
-    "ast_hash": "626b5cdf525d6097e5ef12d62ca11e49",
+    "mtime": 1783107820.8260818,
+    "ast_hash": "b07f129d237bc7f18ca5ce5ffb2af8e0",
     "semantic_hash": ""
   },
   ".agents/skills/local-guardrails-policy/SKILL.md": {
-    "mtime": 1782778546.4221606,
+    "mtime": 1782778594.212584,
     "ast_hash": "3d37d51d5c5805ceb19edc0de53679bc",
     "semantic_hash": ""
   },
   ".agents/skills/qa/SKILL.md": {
-    "mtime": 1782778546.4221606,
+    "mtime": 1782778594.212584,
     "ast_hash": "fddcb21f377418e0958d802c980f86df",
     "semantic_hash": ""
   },
   ".agents/skills/sm/SKILL.md": {
-    "mtime": 1782778546.4221606,
+    "mtime": 1782778594.212584,
     "ast_hash": "f5cd24c1b680e23fcb915d986de19c52",
     "semantic_hash": ""
   },
   ".agents/skills/ux-expert/SKILL.md": {
-    "mtime": 1782778546.4221606,
+    "mtime": 1782778594.212584,
     "ast_hash": "b2efdc99fd18c2df59ce32a1c5e55f5a",
     "semantic_hash": ""
   },
@@ -175,8 +160,8 @@
     "semantic_hash": ""
   },
   "00_docs/04_adrs/0002-harness-refinement-spec.md": {
-    "mtime": 1782723337.3203597,
-    "ast_hash": "cf0478290e3e5a98b92c9f7a4375815d",
+    "mtime": 1783107780.6268559,
+    "ast_hash": "12232bc7ad2cc624fce9963efd2b8681",
     "semantic_hash": ""
   },
   "GEMINI.md": {
@@ -207,11 +192,6 @@
   "tests/synapse_cli.test.js": {
     "mtime": 1782778536.3407803,
     "ast_hash": "3bc89248f91063aa76315d3b2b767d94",
-    "semantic_hash": ""
-  },
-  "00_docs/global_setup_guide.md": {
-    "mtime": 1782778492.6787403,
-    "ast_hash": "2da7ee775e2a451b82563af73a31b800",
     "semantic_hash": ""
   },
   "README.md": {
@@ -252,6 +232,51 @@
   "templates/CLAUDE.template.md": {
     "mtime": 1782778419.3195632,
     "ast_hash": "7bd009ad6a0ddc77b1c5738bd0c09c54",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/boss.md": {
+    "mtime": 1783107798.5533862,
+    "ast_hash": "256615131c5b6239c3329b00c2cb2edb",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/dev.md": {
+    "mtime": 1783107790.7800329,
+    "ast_hash": "dc754e8caa85c0cf7fcc9596fd09b4d0",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/pm.md": {
+    "mtime": 1783107785.6018827,
+    "ast_hash": "0cdb025e92d487dc78f9b27db20c7800",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/qa.md": {
+    "mtime": 1783107794.5804708,
+    "ast_hash": "ea9894557099bc3ee6ea3bee1db0014e",
+    "semantic_hash": ""
+  },
+  "00_docs/01_prd/SPEC.md": {
+    "mtime": 1783107758.902948,
+    "ast_hash": "8a7e652300e83890fe9c8c40a88adc64",
+    "semantic_hash": ""
+  },
+  "00_docs/02_tech_specs/PLAN.md": {
+    "mtime": 1783107763.0719116,
+    "ast_hash": "a35f39b1367a3ffa661f84d01452730c",
+    "semantic_hash": ""
+  },
+  "00_docs/02_tech_specs/walkthrough.md": {
+    "mtime": 1783107768.227779,
+    "ast_hash": "87fdbd6f68f63a6437cc89d01654818f",
+    "semantic_hash": ""
+  },
+  "00_docs/03_rules/global_setup_guide.md": {
+    "mtime": 1783107772.8999016,
+    "ast_hash": "2da7ee775e2a451b82563af73a31b800",
+    "semantic_hash": ""
+  },
+  "execution.json": {
+    "mtime": 1783107825.3981674,
+    "ast_hash": "8e9f3a952bbb57383a28857349c24d93",
     "semantic_hash": ""
   }
 }

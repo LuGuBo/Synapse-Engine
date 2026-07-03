@@ -1,0 +1,31 @@
+{
+  "project_name": "Synapse Engine",
+  "protocol_version": "S.T.O.P. 2.0 / BMAD 4.0",
+  "status": "IN_COMPLIANCE",
+  "last_audit": "2026-07-03T19:44:00-03:00",
+  "orchestrator": {
+    "engine": "Google Antigravity",
+    "cli": "boss",
+    "graph_indexer": "graphifyy"
+  },
+  "quality_gates": {
+    "gate_0_linter": {
+      "status": "PASSED",
+      "description": "Syntax, static audit, and exception silences verification"
+    },
+    "gate_1_tdd": {
+      "status": "PASSED",
+      "description": "Unit tests and TDD loop compliance"
+    },
+    "gate_2_integration": {
+      "status": "PASSED",
+      "description": "Graphify AST integration and architectural integrity"
+    }
+  },
+  "active_personas": ["PM", "ARCHITECT", "DEVELOPER", "QA", "BOSS"],
+  "skills_compliance": {
+    "local-guardrails-policy": { "always_on": true },
+    "grill-and-evolve": { "always_on": true },
+    "harness_dynamic_index": { "always_on": true }
+  }
+}

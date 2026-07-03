@@ -9,8 +9,8 @@ This document defines the functional requirements for the custom skill `grill-an
 ## 📜 Functional Requirements
 
 - **REQ-GE-001**: Custom Skill structure and metadata in English:
-  - Create the folder structure `.agent/skills/grill-and-evolve/`.
-  - Create `.agent/skills/grill-and-evolve/SKILL.md` containing a YAML frontmatter block defining `name: grill-and-evolve` and the appropriate `description` in English (consistent with the Bilingual Rule).
+  - Create the folder structure `.agents/skills/grill-and-evolve/`.
+  - Create `.agents/skills/grill-and-evolve/SKILL.md` containing a YAML frontmatter block defining `name: grill-and-evolve` and the appropriate `description` in English (consistent with the Bilingual Rule).
 
 - **REQ-GE-002**: Niche Viability Calculations:
   - Implement a calculation function for Niche Viability ($V_n$) where:
@@ -19,7 +19,7 @@ This document defines the functional requirements for the custom skill `grill-an
 
 - **REQ-GE-003**: Codebase Exception Audit:
   - Inspect codebase files recursively for Python `.py` source files.
-  - Exclude system/temporary directories: `node_modules`, `.git`, `.agents`, `.agent`, `venv`, `__pycache__`.
+  - Exclude system/temporary directories: `node_modules`, `.git`, `.agents`, `venv`, `__pycache__`.
   - Flag violations for generic exceptions (`except Exception:` or `except:`) immediately followed by silencers like `pass` or `continue` within the next two active lines.
 
 - **REQ-GE-004**: Command-Line Interface (CLI):

@@ -1,3 +1,10 @@
+---
+status: Accepted
+date: 2026-07-03
+decision_maker: AI Agent & Tech Lead
+madr_version: 4.0.0
+---
+
 # **Engenharia de Harness Avançada para Sistemas Multi-Agente: A Evolução do Método BMAD e a Integração Híbrida no Antigravity**
 
 A engenharia de software governada por Inteligência Artificial atravessa um ponto de inflexão crítico. A indústria superou a fase inicial de geração estocástica de código — caracterizada por modelos que atuavam como meros assistentes de preenchimento automático — para adentrar a era arquitetural da Orquestração de Agentes e da Engenharia de Harness (Harness Engineering). Neste novo paradigma, o gargalo central do desenvolvimento não reside mais na velocidade de digitação de implementações sintáticas, mas sim na sofisticação do design de sistemas, na gestão implacável do contexto da janela de tokens, na definição de limites operacionais (guardrails), na automatização de ciclos de revisão e nas práticas de ambiente que permitem que modelos fundacionais operem com autonomia confiável e repetível.1  

@@ -1,6 +1,7 @@
 ---
 name: harness_dynamic_index
 description: "Local Domain Index (BMAD Harness). Accessory for local rules, validations, tests, and structural audits specific to the BmadHarness project. Maps local agent skills for TDD harness execution and simplicity."
+always_on: true
 ---
 
 # BMAD Harness - Domain Skills Index (Local Validation Logic)

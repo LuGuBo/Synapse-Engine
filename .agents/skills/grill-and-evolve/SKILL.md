@@ -1,7 +1,7 @@
 ---
 name: grill-and-evolve
 description: "Custom skill to perform static audits of exception handling in Python codebases, calculate strategic niche viability metrics, and apply Karpathy's software design simplicity guidelines using Socratic questioning and refinement loops (/grill-me)."
-always_on: false
+always_on: true
 ---
 
 # Skill: grill-and-evolve (Karpathy Simplicity & Codebase Audit)
