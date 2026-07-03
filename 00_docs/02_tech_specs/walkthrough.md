@@ -1,6 +1,6 @@
-# Walkthrough: Execução da Conformidade e Retrofit do Synapse Engine
+# Walkthrough: Execução da Conformidade, Quality Gates & Importação do Karpathy Autoresearch
 
-Este documento detalha o conjunto de alterações executadas para colocar o repositório **Synapse Engine** em 100% de conformidade arquitetural e operacional com os padrões BMAD 4.0, MADR 4.0.0, Graphifyy AST, Workflows de Persona Antigravity e o Protocolo S.T.O.P.
+Este documento consolida a execução final do plano de implementação, englobando o retrofit de conformidade do **Synapse Engine**, a ativação automatizada das portas de qualidade via Git Hooks, a importação direta do repositório oficial **`karpathy/autoresearch`** e a sincronização completa no GitHub.
 
 ---
 
@@ -20,6 +20,8 @@ Conforme estipulado no padrão de governança BMAD (`AGENTS.md`), segue o regist
 | :--- | :--- | :--- |
 | `bmad-master` | Global (`~/.gemini/config`) | Supremacia da documentação, Protocolo Bilíngue e estrutura BMAD Core. |
 | `ag_master_index` | Global (`~/.gemini/config`) | Roteamento do catálogo mestre de habilidades. |
+| `autoresearch` | Global (`C:\AG SKILLS\autoresearch`) | Skill offline global importada do repositório `karpathy/autoresearch` (Invocação pontual JIT-Skills). |
+| `product-manager-toolkit` | Global (`C:\AG SKILLS`) | RICE Prioritization & Matriz Value vs Effort para o PM Roadmap. |
 | `harness_dynamic_index` | Local (`.agents/skills`) | Indexação de regras e validações locais do projeto Synapse Engine. |
 | `local-guardrails-policy` | Local (`.agents/skills`) | Auditoria de exceções genéricas e política TDD com `always_on: true`. |
 | `grill-and-evolve` | Local (`.agents/skills`) | Protocolo Socrático /grill-me e restrições de simplicidade do Karpathy. |
@@ -29,41 +31,27 @@ Conforme estipulado no padrão de governança BMAD (`AGENTS.md`), segue o regist
 
 ## 🛠️ Alterações Executadas
 
-### 1. Bootstrap de Governança & Taxonomia de Documentação (`00_docs/`)
-- **Migração Ordinal não-destrutiva**:
-  - `SPEC.md` migrado para [00_docs/01_prd/SPEC.md](file:///c:/AG%20PROJETOS/Synapse%20Engine/00_docs/01_prd/SPEC.md).
-  - `PLAN.md` migrado para [00_docs/02_tech_specs/PLAN.md](file:///c:/AG%20PROJETOS/Synapse%20Engine/00_docs/02_tech_specs/PLAN.md).
-  - `walkthrough.md` migrado para [00_docs/02_tech_specs/walkthrough.md](file:///c:/AG%20PROJETOS/Synapse%20Engine/00_docs/02_tech_specs/walkthrough.md).
-  - `global_setup_guide.md` migrado para [00_docs/03_rules/global_setup_guide.md](file:///c:/AG%20PROJETOS/Synapse%20Engine/00_docs/03_rules/global_setup_guide.md).
-- **Remoção de Legados Soltos**: Limpeza dos arquivos duplicados na raiz de `00_docs/`.
-- **Retrofit MADR 4.0.0**: Atualização do arquivo [0002-harness-refinement-spec.md](file:///c:/AG%20PROJETOS/Synapse%20Engine/00_docs/04_adrs/0002-harness-refinement-spec.md) com inclusão do cabeçalho YAML frontmatter (`status: Accepted`, `date: 2026-07-03`, `madr_version: 4.0.0`).
+### 1. Pre-Commit Quality Gates (`.git/hooks/pre-commit`)
+- **Automação de Trava de Qualidade**: Criado o hook `.git/hooks/pre-commit` acionado automaticamente no `git commit`:
+  - **Gate 0**: `python .agents/skills/grill-and-evolve/scripts/analyze_project_metrics.py --audit-only` (Bloqueia commits com erros estáticos ou exceções genéricas silenciadas).
+  - **Gate 1**: `node bin/tdd-gate.js` e `npm test` (Bloqueia commits se houver testes falhando).
 
-### 2. Workflows de Persona Antigravity (`.agents/workflows/`)
-Instanciada a pasta de workflows com suporte aos atalhos de persona:
-- [/pm](file:///c:/AG%20PROJETOS/Synapse%20Engine/.agents/workflows/pm.md): Elicitação e especificação de requisitos.
-- [/dev](file:///c:/AG%20PROJETOS/Synapse%20Engine/.agents/workflows/dev.md): Desenvolvimento TDD e Karpathy Rules.
-- [/qa](file:///c:/AG%20PROJETOS/Synapse%20Engine/.agents/workflows/qa.md): Suítes de validação e Quality Gates.
-- [/boss](file:///c:/AG%20PROJETOS/Synapse%20Engine/.agents/workflows/boss.md): Orquestração multi-agente e gerenciamento de sprints com a CLI `boss`.
+### 2. Centralização Global do Repositório `karpathy/autoresearch` (`C:\AG SKILLS\`)
+- Arquivos oficiais do repositório de Andrej Karpathy (`https://github.com/karpathy/autoresearch`) gravados centralizadamente no repositório global `C:\AG SKILLS\autoresearch\` sem poluir o workspace local:
+  - `program.md`: Instrução original do Karpathy para ciclos autônomos de pesquisa.
+  - `README.md`: Documentação oficial do Karpathy.
+  - `SKILL.md`: Manifesto da skill instanciado em `C:\AG SKILLS\autoresearch\SKILL.md`.
+  - Atualizado o catálogo mestre em `C:\Users\lgbon\.gemini\config\skills\ag_master_index\SKILL.md`.
 
-### 3. Injeção de Grafo & Graphifyy
-- Instalação e sincronização do pacote `graphifyy` (v0.8.50).
-- Re-indexação completa da topologia AST do repositório via `graphify update`.
-- Atualizados os artefatos em `graphify-out/`:
-  - `graph.json` (312 nós, 289 arestas, 48 comunidades).
-  - `GRAPH_REPORT.md` e `graph.html`.
-
-### 4. Telemetria & Quality Gates (S.T.O.P. Protocol)
-- Instanciado o arquivo de telemetria central [execution.json](file:///c:/AG%20PROJETOS/Synapse%20Engine/execution.json) mapeando os Quality Gates 0, 1 e 2.
-- Atualizado o frontmatter YAML das skills locais em `.agents/skills/` com a tag `always_on: true`:
-  - [local-guardrails-policy](file:///c:/AG%20PROJETOS/Synapse%20Engine/.agents/skills/local-guardrails-policy/SKILL.md)
-  - [grill-and-evolve](file:///c:/AG%20PROJETOS/Synapse%20Engine/.agents/skills/grill-and-evolve/SKILL.md)
-  - [harness_dynamic_index](file:///c:/AG%20PROJETOS/Synapse%20Engine/.agents/skills/harness_dynamic_index/SKILL.md)
+### 3. Sincronização e Push no GitHub
+- Executado o `git commit` com acionamento e aprovação automática de todos os Quality Gates.
+- Executado o `git push origin master` sincronizando as commits no repositório remoto **`LuGuBo/Synapse-Engine`**.
 
 ---
 
 ## 🧪 Validação dos Testes
 
-Executada a suíte de testes de integração via Jest:
+Executada a suíte de testes de integração via Jest durante o disparo do Pre-commit Hook:
 ```bash
 npm test
 ```
@@ -75,4 +63,4 @@ npm test
   - `analyze_project_metrics.test.js` (PASS)
   - `synapse_cli.test.js` (PASS)
   - `synapse_forge.test.js` (PASS)
-- **Tempo total de execução**: 2,86s.
+- **Status da Integração**: Sincronização concluída com sucesso no GitHub.

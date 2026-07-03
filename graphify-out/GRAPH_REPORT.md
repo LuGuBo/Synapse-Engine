@@ -1,16 +1,16 @@
 # Graph Report - Synapse Engine  (2026-07-03)
 
 ## Corpus Check
-- 66 files · ~20,400 words
+- 67 files · ~20,748 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 312 nodes · 289 edges · 50 communities (42 shown, 8 thin omitted)
+- 323 nodes · 299 edges · 50 communities (42 shown, 8 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `887769ee`
+- Built from commit: `7689efc4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -73,10 +73,10 @@
 4. `🛠️ Comandos Disponíveis` - 6 edges
 5. `Agent Instructions - {{PROJECT_NAME}}` - 6 edges
 6. `BMAD Master Core Methodology` - 5 edges
-7. `🌐 Guia de Configuração Global do Synapse Engine` - 5 edges
-8. `**2\. A Evolução do Ecossistema: Da Rigidez Metodológica ao Hibridismo Dinâmico**` - 5 edges
-9. `**4\. Governança de Workspace e Padrões Metodológicos (Implementações Extraídas)**` - 5 edges
-10. `BMAD Master Core Methodology` - 5 edges
+7. `🛠️ Alterações Executadas` - 5 edges
+8. `🌐 Guia de Configuração Global do Synapse Engine` - 5 edges
+9. `**2\. A Evolução do Ecossistema: Da Rigidez Metodológica ao Hibridismo Dinâmico**` - 5 edges
+10. `**4\. Governança de Workspace e Padrões Metodológicos (Implementações Extraídas)**` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
@@ -123,12 +123,12 @@ Cohesion: 0.36
 Nodes (7): audit_file_for_exception_silencing(), calculate_niche_viability(), main(), Scans a Python file for generic exceptions followed by pass or continue     with, Recursively scans the directory for Python files, excluding system/temp dirs., Calculates the Niche Viability (Vn).     Formula: Vn = (US * PM) / (CL * AC), run_codebase_audit()
 
 ### Community 9 - "Community 9"
-Cohesion: 0.36
-Nodes (7): fs, main(), path, printUsage(), readState(), STATE_FILE_PATH, writeState()
-
-### Community 10 - "Community 10"
 Cohesion: 0.38
 Nodes (6): { execSync }, fs, getStagedFiles(), getTrackedFiles(), main(), path
+
+### Community 10 - "Community 10"
+Cohesion: 0.50
+Nodes (3): 🧠 Core Philosophy & Architecture, Skill: Autoresearch (Official Andrej Karpathy Framework), 🔄 The Keep or Discard Loop
 
 ### Community 11 - "Community 11"
 Cohesion: 0.29
@@ -155,16 +155,16 @@ Cohesion: 0.33
 Nodes (5): 1. Informational Authority & Integration, 2. Bilingual Protocol, 3. Sandboxing & Temporary Environments, 4. Context Window Optimization (Surgical Actions), BMAD Master Core Methodology
 
 ### Community 18 - "Community 18"
-Cohesion: 0.10
-Nodes (16): Path, Validates, installs, and runs Graphify for repository mapping., Orchestrates skill deployment based on metadata scope., Parses YAML frontmatter manually to avoid external dependencies like PyYAML., Deploys a skill manifest (SKILL.md) in the target directory folder., Creates semantic taxonomy directories and provides the MADR 4.0.0 template., SynapseEngineHybridEngine, { execSync } (+8 more)
+Cohesion: 0.08
+Nodes (23): fs, main(), path, printUsage(), readState(), STATE_FILE_PATH, writeState(), Path (+15 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.40
 Nodes (4): 🧪 Acceptance Criteria, 📜 Functional Requirements, 🎯 Product Goals, Specification: Custom Skill "grill-and-evolve"
 
 ### Community 21 - "Community 21"
-Cohesion: 0.40
-Nodes (4): 📦 Artefatos Desenvolvidos e Entregues, 🧪 Casos de Testes Validados, 🛠️ Checklist de Verificação Físico-Mecânica, Walkthrough: Entrega da Sandbox e da Skill Customizada "grill-and-evolve"
+Cohesion: 0.17
+Nodes (11): 1. Bootstrap de Governança & Taxonomia de Documentação (`00_docs/`), 2. Workflows de Persona Antigravity (`.agents/workflows/`), 3. Injeção de Grafo & Graphifyy, 4. Telemetria & Quality Gates (S.T.O.P. Protocol), 🎭 Agentes Mobilizados (Personas), 🤖 Agentes Utilizados & Skills Invocadas, 🛠️ Alterações Executadas, Resultados obtidos: (+3 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.40
@@ -255,7 +255,7 @@ Cohesion: 0.50
 Nodes (3): 📜 Design Guidelines, 🎯 Phase Goal, UX/UI Expert Role & Guidelines
 
 ## Knowledge Gaps
-- **160 isolated node(s):** `fs`, `path`, `STATE_FILE_PATH`, `fs`, `path` (+155 more)
+- **166 isolated node(s):** `fs`, `path`, `STATE_FILE_PATH`, `fs`, `path` (+161 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -263,10 +263,10 @@ Nodes (3): 📜 Design Guidelines, 🎯 Phase Goal, UX/UI Expert Role & Guidelin
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `**Engenharia de Harness Avançada para Sistemas Multi-Agente: A Evolução do Método BMAD e a Integração Híbrida no Antigravity**` connect `Community 1` to `Community 2`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **What connects `fs`, `path`, `STATE_FILE_PATH` to the rest of the system?**
-  _170 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _176 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.11764705882352941 - nodes in this community are weakly interconnected._
 - **Should `Community 18` be split into smaller, more focused modules?**
-  _Cohesion score 0.09846153846153846 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0766488413547237 - nodes in this community are weakly interconnected._

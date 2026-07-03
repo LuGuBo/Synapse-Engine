@@ -90,7 +90,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_bin_tdd_gate",
-      "community": 10,
+      "community": 9,
       "norm_label": "tdd-gate.js"
     },
     {
@@ -100,7 +100,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_bin_tdd_gate_fs",
-      "community": 10,
+      "community": 9,
       "norm_label": "fs"
     },
     {
@@ -110,7 +110,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "agents_bin_tdd_gate_path",
-      "community": 10,
+      "community": 9,
       "norm_label": "path"
     },
     {
@@ -120,7 +120,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "agents_bin_tdd_gate_execsync",
-      "community": 10,
+      "community": 9,
       "norm_label": "{ execsync }"
     },
     {
@@ -130,7 +130,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "agents_bin_tdd_gate_getstagedfiles",
-      "community": 10,
+      "community": 9,
       "norm_label": "getstagedfiles()"
     },
     {
@@ -140,7 +140,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "agents_bin_tdd_gate_gettrackedfiles",
-      "community": 10,
+      "community": 9,
       "norm_label": "gettrackedfiles()"
     },
     {
@@ -150,7 +150,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "agents_bin_tdd_gate_main",
-      "community": 10,
+      "community": 9,
       "norm_label": "main()"
     },
     {
@@ -310,7 +310,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "bin_state_manager",
-      "community": 9,
+      "community": 18,
       "norm_label": "state-manager.js"
     },
     {
@@ -320,7 +320,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "bin_state_manager_fs",
-      "community": 9,
+      "community": 18,
       "norm_label": "fs"
     },
     {
@@ -330,7 +330,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "bin_state_manager_path",
-      "community": 9,
+      "community": 18,
       "norm_label": "path"
     },
     {
@@ -340,7 +340,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "bin_state_manager_state_file_path",
-      "community": 9,
+      "community": 18,
       "norm_label": "state_file_path"
     },
     {
@@ -350,7 +350,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "bin_state_manager_readstate",
-      "community": 9,
+      "community": 18,
       "norm_label": "readstate()"
     },
     {
@@ -360,7 +360,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "bin_state_manager_writestate",
-      "community": 9,
+      "community": 18,
       "norm_label": "writestate()"
     },
     {
@@ -370,7 +370,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "bin_state_manager_printusage",
-      "community": 9,
+      "community": 18,
       "norm_label": "printusage()"
     },
     {
@@ -380,7 +380,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "bin_state_manager_main",
-      "community": 9,
+      "community": 18,
       "norm_label": "main()"
     },
     {
@@ -1162,6 +1162,46 @@
       "id": "agents_rules_qa_rules_next_steps",
       "community": 27,
       "norm_label": "\ud83d\udcdd next steps"
+    },
+    {
+      "label": "SKILL.md",
+      "file_type": "document",
+      "source_file": ".agents/skills/autoresearch/SKILL.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "agents_skills_autoresearch_skill",
+      "community": 10,
+      "norm_label": "skill.md"
+    },
+    {
+      "label": "Skill: Autoresearch (Official Andrej Karpathy Framework)",
+      "file_type": "document",
+      "source_file": ".agents/skills/autoresearch/SKILL.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "agents_skills_autoresearch_skill_skill_autoresearch_official_andrej_karpathy_framework",
+      "community": 10,
+      "norm_label": "skill: autoresearch (official andrej karpathy framework)"
+    },
+    {
+      "label": "\ud83e\udde0 Core Philosophy & Architecture",
+      "file_type": "document",
+      "source_file": ".agents/skills/autoresearch/SKILL.md",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "agents_skills_autoresearch_skill_core_philosophy_architecture",
+      "community": 10,
+      "norm_label": "\ud83e\udde0 core philosophy & architecture"
+    },
+    {
+      "label": "\ud83d\udd04 The Keep or Discard Loop",
+      "file_type": "document",
+      "source_file": ".agents/skills/autoresearch/SKILL.md",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "agents_skills_autoresearch_skill_the_keep_or_discard_loop",
+      "community": 10,
+      "norm_label": "\ud83d\udd04 the keep or discard loop"
     },
     {
       "label": "SKILL.md",
@@ -2034,44 +2074,114 @@
       "norm_label": "walkthrough.md"
     },
     {
-      "label": "Walkthrough: Entrega da Sandbox e da Skill Customizada \"grill-and-evolve\"",
+      "label": "Walkthrough: Execu\u00e7\u00e3o da Conformidade e Retrofit do Synapse Engine",
       "file_type": "document",
       "source_file": "00_docs/02_tech_specs/walkthrough.md",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "00_docs_02_tech_specs_walkthrough_walkthrough_entrega_da_sandbox_e_da_skill_customizada_grill_and_evolve",
+      "id": "00_docs_02_tech_specs_walkthrough_walkthrough_execu\u00e7\u00e3o_da_conformidade_e_retrofit_do_synapse_engine",
       "community": 21,
-      "norm_label": "walkthrough: entrega da sandbox e da skill customizada \"grill-and-evolve\""
+      "norm_label": "walkthrough: execucao da conformidade e retrofit do synapse engine"
     },
     {
-      "label": "\ud83d\udee0\ufe0f Checklist de Verifica\u00e7\u00e3o F\u00edsico-Mec\u00e2nica",
+      "label": "\ud83e\udd16 Agentes Utilizados & Skills Invocadas",
       "file_type": "document",
       "source_file": "00_docs/02_tech_specs/walkthrough.md",
-      "source_location": "L5",
+      "source_location": "L7",
       "_origin": "ast",
-      "id": "00_docs_02_tech_specs_walkthrough_checklist_de_verifica\u00e7\u00e3o_f\u00edsico_mec\u00e2nica",
+      "id": "00_docs_02_tech_specs_walkthrough_agentes_utilizados_skills_invocadas",
       "community": 21,
-      "norm_label": "\ud83d\udee0\ufe0f checklist de verificacao fisico-mecanica"
+      "norm_label": "\ud83e\udd16 agentes utilizados & skills invocadas"
     },
     {
-      "label": "\ud83e\uddea Casos de Testes Validados",
+      "label": "\ud83c\udfad Agentes Mobilizados (Personas)",
       "file_type": "document",
       "source_file": "00_docs/02_tech_specs/walkthrough.md",
-      "source_location": "L20",
+      "source_location": "L11",
       "_origin": "ast",
-      "id": "00_docs_02_tech_specs_walkthrough_casos_de_testes_validados",
+      "id": "00_docs_02_tech_specs_walkthrough_agentes_mobilizados_personas",
       "community": 21,
-      "norm_label": "\ud83e\uddea casos de testes validados"
+      "norm_label": "\ud83c\udfad agentes mobilizados (personas)"
     },
     {
-      "label": "\ud83d\udce6 Artefatos Desenvolvidos e Entregues",
+      "label": "\ud83d\udee0\ufe0f Skills Invocadas (Globais, Locais e Offline)",
       "file_type": "document",
       "source_file": "00_docs/02_tech_specs/walkthrough.md",
-      "source_location": "L29",
+      "source_location": "L18",
       "_origin": "ast",
-      "id": "00_docs_02_tech_specs_walkthrough_artefatos_desenvolvidos_e_entregues",
+      "id": "00_docs_02_tech_specs_walkthrough_skills_invocadas_globais_locais_e_offline",
       "community": 21,
-      "norm_label": "\ud83d\udce6 artefatos desenvolvidos e entregues"
+      "norm_label": "\ud83d\udee0\ufe0f skills invocadas (globais, locais e offline)"
+    },
+    {
+      "label": "\ud83d\udee0\ufe0f Altera\u00e7\u00f5es Executadas",
+      "file_type": "document",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "00_docs_02_tech_specs_walkthrough_altera\u00e7\u00f5es_executadas",
+      "community": 21,
+      "norm_label": "\ud83d\udee0\ufe0f alteracoes executadas"
+    },
+    {
+      "label": "1. Bootstrap de Governan\u00e7a & Taxonomia de Documenta\u00e7\u00e3o (`00_docs/`)",
+      "file_type": "document",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "00_docs_02_tech_specs_walkthrough_1_bootstrap_de_governan\u00e7a_taxonomia_de_documenta\u00e7\u00e3o_00_docs",
+      "community": 21,
+      "norm_label": "1. bootstrap de governanca & taxonomia de documentacao (`00_docs/`)"
+    },
+    {
+      "label": "2. Workflows de Persona Antigravity (`.agents/workflows/`)",
+      "file_type": "document",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L41",
+      "_origin": "ast",
+      "id": "00_docs_02_tech_specs_walkthrough_2_workflows_de_persona_antigravity_agents_workflows",
+      "community": 21,
+      "norm_label": "2. workflows de persona antigravity (`.agents/workflows/`)"
+    },
+    {
+      "label": "3. Inje\u00e7\u00e3o de Grafo & Graphifyy",
+      "file_type": "document",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L48",
+      "_origin": "ast",
+      "id": "00_docs_02_tech_specs_walkthrough_3_inje\u00e7\u00e3o_de_grafo_graphifyy",
+      "community": 21,
+      "norm_label": "3. injecao de grafo & graphifyy"
+    },
+    {
+      "label": "4. Telemetria & Quality Gates (S.T.O.P. Protocol)",
+      "file_type": "document",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L55",
+      "_origin": "ast",
+      "id": "00_docs_02_tech_specs_walkthrough_4_telemetria_quality_gates_s_t_o_p_protocol",
+      "community": 21,
+      "norm_label": "4. telemetria & quality gates (s.t.o.p. protocol)"
+    },
+    {
+      "label": "\ud83e\uddea Valida\u00e7\u00e3o dos Testes",
+      "file_type": "document",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L64",
+      "_origin": "ast",
+      "id": "00_docs_02_tech_specs_walkthrough_valida\u00e7\u00e3o_dos_testes",
+      "community": 21,
+      "norm_label": "\ud83e\uddea validacao dos testes"
+    },
+    {
+      "label": "Resultados obtidos:",
+      "file_type": "document",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L71",
+      "_origin": "ast",
+      "id": "00_docs_02_tech_specs_walkthrough_resultados_obtidos",
+      "community": 21,
+      "norm_label": "resultados obtidos:"
     },
     {
       "label": "global_setup_guide.md",
@@ -4439,6 +4549,36 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/autoresearch/SKILL.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "agents_skills_autoresearch_skill",
+      "target": "agents_skills_autoresearch_skill_skill_autoresearch_official_andrej_karpathy_framework",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/autoresearch/SKILL.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "agents_skills_autoresearch_skill_skill_autoresearch_official_andrej_karpathy_framework",
+      "target": "agents_skills_autoresearch_skill_core_philosophy_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/autoresearch/SKILL.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "agents_skills_autoresearch_skill_skill_autoresearch_official_andrej_karpathy_framework",
+      "target": "agents_skills_autoresearch_skill_the_keep_or_discard_loop",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": ".agents/skills/grill-and-evolve/SKILL.md",
       "source_location": "L7",
       "weight": 1.0,
@@ -5113,37 +5253,107 @@
       "source_location": "L1",
       "weight": 1.0,
       "source": "00_docs_02_tech_specs_walkthrough",
-      "target": "00_docs_02_tech_specs_walkthrough_walkthrough_entrega_da_sandbox_e_da_skill_customizada_grill_and_evolve",
+      "target": "00_docs_02_tech_specs_walkthrough_walkthrough_execu\u00e7\u00e3o_da_conformidade_e_retrofit_do_synapse_engine",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "00_docs/02_tech_specs/walkthrough.md",
-      "source_location": "L29",
+      "source_location": "L7",
       "weight": 1.0,
-      "source": "00_docs_02_tech_specs_walkthrough_walkthrough_entrega_da_sandbox_e_da_skill_customizada_grill_and_evolve",
-      "target": "00_docs_02_tech_specs_walkthrough_artefatos_desenvolvidos_e_entregues",
+      "source": "00_docs_02_tech_specs_walkthrough_walkthrough_execu\u00e7\u00e3o_da_conformidade_e_retrofit_do_synapse_engine",
+      "target": "00_docs_02_tech_specs_walkthrough_agentes_utilizados_skills_invocadas",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "00_docs/02_tech_specs/walkthrough.md",
-      "source_location": "L20",
+      "source_location": "L30",
       "weight": 1.0,
-      "source": "00_docs_02_tech_specs_walkthrough_walkthrough_entrega_da_sandbox_e_da_skill_customizada_grill_and_evolve",
-      "target": "00_docs_02_tech_specs_walkthrough_casos_de_testes_validados",
+      "source": "00_docs_02_tech_specs_walkthrough_walkthrough_execu\u00e7\u00e3o_da_conformidade_e_retrofit_do_synapse_engine",
+      "target": "00_docs_02_tech_specs_walkthrough_altera\u00e7\u00f5es_executadas",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "00_docs/02_tech_specs/walkthrough.md",
-      "source_location": "L5",
+      "source_location": "L64",
       "weight": 1.0,
-      "source": "00_docs_02_tech_specs_walkthrough_walkthrough_entrega_da_sandbox_e_da_skill_customizada_grill_and_evolve",
-      "target": "00_docs_02_tech_specs_walkthrough_checklist_de_verifica\u00e7\u00e3o_f\u00edsico_mec\u00e2nica",
+      "source": "00_docs_02_tech_specs_walkthrough_walkthrough_execu\u00e7\u00e3o_da_conformidade_e_retrofit_do_synapse_engine",
+      "target": "00_docs_02_tech_specs_walkthrough_valida\u00e7\u00e3o_dos_testes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "00_docs_02_tech_specs_walkthrough_agentes_utilizados_skills_invocadas",
+      "target": "00_docs_02_tech_specs_walkthrough_agentes_mobilizados_personas",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "00_docs_02_tech_specs_walkthrough_agentes_utilizados_skills_invocadas",
+      "target": "00_docs_02_tech_specs_walkthrough_skills_invocadas_globais_locais_e_offline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "00_docs_02_tech_specs_walkthrough_altera\u00e7\u00f5es_executadas",
+      "target": "00_docs_02_tech_specs_walkthrough_1_bootstrap_de_governan\u00e7a_taxonomia_de_documenta\u00e7\u00e3o_00_docs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "00_docs_02_tech_specs_walkthrough_altera\u00e7\u00f5es_executadas",
+      "target": "00_docs_02_tech_specs_walkthrough_2_workflows_de_persona_antigravity_agents_workflows",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "00_docs_02_tech_specs_walkthrough_altera\u00e7\u00f5es_executadas",
+      "target": "00_docs_02_tech_specs_walkthrough_3_inje\u00e7\u00e3o_de_grafo_graphifyy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "00_docs_02_tech_specs_walkthrough_altera\u00e7\u00f5es_executadas",
+      "target": "00_docs_02_tech_specs_walkthrough_4_telemetria_quality_gates_s_t_o_p_protocol",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "00_docs/02_tech_specs/walkthrough.md",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "00_docs_02_tech_specs_walkthrough_valida\u00e7\u00e3o_dos_testes",
+      "target": "00_docs_02_tech_specs_walkthrough_resultados_obtidos",
       "confidence_score": 1.0
     },
     {
@@ -6048,5 +6258,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "887769ee3563664a2b71db6b49795c0c347afae1"
+  "built_at_commit": "7689efc419fd7cffc40c47cdccd622fa9bc4561e"
 }

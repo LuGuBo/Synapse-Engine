@@ -100,22 +100,22 @@
     "semantic_hash": ""
   },
   ".agents/skills/local-guardrails-policy/SKILL.md": {
-    "mtime": 1782778594.212584,
+    "mtime": 1783110306.0123675,
     "ast_hash": "3d37d51d5c5805ceb19edc0de53679bc",
     "semantic_hash": ""
   },
   ".agents/skills/qa/SKILL.md": {
-    "mtime": 1782778594.212584,
+    "mtime": 1783110306.0123675,
     "ast_hash": "fddcb21f377418e0958d802c980f86df",
     "semantic_hash": ""
   },
   ".agents/skills/sm/SKILL.md": {
-    "mtime": 1782778594.212584,
+    "mtime": 1783110306.0112,
     "ast_hash": "f5cd24c1b680e23fcb915d986de19c52",
     "semantic_hash": ""
   },
   ".agents/skills/ux-expert/SKILL.md": {
-    "mtime": 1782778594.212584,
+    "mtime": 1783110306.0112,
     "ast_hash": "b2efdc99fd18c2df59ce32a1c5e55f5a",
     "semantic_hash": ""
   },
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "00_docs/02_tech_specs/walkthrough.md": {
-    "mtime": 1783107768.227779,
-    "ast_hash": "87fdbd6f68f63a6437cc89d01654818f",
+    "mtime": 1783108745.6397276,
+    "ast_hash": "a1e5d02ff158b4995f7b079f1f0938ac",
     "semantic_hash": ""
   },
   "00_docs/03_rules/global_setup_guide.md": {
@@ -277,6 +277,11 @@
   "execution.json": {
     "mtime": 1783107825.3981674,
     "ast_hash": "8e9f3a952bbb57383a28857349c24d93",
+    "semantic_hash": ""
+  },
+  ".agents/skills/autoresearch/SKILL.md": {
+    "mtime": 1783110362.496984,
+    "ast_hash": "a5f7f4c5e69cad408d88b547fe5dd525",
     "semantic_hash": ""
   }
 }
