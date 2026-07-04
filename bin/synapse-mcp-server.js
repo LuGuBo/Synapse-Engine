@@ -1,0 +1,672 @@
+#!/usr/bin/env node
+
+/**
+ * ⚡ Synapse Engine V2 - Lightweight Stdio MCP Server
+ * Fast, zero-dependency MCP server providing Graphify AST queries, TDD status checks,
+ * secret scanning, JIT skills search, context health, and CPU/GPU hardware selection.
+ * Optimized for maximum token efficiency and sub-millisecond local stdio IPC performance.
+ */
+
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const readline = require('readline');
+const { execSync } = require('child_process');
+const { getHardwareStatus } = require('./hardware-selector');
+
+// Operational paths
+const ROOT_DIR = process.cwd();
+const GRAPH_PATH = path.join(ROOT_DIR, 'graphify-out', 'graph.json');
+const STATE_PATH = path.join(ROOT_DIR, '.agents', 'state.json');
+
+/**
+ * Reads and parses graphify-out/graph.json safely
+ */
+function loadGraph() {
+  if (!fs.existsSync(GRAPH_PATH)) {
+    return { nodes: [], edges: [] };
+  }
+  try {
+    const raw = fs.readFileSync(GRAPH_PATH, 'utf8');
+    return JSON.parse(raw);
+  } catch (err) {
+    return { nodes: [], edges: [], error: err.message };
+  }
+}
+
+/**
+ * Reads .agents/state.json safely
+ */
+function loadState() {
+  if (!fs.existsSync(STATE_PATH)) {
+    return { persona: 'DEVELOPER', target: null };
+  }
+  try {
+    const raw = fs.readFileSync(STATE_PATH, 'utf8');
+    return JSON.parse(raw);
+  } catch (err) {
+    return { persona: 'DEVELOPER', error: err.message };
+  }
+}
+
+/**
+ * Tool 1: Get direct dependencies and callers for a given file/node
+ */
+function handleGetDeps(targetFile) {
+  const graph = loadGraph();
+  if (!targetFile) {
+    return { error: 'targetFile argument is required' };
+  }
+
+  const normalizedTarget = path.normalize(targetFile).replace(/\\/g, '/');
+
+  const matchedNodes = (graph.nodes || []).filter(n => {
+    const nodeName = (n.name || n.id || '').replace(/\\/g, '/');
+    return nodeName.includes(normalizedTarget) || normalizedTarget.includes(nodeName);
+  });
+
+  if (matchedNodes.length === 0) {
+    return {
+      target: targetFile,
+      found: false,
+      message: 'Node not found in graphify-out/graph.json. Run synapse init or graphify first.'
+    };
+  }
+
+  const matchedIds = new Set(matchedNodes.map(n => n.id || n.name));
+
+  const dependencies = [];
+  const callers = [];
+
+  (graph.edges || []).forEach(edge => {
+    if (matchedIds.has(edge.source)) {
+      dependencies.push(edge.target);
+    }
+    if (matchedIds.has(edge.target)) {
+      callers.push(edge.source);
+    }
+  });
+
+  return {
+    target: targetFile,
+    found: true,
+    nodesCount: matchedNodes.length,
+    dependencies: Array.from(new Set(dependencies)),
+    callers: Array.from(new Set(callers))
+  };
+}
+
+/**
+ * Tool 2: Get impact radius / test files for a changed file
+ */
+function handleGetImpactedTests(targetFile) {
+  const deps = handleGetDeps(targetFile);
+  if (!deps.found) {
+    return deps;
+  }
+
+  const testFiles = (deps.callers || []).filter(c => c.includes('test') || c.includes('spec'));
+
+  return {
+    target: targetFile,
+    impactedCallersCount: deps.callers.length,
+    relatedTestFiles: testFiles.length > 0 ? testFiles : [`tests/${path.basename(targetFile, path.extname(targetFile))}.test.js`]
+  };
+}
+
+/**
+ * Tool 3: Check for circular dependencies in graph
+ */
+function handleCheckCircular() {
+  const graph = loadGraph();
+  const adj = {};
+
+  (graph.nodes || []).forEach(n => {
+    adj[n.id || n.name] = [];
+  });
+
+  (graph.edges || []).forEach(e => {
+    if (adj[e.source]) {
+      adj[e.source].push(e.target);
+    }
+  });
+
+  const visited = {};
+  const recStack = {};
+  const cycles = [];
+
+  function isCyclic(node, pathArr) {
+    visited[node] = true;
+    recStack[node] = true;
+    pathArr.push(node);
+
+    const neighbors = adj[node] || [];
+    for (const neighbor of neighbors) {
+      if (!visited[neighbor]) {
+        if (isCyclic(neighbor, pathArr)) return true;
+      } else if (recStack[neighbor]) {
+        cycles.push([...pathArr, neighbor]);
+        return true;
+      }
+    }
+
+    recStack[node] = false;
+    pathArr.pop();
+    return false;
+  }
+
+  Object.keys(adj).forEach(node => {
+    if (!visited[node]) {
+      isCyclic(node, []);
+    }
+  });
+
+  return {
+    hasCircular: cycles.length > 0,
+    cycleCount: cycles.length,
+    detectedCycles: cycles.slice(0, 5)
+  };
+}
+
+/**
+ * Tool 4: Get TDD status from state.json
+ */
+function handleGetTddStatus() {
+  const state = loadState();
+  return {
+    persona: state.persona || 'DEVELOPER',
+    surgicalTarget: state.target || null,
+    tddValid: state.tdd_valid !== false,
+    lastUpdate: state.last_updated || new Date().toISOString()
+  };
+}
+
+/**
+ * Tool 5: Shift Persona
+ */
+function handleShiftPersona(persona) {
+  const validPersonas = ['PM', 'ARCHITECT', 'DEVELOPER', 'QA', 'BOSS'];
+  const newPersona = (persona || '').toUpperCase();
+  if (!validPersonas.includes(newPersona)) {
+    return { success: false, error: `Invalid persona '${persona}'. Valid: ${validPersonas.join(', ')}` };
+  }
+  const state = loadState();
+  state.persona = newPersona;
+  state.last_updated = new Date().toISOString();
+  fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
+  fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+  return { success: true, persona: newPersona, timestamp: state.last_updated };
+}
+
+/**
+ * Tool 6: Set Surgical Target
+ */
+function handleSetTarget(targetFile, startLine, endLine) {
+  if (!targetFile) {
+    return { success: false, error: 'targetFile is required' };
+  }
+  const state = loadState();
+  state.target = {
+    file: targetFile,
+    startLine: startLine || 1,
+    endLine: endLine || null
+  };
+  state.last_updated = new Date().toISOString();
+  fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
+  fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+  return { success: true, target: state.target };
+}
+
+/**
+ * Tool 7: Generate Audit Tables for Walkthrough
+ */
+function handleGenerateAuditTables(activePersona, skillsUsed = []) {
+  const persona = activePersona || loadState().persona || 'DEVELOPER';
+  const skillsList = Array.isArray(skillsUsed) && skillsUsed.length > 0 
+    ? skillsUsed.map(s => `| ${s} | Global / Local | Invocado durante a tarefa |`).join('\n')
+    : '| Nenhum | N/A | Nenhuma skill invocada nesta execução |';
+
+  const tablesMarkdown = `## 🤖 Agentes Utilizados & Skills Invocadas
+
+### 🎭 Agentes Mobilizados (Personas)
+| Agente / Persona | Papel Desempenhado | Fase da Tarefa |
+| :--- | :--- | :--- |
+| **${persona}** | Execução e governança da tarefa | Fase Ativa |
+
+### 🛠️ Skills Invocadas (Globais, Locais e Offline)
+| Nome da Skill | Tipo de Escopo | Propósito da Invocação |
+| :--- | :--- | :--- |
+${skillsList}`;
+
+  return { success: true, markdown: tablesMarkdown };
+}
+
+/**
+ * Tool 8: Scan Secrets (OWASP)
+ */
+function handleScanSecrets() {
+  const secretPatterns = [
+    { name: 'AWS Access Key', regex: /AKIA[0-9A-Z]{16}/g },
+    { name: 'GitHub Token', regex: /gh[pous]_[A-Za-z0-9_]{36,}/g },
+    { name: 'Generic Secret/Key', regex: /(api_key|secret_key|private_key|jwt_secret)\s*[:=]\s*["'][A-Za-z0-9_\-]{16,}["']/gi }
+  ];
+
+  const violations = [];
+  function scanDir(dir) {
+    const files = fs.readdirSync(dir);
+    for (const file of files) {
+      if (['node_modules', '.git', '.venv', 'graphify-out', 'dist', 'build'].includes(file)) continue;
+      const fullPath = path.join(dir, file);
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        scanDir(fullPath);
+      } else if (stat.isFile() && /\.(js|py|json|md|env|yml|yaml|ts)$/i.test(file)) {
+        try {
+          const content = fs.readFileSync(fullPath, 'utf8');
+          secretPatterns.forEach(p => {
+            let match;
+            while ((match = p.regex.exec(content)) !== null) {
+              violations.push({
+                file: path.relative(ROOT_DIR, fullPath),
+                type: p.name,
+                snippet: match[0].substring(0, 15) + '...'
+              });
+            }
+          });
+        } catch (e) {}
+      }
+    }
+  }
+
+  scanDir(ROOT_DIR);
+
+  return {
+    clean: violations.length === 0,
+    violationCount: violations.length,
+    violations: violations.slice(0, 10)
+  };
+}
+
+/**
+ * Tool 9: Get Clean Git Diff
+ */
+function handleGetCleanDiff() {
+  try {
+    const rawDiff = execSync('git diff --cached --stat', { encoding: 'utf8', cwd: ROOT_DIR });
+    const lines = rawDiff.trim().split('\n');
+    const summary = lines.slice(-1)[0] || 'No changes staged';
+    const changedFiles = lines.slice(0, -1).map(l => l.trim());
+    return {
+      staged: true,
+      summary,
+      changedFilesCount: changedFiles.length,
+      changedFiles
+    };
+  } catch (err) {
+    return { staged: false, error: err.message, changedFilesCount: 0, changedFiles: [] };
+  }
+}
+
+/**
+ * Tool 10: Search Skills JIT
+ */
+function handleSearchSkills(query) {
+  const searchTerm = (query || '').toLowerCase();
+  const searchDirs = [
+    'C:\\AG SKILLS',
+    path.join(os.homedir(), '.gemini', 'config', 'skills'),
+    path.join(ROOT_DIR, '.agents', 'skills')
+  ];
+
+  const matchedSkills = [];
+
+  searchDirs.forEach(dir => {
+    if (!fs.existsSync(dir)) return;
+    try {
+      const entries = fs.readdirSync(dir);
+      entries.forEach(entry => {
+        const skillPath = path.join(dir, entry);
+        const manifest = path.join(skillPath, 'SKILL.md');
+        if (fs.existsSync(manifest)) {
+          try {
+            const content = fs.readFileSync(manifest, 'utf8');
+            if (!searchTerm || entry.toLowerCase().includes(searchTerm) || content.toLowerCase().includes(searchTerm)) {
+              matchedSkills.push({
+                name: entry,
+                path: manifest,
+                scope: dir.includes('.agents') ? 'local' : 'global'
+              });
+            }
+          } catch (e) {}
+        }
+      });
+    } catch (e) {}
+  });
+
+  return {
+    query: searchTerm,
+    foundCount: matchedSkills.length,
+    skills: matchedSkills
+  };
+}
+
+/**
+ * Tool 11: Context Health Check
+ */
+function handleContextHealthCheck() {
+  const largeFiles = [];
+  function checkDir(dir) {
+    const files = fs.readdirSync(dir);
+    for (const file of files) {
+      if (['node_modules', '.git', '.venv', 'graphify-out', 'dist', 'build', 'package-lock.json'].includes(file)) continue;
+      const fullPath = path.join(dir, file);
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        checkDir(fullPath);
+      } else if (stat.isFile() && /\.(js|py|ts|json|md)$/i.test(file)) {
+        try {
+          const content = fs.readFileSync(fullPath, 'utf8');
+          const lineCount = content.split('\n').length;
+          if (lineCount > 500) {
+            largeFiles.push({
+              file: path.relative(ROOT_DIR, fullPath),
+              lineCount
+            });
+          }
+        } catch (e) {}
+      }
+    }
+  }
+
+  checkDir(ROOT_DIR);
+
+  const gitignorePath = path.join(ROOT_DIR, '.gitignore');
+  const hasGitignore = fs.existsSync(gitignorePath);
+  let gitignoreCompliant = false;
+  if (hasGitignore) {
+    const content = fs.readFileSync(gitignorePath, 'utf8');
+    gitignoreCompliant = content.includes('.env') && content.includes('graphify-out');
+  }
+
+  return {
+    healthy: largeFiles.length === 0 && gitignoreCompliant,
+    largeFilesCount: largeFiles.length,
+    largeFiles: largeFiles.slice(0, 10),
+    gitignoreStatus: {
+      exists: hasGitignore,
+      protectsEnvAndGraphify: gitignoreCompliant
+    }
+  };
+}
+
+/**
+ * Tool 12 & 13: Hardware Status & Select Device
+ */
+function handleHardwareStatus() {
+  return getHardwareStatus('auto', 0.0);
+}
+
+function handleSelectDevice(workloadType, payloadSizeKb, override) {
+  return getHardwareStatus(workloadType || 'auto', payloadSizeKb || 0.0, override);
+}
+
+// Available Tool Definitions
+const TOOLS = [
+  {
+    name: 'graphify_get_deps',
+    description: 'Get direct dependencies and caller files for a specific node/file using AST topology.',
+    inputSchema: {
+      type: 'object',
+      properties: { targetFile: { type: 'string', description: 'Relative file path or node name' } },
+      required: ['targetFile']
+    }
+  },
+  {
+    name: 'graphify_get_impacted_tests',
+    description: 'Get tests and callers affected when a file is modified.',
+    inputSchema: {
+      type: 'object',
+      properties: { targetFile: { type: 'string', description: 'Relative file path' } },
+      required: ['targetFile']
+    }
+  },
+  {
+    name: 'graphify_check_circular',
+    description: 'Check AST graph for circular dependencies.',
+    inputSchema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'synapse_tdd_status',
+    description: 'Get current TDD state, active persona, and surgical target.',
+    inputSchema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'synapse_shift_persona',
+    description: 'Shift current active persona in .agents/state.json.',
+    inputSchema: {
+      type: 'object',
+      properties: { persona: { type: 'string', description: 'Persona: PM, ARCHITECT, DEVELOPER, QA, BOSS' } },
+      required: ['persona']
+    }
+  },
+  {
+    name: 'synapse_set_target',
+    description: 'Set surgical target scope in .agents/state.json.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        targetFile: { type: 'string' },
+        startLine: { type: 'number' },
+        endLine: { type: 'number' }
+      },
+      required: ['targetFile']
+    }
+  },
+  {
+    name: 'synapse_generate_audit_tables',
+    description: 'Generate markdown audit tables for walkthrough.md compliance.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        activePersona: { type: 'string' },
+        skillsUsed: { type: 'array', items: { type: 'string' } }
+      }
+    }
+  },
+  {
+    name: 'synapse_scan_secrets',
+    description: 'Scan workspace for OWASP secret leaks (API keys, tokens, hardcoded passwords).',
+    inputSchema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'synapse_get_clean_diff',
+    description: 'Get compact staged Git diff summary.',
+    inputSchema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'synapse_search_skills',
+    description: 'Search offline SKILL.md manifests in C:\\AG SKILLS and local directory.',
+    inputSchema: {
+      type: 'object',
+      properties: { query: { type: 'string', description: 'Search term or keyword' } }
+    }
+  },
+  {
+    name: 'synapse_context_health_check',
+    description: 'Check workspace context health (large files >500 lines and .gitignore status).',
+    inputSchema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'synapse_hardware_status',
+    description: 'Get CPU/GPU hardware specs and active acceleration provider.',
+    inputSchema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'synapse_select_device',
+    description: 'Select execution device (CPU vs GPU) dynamically based on workload and payload size.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        workloadType: { type: 'string', description: 'mcp_ipc, ast_query, batch_embeddings, neural_inference, auto' },
+        payloadSizeKb: { type: 'number', description: 'Payload size in KB' },
+        override: { type: 'string', description: 'Explicit override: cpu or gpu' }
+      }
+    }
+  }
+];
+
+/**
+ * Handle JSON-RPC request over stdio
+ */
+function processRPCRequest(request) {
+  const { id, method, params } = request;
+
+  if (method === 'initialize') {
+    return {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        protocolVersion: '2024-11-05',
+        capabilities: { tools: {} },
+        serverInfo: { name: 'synapse-mcp-server', version: '2.0.0' }
+      }
+    };
+  }
+
+  if (method === 'notifications/initialized') {
+    return null;
+  }
+
+  if (method === 'tools/list') {
+    return {
+      jsonrpc: '2.0',
+      id,
+      result: { tools: TOOLS }
+    };
+  }
+
+  if (method === 'tools/call') {
+    const { name, arguments: args } = params || {};
+    let resultData = {};
+
+    switch (name) {
+      case 'graphify_get_deps':
+        resultData = handleGetDeps(args?.targetFile);
+        break;
+      case 'graphify_get_impacted_tests':
+        resultData = handleGetImpactedTests(args?.targetFile);
+        break;
+      case 'graphify_check_circular':
+        resultData = handleCheckCircular();
+        break;
+      case 'synapse_tdd_status':
+        resultData = handleGetTddStatus();
+        break;
+      case 'synapse_shift_persona':
+        resultData = handleShiftPersona(args?.persona);
+        break;
+      case 'synapse_set_target':
+        resultData = handleSetTarget(args?.targetFile, args?.startLine, args?.endLine);
+        break;
+      case 'synapse_generate_audit_tables':
+        resultData = handleGenerateAuditTables(args?.activePersona, args?.skillsUsed);
+        break;
+      case 'synapse_scan_secrets':
+        resultData = handleScanSecrets();
+        break;
+      case 'synapse_get_clean_diff':
+        resultData = handleGetCleanDiff();
+        break;
+      case 'synapse_search_skills':
+        resultData = handleSearchSkills(args?.query);
+        break;
+      case 'synapse_context_health_check':
+        resultData = handleContextHealthCheck();
+        break;
+      case 'synapse_hardware_status':
+        resultData = handleHardwareStatus();
+        break;
+      case 'synapse_select_device':
+        resultData = handleSelectDevice(args?.workloadType, args?.payloadSizeKb, args?.override);
+        break;
+      default:
+        return {
+          jsonrpc: '2.0',
+          id,
+          error: { code: -32601, message: `Tool not found: ${name}` }
+        };
+    }
+
+    return {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(resultData, null, 2)
+          }
+        ]
+      }
+    };
+  }
+
+  return {
+    jsonrpc: '2.0',
+    id,
+    error: { code: -32601, message: `Method not found: ${method}` }
+  };
+}
+
+/**
+ * Start Stdio JSON-RPC Listener
+ */
+function startServer() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: false
+  });
+
+  rl.on('line', line => {
+    if (!line.trim()) return;
+    try {
+      const request = JSON.parse(line);
+      const response = processRPCRequest(request);
+      if (response) {
+        process.stdout.write(JSON.stringify(response) + '\n');
+      }
+    } catch (err) {
+      process.stdout.write(
+        JSON.stringify({
+          jsonrpc: '2.0',
+          id: null,
+          error: { code: -32700, message: `Parse error: ${err.message}` }
+        }) + '\n'
+      );
+    }
+  });
+}
+
+// Export internal functions for direct unit testing & benchmarking
+module.exports = {
+  processRPCRequest,
+  handleGetDeps,
+  handleGetImpactedTests,
+  handleCheckCircular,
+  handleGetTddStatus,
+  handleShiftPersona,
+  handleSetTarget,
+  handleGenerateAuditTables,
+  handleScanSecrets,
+  handleGetCleanDiff,
+  handleSearchSkills,
+  handleContextHealthCheck,
+  handleHardwareStatus,
+  handleSelectDevice,
+  TOOLS
+};
+
+if (require.main === module) {
+  startServer();
+}

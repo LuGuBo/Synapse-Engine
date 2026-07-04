@@ -286,8 +286,54 @@ O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa 
       console.log('[INFO] C:\\AG SKILLS registry already exists in global skills.json. Skipping.');
     }
 
+    // 3. Configurar mcp_config.json global para registrar o Synapse MCP Server
+    const geminiIdeDir = path.resolve(homeDir, '.gemini/antigravity-ide');
+    fs.mkdirSync(geminiIdeDir, { recursive: true });
+    const mcpConfigPath = path.resolve(geminiIdeDir, 'mcp_config.json');
+    let mcpConfig = { mcpServers: {} };
+    if (fs.existsSync(mcpConfigPath)) {
+      try {
+        mcpConfig = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf8'));
+      } catch (e) {
+        console.warn('⚠️ Warning: Failed to parse global mcp_config.json. Re-creating.');
+      }
+    }
+    mcpConfig.mcpServers = mcpConfig.mcpServers || {};
+    const mcpServerScript = path.resolve(__dirname, 'synapse-mcp-server.js');
+    mcpConfig.mcpServers['synapse-graphify'] = {
+      command: 'node',
+      args: [mcpServerScript]
+    };
+    fs.writeFileSync(mcpConfigPath, JSON.stringify(mcpConfig, null, 2), 'utf8');
+    console.log('✅ Added synapse-graphify MCP server to global mcp_config.json.');
+
     console.log('🎉 Global IDE configurations successfully deployed!');
   });
+
+program
+  .command('mcp [action]')
+  .description('Inicia o servidor MCP stdio local ou roda o benchmark de economia de tokens (start | benchmark)')
+  .action((action) => {
+    const mcpScript = path.resolve(__dirname, 'synapse-mcp-server.js');
+    if (action === 'benchmark') {
+      console.log('🚀 Running Synapse Engine MCP Token Savings Benchmark...');
+      const benchmarkTest = path.resolve(__dirname, '../tests/synapse_mcp_benchmark.test.js');
+      const relPath = path.relative(process.cwd(), benchmarkTest).replace(/\\/g, '/');
+      try {
+        execSync(`npx jest "${relPath}"`, { stdio: 'inherit' });
+      } catch (e) {
+        console.error('❌ Benchmark execution failed:', e.message);
+      }
+    } else {
+      // Padrão: Inicia o servidor stdio
+      try {
+        fork(mcpScript, [], { stdio: 'inherit' });
+      } catch (err) {
+        console.error('❌ Failed to start Synapse MCP Server:', err.message);
+      }
+    }
+  });
+
 
 program
   .command('status')
@@ -316,4 +362,19 @@ program
     }
   });
 
+program
+  .command('hardware')
+  .description('Exibe o diagnóstico e a seleção dinâmica de hardware (CPU vs. GPU)')
+  .option('-w, --workload <type>', 'Tipo de carga de trabalho (mcp_ipc, ast_query, batch_embeddings, neural_inference, auto)', 'auto')
+  .option('-s, --size <kb>', 'Tamanho do payload em KB', parseFloat, 0.0)
+  .option('-o, --override <device>', 'Sobrescrita manual (cpu ou gpu)', null)
+  .action((options) => {
+    const { getHardwareStatus } = require('./hardware-selector');
+    const result = getHardwareStatus(options.workload, options.size, options.override);
+    console.log('⚡ Synapse Engine - Diagnóstico & Seleção Dinâmica de Hardware:');
+    console.log(JSON.stringify(result, null, 2));
+  });
+
 program.parse(process.argv);
+
+

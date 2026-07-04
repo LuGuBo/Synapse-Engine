@@ -61,7 +61,7 @@ def run_codebase_audit(root_dir):
     """
     Recursively scans the directory for Python files, excluding system/temp dirs.
     """
-    excluded_dirs = {'node_modules', '.git', '.agents', '.agent', 'venv', '.venv', '__pycache__'}
+    excluded_dirs = {'node_modules', '.git', '.agents', '.agent', 'venv', '.venv', '__pycache__', '.playground', 'tmp'}
     scanned_files_count = 0
     all_violations = []
 
