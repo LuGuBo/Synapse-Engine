@@ -617,7 +617,7 @@ function processRPCRequest(request) {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(resultData, null, 2)
+            text: JSON.stringify(resultData)
           }
         ]
       }
