@@ -14,3 +14,10 @@ __pycache__/
 
 # Graphify outputs
 graphify-out/
+
+# Autoresearch local framework files (local dev environment only)
+program.md
+prepare.js
+results.tsv
+hypo*.json
+baseline_output.json
