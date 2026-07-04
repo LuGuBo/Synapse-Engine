@@ -19,31 +19,42 @@ const ROOT_DIR = process.cwd();
 const GRAPH_PATH = path.join(ROOT_DIR, 'graphify-out', 'graph.json');
 const STATE_PATH = path.join(ROOT_DIR, '.agents', 'state.json');
 
+let loadedGraph = null;
+let loadedState = null;
+
 /**
- * Reads and parses graphify-out/graph.json safely
+ * Reads and parses graphify-out/graph.json safely (cached in memory)
  */
-function loadGraph() {
+function loadGraph(forceReload = false) {
+  if (loadedGraph && !forceReload) {
+    return loadedGraph;
+  }
   if (!fs.existsSync(GRAPH_PATH)) {
     return { nodes: [], edges: [] };
   }
   try {
     const raw = fs.readFileSync(GRAPH_PATH, 'utf8');
-    return JSON.parse(raw);
+    loadedGraph = JSON.parse(raw);
+    return loadedGraph;
   } catch (err) {
     return { nodes: [], edges: [], error: err.message };
   }
 }
 
 /**
- * Reads .agents/state.json safely
+ * Reads .agents/state.json safely (cached in memory)
  */
-function loadState() {
+function loadState(forceReload = false) {
+  if (loadedState && !forceReload) {
+    return loadedState;
+  }
   if (!fs.existsSync(STATE_PATH)) {
     return { persona: 'DEVELOPER', target: null };
   }
   try {
     const raw = fs.readFileSync(STATE_PATH, 'utf8');
-    return JSON.parse(raw);
+    loadedState = JSON.parse(raw);
+    return loadedState;
   } catch (err) {
     return { persona: 'DEVELOPER', error: err.message };
   }
@@ -195,6 +206,7 @@ function handleShiftPersona(persona) {
   state.last_updated = new Date().toISOString();
   fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+  loadedState = state;
   return { success: true, persona: newPersona, timestamp: state.last_updated };
 }
 
@@ -214,6 +226,7 @@ function handleSetTarget(targetFile, startLine, endLine) {
   state.last_updated = new Date().toISOString();
   fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+  loadedState = state;
   return { success: true, target: state.target };
 }
 
