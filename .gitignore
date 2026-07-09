@@ -21,3 +21,9 @@ prepare.js
 results.tsv
 hypo*.json
 baseline_output.json
+
+# Skill evaluation workspaces
+.agents/skills/workspaces/
+
+# Gemini Local IDE config
+.gemini/

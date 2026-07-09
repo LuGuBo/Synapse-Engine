@@ -231,4 +231,5 @@ decision_maker: AI Agent & Tech Lead
 if __name__ == "__main__":
     print("Initiating Synapse Engine Hybrid Compilation in Antigravity Context...")
     forge = SynapseEngineHybridEngine()
-    forge.forge_hybrid_skills(["sm", "ux-expert", "qa", "bmad-master", "local-guardrails-policy"])
+    forge.forge_hybrid_skills(["bmad-master", "local-guardrails-policy"])
+

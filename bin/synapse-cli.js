@@ -29,15 +29,38 @@ program
     const localAgentsDir = path.resolve(agentsDir, 'agents');
     fs.mkdirSync(localAgentsDir, { recursive: true });
 
-    // 2. Injetar state.json se não existir
+    // 2. Injetar state.json se não existir, autodetectando harness_mode
     const stateFile = path.resolve(agentsDir, 'state.json');
+    let mcpSupported = false;
+    try {
+      execSync('node --version', { stdio: 'ignore' });
+      const homeDir = require('os').homedir();
+      const mcpConfigPath = path.resolve(homeDir, '.gemini/antigravity-ide/mcp_config.json');
+      const mcpConfigDir = path.dirname(mcpConfigPath);
+      if (fs.existsSync(mcpConfigDir)) {
+        mcpSupported = true;
+      }
+    } catch (e) {}
+
+    const harnessMode = mcpSupported ? 'mcp' : 'standalone';
+
     if (!fs.existsSync(stateFile)) {
       const stateTemplatePath = path.resolve(TEMPLATES_DIR, 'state.template.json');
-      fs.copyFileSync(stateTemplatePath, stateFile);
-      console.log('✅ Created .agents/state.json');
+      const stateObj = JSON.parse(fs.readFileSync(stateTemplatePath, 'utf8'));
+      stateObj.harness_mode = harnessMode;
+      fs.writeFileSync(stateFile, JSON.stringify(stateObj, null, 2), 'utf8');
+      console.log(`✅ Created .agents/state.json in '${harnessMode}' mode`);
     } else {
-      console.log('[INFO] .agents/state.json already exists. Skipping.');
+      try {
+        const stateObj = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+        stateObj.harness_mode = harnessMode;
+        fs.writeFileSync(stateFile, JSON.stringify(stateObj, null, 2), 'utf8');
+        console.log(`✅ Updated .agents/state.json to '${harnessMode}' mode`);
+      } catch (e) {
+        console.log('[INFO] .agents/state.json already exists. Skipping.');
+      }
     }
+
 
     // 3. Copiar as personas core de agents para .agents/agents/
     if (fs.existsSync(CORE_AGENTS_DIR)) {

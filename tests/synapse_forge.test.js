@@ -43,7 +43,7 @@ describe('synapse_forge.py integration tests', () => {
     // It should run without error (exit code 0)
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('Created Semantic Taxonomy Directories');
-    expect(result.stdout).toContain('Deployed skill: qa');
+    expect(result.stdout).toContain('Deployed skill: local-guardrails-policy');
     
     // Verify that the document taxonomy folders exist
     expect(fs.existsSync(path.join(__dirname, '..', '00_docs', '01_prd'))).toBe(true);
@@ -54,10 +54,11 @@ describe('synapse_forge.py integration tests', () => {
     // Verify the MADR template existence
     expect(fs.existsSync(path.join(__dirname, '..', '00_docs', '04_adrs', '0001-template-madr.md'))).toBe(true);
     
-    // Verify local skills exist
-    expect(fs.existsSync(path.join(__dirname, '..', '.agents', 'skills', 'qa', 'SKILL.md'))).toBe(true);
-    expect(fs.existsSync(path.join(__dirname, '..', '.agents', 'skills', 'sm', 'SKILL.md'))).toBe(true);
-    expect(fs.existsSync(path.join(__dirname, '..', '.agents', 'skills', 'ux-expert', 'SKILL.md'))).toBe(true);
+    // Verify local skills exist or do not exist based on dynamic design
     expect(fs.existsSync(path.join(__dirname, '..', '.agents', 'skills', 'local-guardrails-policy', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(__dirname, '..', '.agents', 'skills', 'qa'))).toBe(false);
+    expect(fs.existsSync(path.join(__dirname, '..', '.agents', 'skills', 'sm'))).toBe(false);
+    expect(fs.existsSync(path.join(__dirname, '..', '.agents', 'skills', 'ux-expert'))).toBe(false);
+
   });
 });

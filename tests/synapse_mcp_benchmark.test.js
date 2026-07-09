@@ -43,14 +43,14 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
       method: 'tools/call',
       params: {
         name: 'synapse_shift_persona',
-        arguments: { persona: 'ARCHITECT' }
+        arguments: { active_persona: 'ARCHITECT' }
       }
     };
     const response = processRPCRequest(request);
     expect(response.result.content[0].type).toBe('text');
     const data = JSON.parse(response.result.content[0].text);
     expect(data.success).toBe(true);
-    expect(data.persona).toBe('ARCHITECT');
+    expect(data.active_persona).toBe('ARCHITECT');
   });
 
   test('MCP Server executes tools/call for synapse_hardware_status and synapse_select_device', () => {

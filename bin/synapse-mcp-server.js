@@ -104,14 +104,14 @@ function loadState(forceReload = false) {
     return loadedState;
   }
   if (!fs.existsSync(STATE_PATH)) {
-    return { persona: 'DEVELOPER', target: null };
+    return { active_persona: 'DEVELOPER', surgical_target: null };
   }
   try {
     const raw = fs.readFileSync(STATE_PATH, 'utf8');
     loadedState = JSON.parse(raw);
     return loadedState;
   } catch (err) {
-    return { persona: 'DEVELOPER', error: err.message };
+    return { active_persona: 'DEVELOPER', error: err.message };
   }
 }
 
@@ -239,57 +239,60 @@ function handleCheckCircular() {
  */
 function handleGetTddStatus() {
   const state = loadState();
+  const tddValid = state.validation_status ? state.validation_status.gears_validated : false;
   return {
-    persona: state.persona || 'DEVELOPER',
-    surgicalTarget: state.target || null,
-    tddValid: state.tdd_valid !== false,
-    lastUpdate: state.last_updated || new Date().toISOString()
+    active_persona: state.active_persona || 'DEVELOPER',
+    surgical_target: state.surgical_target || null,
+    tdd_valid: tddValid,
+    last_updated: state.last_updated || new Date().toISOString()
   };
 }
 
 /**
  * Tool 5: Shift Persona
  */
-function handleShiftPersona(persona) {
+function handleShiftPersona(activePersona) {
   const validPersonas = ['PM', 'ARCHITECT', 'DEVELOPER', 'QA', 'BOSS'];
-  const newPersona = (persona || '').toUpperCase();
+  const newPersona = (activePersona || '').toUpperCase();
   if (!validPersonas.includes(newPersona)) {
-    return { success: false, error: `Invalid persona '${persona}'. Valid: ${validPersonas.join(', ')}` };
+    return { success: false, error: `Invalid persona '${activePersona}'. Valid: ${validPersonas.join(', ')}` };
   }
   const state = loadState();
-  state.persona = newPersona;
+  state.active_persona = newPersona;
+  delete state.persona;
   state.last_updated = new Date().toISOString();
   fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
   loadedState = state;
-  return { success: true, persona: newPersona, timestamp: state.last_updated };
+  return { success: true, active_persona: newPersona, timestamp: state.last_updated };
 }
 
 /**
  * Tool 6: Set Surgical Target
  */
-function handleSetTarget(targetFile, startLine, endLine) {
-  if (!targetFile) {
-    return { success: false, error: 'targetFile is required' };
+function handleSetTarget(filePath, startLine, endLine) {
+  if (!filePath) {
+    return { success: false, error: 'filePath argument is required' };
   }
   const state = loadState();
-  state.target = {
-    file: targetFile,
-    startLine: startLine || 1,
-    endLine: endLine || null
+  state.surgical_target = {
+    file_path: filePath,
+    line_range_start: startLine || 0,
+    line_range_end: endLine || 0
   };
+  delete state.target;
   state.last_updated = new Date().toISOString();
   fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
   loadedState = state;
-  return { success: true, target: state.target };
+  return { success: true, surgical_target: state.surgical_target };
 }
 
 /**
  * Tool 7: Generate Audit Tables for Walkthrough
  */
 function handleGenerateAuditTables(activePersona, skillsUsed = []) {
-  const persona = activePersona || loadState().persona || 'DEVELOPER';
+  const persona = activePersona || loadState().active_persona || 'DEVELOPER';
   const skillsList = Array.isArray(skillsUsed) && skillsUsed.length > 0 
     ? skillsUsed.map(s => `| ${s} | Global / Local | Invocado durante a tarefa |`).join('\n')
     : '| Nenhum | N/A | Nenhuma skill invocada nesta execução |';
@@ -478,6 +481,103 @@ function handleSelectDevice(workloadType, payloadSizeKb, override) {
   return getHardwareStatus(workloadType || 'auto', payloadSizeKb || 0.0, override);
 }
 
+/**
+ * Resource Helper: List available skills in C:\AG SKILLS
+ */
+function handleListResources() {
+  const skillsDir = 'C:\\AG SKILLS';
+  if (!fs.existsSync(skillsDir)) return [];
+  try {
+    const folders = fs.readdirSync(skillsDir);
+    const resources = [];
+    folders.forEach(folder => {
+      const skillPath = path.join(skillsDir, folder);
+      const manifest = path.join(skillPath, 'SKILL.md');
+      if (fs.existsSync(manifest)) {
+        resources.push({
+          uri: `skills://${folder}`,
+          name: folder,
+          mimeType: 'text/markdown',
+          description: `Dynamic offline skill ${folder} loaded from C:\\AG SKILLS`
+        });
+      }
+    });
+    return resources;
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * Resource Helper: Minify markdown prompts to save tokens
+ */
+function minifySkillPrompt(content) {
+  if (!content) return '';
+  let cleaned = content.replace(/<!--[\s\S]*?-->/g, '');
+  cleaned = cleaned.split('\n')
+    .map(line => line.trimEnd())
+    .filter((line, index, arr) => {
+      if (line === '' && arr[index - 1] === '') return false;
+      return true;
+    })
+    .join('\n');
+  return cleaned;
+}
+
+/**
+ * Resource Helper: Read specific skill content from C:\AG SKILLS, config, or local workspace
+ */
+function handleReadResource(id, uri) {
+  if (!uri || !uri.startsWith('skills://')) {
+    return {
+      jsonrpc: '2.0',
+      id,
+      error: { code: -32602, message: `Invalid resource URI: ${uri}` }
+    };
+  }
+
+  const skillName = uri.replace('skills://', '');
+  const searchPaths = [
+    path.join('C:\\AG SKILLS', skillName, 'SKILL.md'),
+    path.join(os.homedir(), '.gemini', 'config', 'skills', skillName, 'SKILL.md'),
+    path.join(ROOT_DIR, '.agents', 'skills', skillName, 'SKILL.md')
+  ];
+
+  let fileContent = null;
+  for (const p of searchPaths) {
+    if (fs.existsSync(p)) {
+      try {
+        fileContent = fs.readFileSync(p, 'utf8');
+        break;
+      } catch (e) {}
+    }
+  }
+
+  if (fileContent === null) {
+    return {
+      jsonrpc: '2.0',
+      id,
+      error: { code: -32602, message: `Skill resource not found: ${skillName}` }
+    };
+  }
+
+  const optimizedText = minifySkillPrompt(fileContent);
+
+  return {
+    jsonrpc: '2.0',
+    id,
+    result: {
+      contents: [
+        {
+          uri,
+          mimeType: 'text/markdown',
+          text: optimizedText
+        }
+      ]
+    }
+  };
+}
+
 // Available Tool Definitions
 const TOOLS = [
   {
@@ -513,8 +613,8 @@ const TOOLS = [
     description: 'Shift current active persona in .agents/state.json.',
     inputSchema: {
       type: 'object',
-      properties: { persona: { type: 'string', description: 'Persona: PM, ARCHITECT, DEVELOPER, QA, BOSS' } },
-      required: ['persona']
+      properties: { active_persona: { type: 'string', description: 'Persona: PM, ARCHITECT, DEVELOPER, QA, BOSS' } },
+      required: ['active_persona']
     }
   },
   {
@@ -523,11 +623,11 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        targetFile: { type: 'string' },
-        startLine: { type: 'number' },
-        endLine: { type: 'number' }
+        file_path: { type: 'string' },
+        line_range_start: { type: 'number' },
+        line_range_end: { type: 'number' }
       },
-      required: ['targetFile']
+      required: ['file_path']
     }
   },
   {
@@ -595,7 +695,7 @@ function processRPCRequest(request) {
       id,
       result: {
         protocolVersion: '2024-11-05',
-        capabilities: { tools: {} },
+        capabilities: { tools: {}, resources: {} },
         serverInfo: { name: 'synapse-mcp-server', version: '2.0.0' }
       }
     };
@@ -603,6 +703,21 @@ function processRPCRequest(request) {
 
   if (method === 'notifications/initialized') {
     return null;
+  }
+
+  if (method === 'resources/list') {
+    return {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        resources: handleListResources()
+      }
+    };
+  }
+
+  if (method === 'resources/read') {
+    const { uri } = params || {};
+    return handleReadResource(id, uri);
   }
 
   if (method === 'tools/list') {
@@ -631,10 +746,10 @@ function processRPCRequest(request) {
         resultData = handleGetTddStatus();
         break;
       case 'synapse_shift_persona':
-        resultData = handleShiftPersona(args?.persona);
+        resultData = handleShiftPersona(args?.active_persona);
         break;
       case 'synapse_set_target':
-        resultData = handleSetTarget(args?.targetFile, args?.startLine, args?.endLine);
+        resultData = handleSetTarget(args?.file_path, args?.line_range_start, args?.line_range_end);
         break;
       case 'synapse_generate_audit_tables':
         resultData = handleGenerateAuditTables(args?.activePersona, args?.skillsUsed);
@@ -732,6 +847,9 @@ module.exports = {
   handleContextHealthCheck,
   handleHardwareStatus,
   handleSelectDevice,
+  handleListResources,
+  minifySkillPrompt,
+  handleReadResource,
   TOOLS
 };
 

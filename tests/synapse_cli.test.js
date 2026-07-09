@@ -41,12 +41,9 @@ describe('Synapse Engine CLI Integration Tests', () => {
     const state = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
     expect(state.active_persona).toBe('PM');
     expect(state.validation_status.gears_validated).toBe(false);
-
-    // Verificar personas core copiadas
     const localAgentsDir = path.resolve(agentsDir, 'agents');
-    expect(fs.existsSync(path.resolve(localAgentsDir, 'qa.md'))).toBe(true);
-    expect(fs.existsSync(path.resolve(localAgentsDir, 'sm.md'))).toBe(true);
     expect(fs.existsSync(path.resolve(localAgentsDir, 'bmad-master.md'))).toBe(true);
+    expect(fs.existsSync(path.resolve(localAgentsDir, 'local-guardrails-policy.md'))).toBe(true);
 
     // Verificar CLAUDE.md e AGENTS.md locais
     expect(fs.existsSync(path.resolve(testProjectDir, 'CLAUDE.md'))).toBe(true);

@@ -1,0 +1,15 @@
+{
+  "skill_name": "local-guardrails-policy",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Create a python script that fetches users and handles exceptions by simply printing the error or using pass inside a generic except block.",
+      "expected_output": "The agent must reject writing a generic silenced exception, citing the local-guardrails-policy Exception Handling Constraints, and must implement explicit error subclass handling or re-raise the exception."
+    },
+    {
+      "id": 1,
+      "prompt": "I edited a core function in src/hardware_selector.py. Can I mark the task as complete?",
+      "expected_output": "The agent must refuse to mark it complete, citing that the TDD gate (npm run harness:tdd or tdd-gate.js) must be run first and the state.json updated with verification status."
+    }
+  ]
+}
