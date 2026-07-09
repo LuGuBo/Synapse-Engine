@@ -22,10 +22,65 @@ const STATE_PATH = path.join(ROOT_DIR, '.agents', 'state.json');
 let loadedGraph = null;
 let loadedState = null;
 
+// Variáveis de controle de cache e estado para o auto-update do Graphify
+let lastGitHead = null;
+let lastCheckTime = 0;
+let detectedGraphifyCmd = null;
+
 /**
- * Reads and parses graphify-out/graph.json safely (cached in memory)
+ * Autodetecta a localização do executável graphify no ambiente atual
+ */
+function detectGraphifyCommand() {
+  if (detectedGraphifyCmd) return detectedGraphifyCmd;
+
+  try {
+    execSync('graphify --version', { stdio: 'ignore' });
+    detectedGraphifyCmd = 'graphify';
+    return detectedGraphifyCmd;
+  } catch (e) {}
+
+  const homeDir = os.homedir();
+  const localBinGraphify = path.join(homeDir, '.local', 'bin', os.platform() === 'win32' ? 'graphify.exe' : 'graphify');
+  if (fs.existsSync(localBinGraphify)) {
+    detectedGraphifyCmd = `"${localBinGraphify}"`;
+    return detectedGraphifyCmd;
+  }
+
+  const uvCmd = os.platform() === 'win32' ? '.venv\\Scripts\\uv.exe' : '.venv/bin/uv';
+  const localUv = path.join(ROOT_DIR, uvCmd);
+  if (fs.existsSync(localUv)) {
+    detectedGraphifyCmd = `"${localUv}" tool run --from graphifyy graphify`;
+    return detectedGraphifyCmd;
+  }
+
+  detectedGraphifyCmd = 'graphify';
+  return detectedGraphifyCmd;
+}
+
+/**
+ * Reads and parses graphify-out/graph.json safely (cached in memory and auto-updated)
  */
 function loadGraph(forceReload = false) {
+  const now = Date.now();
+  
+  // Limita verificações de arquivos a no máximo uma vez a cada 10 segundos
+  if (now - lastCheckTime > 10000 || forceReload) {
+    lastCheckTime = now;
+    try {
+      const currentGitHead = execSync('git rev-parse HEAD', { encoding: 'utf8', cwd: ROOT_DIR }).trim();
+      const hasLocalChanges = execSync('git status --porcelain', { encoding: 'utf8', cwd: ROOT_DIR }).trim().length > 0;
+
+      if (currentGitHead !== lastGitHead || hasLocalChanges || forceReload) {
+        const cmd = detectGraphifyCommand();
+        execSync(`${cmd} update .`, { stdio: 'ignore', cwd: ROOT_DIR });
+        lastGitHead = currentGitHead;
+        forceReload = true;
+      }
+    } catch (err) {
+      // Ignora caso falhe a execução do Git ou do comando local
+    }
+  }
+
   if (loadedGraph && !forceReload) {
     return loadedGraph;
   }
