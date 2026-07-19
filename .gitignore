@@ -30,3 +30,6 @@ baseline_output.json
 
 # Obsidian Vault (Local Persistent Memory)
 .obsidian-vault/
+
+# Local Session Walkthrough Report (telemetria de sessão do agente)
+walkthrough.md
