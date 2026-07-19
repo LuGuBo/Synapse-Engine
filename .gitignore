@@ -27,3 +27,6 @@ baseline_output.json
 
 # Gemini Local IDE config
 .gemini/
+
+# Obsidian Vault (Local Persistent Memory)
+.obsidian-vault/

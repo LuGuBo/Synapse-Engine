@@ -1,19 +1,19 @@
 ---
 bmad_version: 2.0.0
-inherits: "Global BMAD (GEMINI.md + bmad-core-methodology)"
+inherits: "Global BMAD (GEMINI.md + bmad-master)"
 scope: "Local Domain ({{PROJECT_NAME}})"
 last_updated: "{{DATE}}"
 ---
 
-# Agent Instructions - {{PROJECT_NAME}}
+# Agent Instructions - {{PROJECT_NAME}} (Antigravity Ruleset)
 
 ## Overview
 This repository implements the **{{PROJECT_NAME}}** application. It strictly integrates with the global **BMAD Core Methodology** and utilizes the **Synapse Engine** framework for local harness development.
 
 ## Codebase Navigation via Graphify
-- **Map-First Querying**: Do not perform blind recursive text searches or grep scans over the entire codebase. You MUST inspect the local dependency graph at `./graphify-out/graph.json` first to understand logical node connections, import maps, and dependencies.
-- **Surgical Modification**: Limit context pollution. Modify only the nodes/files directly related to the active task.
-- **Keep Graph Fresh**: Run `npm run harness:graphify` (or `synapse graphify`) after adding, deleting, or refactoring files to ensure structural representations are up to date.
+- **Map-First Querying**: Do not perform blind recursive text searches. Inspect `./graphify-out/graph.json` or call graph query tools first to trace AST dependencies before editing code.
+- **Surgical Target**: Limit context pollution. Open and edit ONLY the specific files impacted by the task.
+- **Auto-Update**: The Synapse MCP Server automatically updates the graph in background when tools are invoked. Manual CLI updates (`npm run harness:graphify`) are only required for structural audits.
 
 ## Governance & State Machine (Persona Shift Loop)
 Transitions between coding phases are tracked in `.agents/state.json`. You must update this file using `synapse status` or manual edits:

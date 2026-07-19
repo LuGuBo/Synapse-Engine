@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "github-local": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_PAT}",
+        "GITHUB_TOKEN": "${env:GITHUB_PAT}"
+      },
+      "description": "Servidor MCP GitHub local utilizando o token GITHUB_PAT do arquivo .env local"
+    }
+  }
+}

@@ -8,20 +8,58 @@
 const { execFileSync } = require('child_process');
 const path = require('path');
 const os = require('os');
+const fs = require('fs');
 
-const PYTHON_SCRIPT = path.join(__dirname, '..', 'src', 'hardware_selector.py');
+const ROOT_DIR = path.join(__dirname, '..');
+const PYTHON_SCRIPT = path.join(ROOT_DIR, 'src', 'hardware_selector.py');
 
 function getHardwareStatus(workload = 'auto', payloadSizeKb = 0.0, override = null) {
+  const cpuCores = os.cpus().length;
+
+  // Otimização estática: Cargas de ultra-baixa latência rodam localmente na CPU sem spawnar subprocesso Python
+  const staticCpuWorkloads = ['mcp_ipc', 'ast_query', 'json_state', 'secret_scan', 'git_diff'];
+  const isCpuWorkload = staticCpuWorkloads.includes(workload);
+  const isCpuOverride = override && override.toLowerCase() === 'cpu';
+
+  if (isCpuWorkload && (!override || isCpuOverride)) {
+    return {
+      selected_device: 'CPU',
+      reason: `Workload type '${workload}' requires ultra-low latency IPC (<0.5ms). CPU preferred.`,
+      gpu_available: false,
+      gpu_name: 'None',
+      provider: 'CPU'
+    };
+  }
+
+  if (isCpuOverride) {
+    return {
+      selected_device: 'CPU',
+      reason: "User explicit override ('cpu')",
+      gpu_available: false,
+      gpu_name: 'None',
+      provider: 'CPU'
+    };
+  }
+
+  // Detecta interpretador python local da virtualenv para evitar o python global lento/quebrado do Windows
+  let pythonCmd = 'python';
+  const localVenvPython = os.platform() === 'win32'
+    ? path.join(ROOT_DIR, '.venv', 'Scripts', 'python.exe')
+    : path.join(ROOT_DIR, '.venv', 'bin', 'python');
+  
+  if (fs.existsSync(localVenvPython)) {
+    pythonCmd = localVenvPython;
+  }
+
   try {
     const args = [PYTHON_SCRIPT, '--json', workload, String(payloadSizeKb)];
     if (override) {
       args.push(override);
     }
-    const output = execFileSync('python', args, { encoding: 'utf8', timeout: 5000 });
+    const output = execFileSync(pythonCmd, args, { encoding: 'utf8', timeout: 5000 });
     return JSON.parse(output.trim());
   } catch (err) {
     // Graceful fallback to pure JS CPU response
-    const cpuCores = os.cpus().length;
     return {
       selected_device: 'CPU',
       reason: `Python selector fallback (${err.message}). Defaulting to CPU (${cpuCores} cores).`,

@@ -29,7 +29,7 @@ Inicializa o framework no seu repositório de projeto atual.
 *   Cria a pasta local de telemetria `.agents/` (no plural).
 *   Injeta o arquivo de estado `.agents/state.json` com os valores padrão.
 *   Copia as personas core dos agentes para `.agents/agents/`.
-*   Injeta os arquivos de governança local `CLAUDE.md` e `AGENTS.md` na raiz do projeto.
+*   Injeta os arquivos de governança local `GEMINI.md` e `AGENTS.md` na raiz do projeto.
 *   Configura os scripts npm de atalho no seu `package.json` local.
 *   Verifica a instalação do **Graphify** no sistema e roda o primeiro mapeamento de dependências.
 

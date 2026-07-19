@@ -15,6 +15,90 @@ program
 const TEMPLATES_DIR = path.resolve(__dirname, '../templates');
 const CORE_AGENTS_DIR = path.resolve(__dirname, '../core/agents');
 
+// --- FUNÇÕES AUXILIARES DE SEGURANÇA E ESCALA DO HARNESS ---
+
+function backupFileSafe(filePath) {
+  if (fs.existsSync(filePath)) {
+    try {
+      const date = new Date();
+      const pad = num => String(num).padStart(2, '0');
+      const timestamp = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+      const backupPath = `${filePath}.bak_${timestamp}`;
+      fs.copyFileSync(filePath, backupPath);
+      console.log(`🔒 Backup de segurança criado: ${path.basename(backupPath)}`);
+    } catch (e) {
+      console.warn(`⚠️ Warning: Falha ao criar backup do arquivo ${path.basename(filePath)}: ${e.message}`);
+    }
+  }
+}
+
+function parseXmlRules(content) {
+  const rules = {};
+  if (!content) return rules;
+  const regex = /<RULE\[([a-zA-Z0-9_\-]+)\]>([\s\S]*?)<\/RULE\[\1\]>/g;
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    rules[match[1]] = match[2];
+  }
+  return rules;
+}
+
+function mergeRulesContent(existingContent, templateContent) {
+  if (!existingContent) return templateContent;
+  const existingRules = parseXmlRules(existingContent);
+  const templateRules = parseXmlRules(templateContent);
+  let updatedContent = existingContent;
+
+  const defaultOldRules = {
+    local_governance: `\n# Local Governance Rules\n- All codebase file changes must be validated by the \`synapse tdd\` gate tool.\n- All work progress and active persona state transitions are tracked in \`.agents/state.json\`.\n- Every task delivery must include a \`walkthrough.md\` in Portuguese containing the **Agent & Skill Trace** audit table matching the agents/personas used and the skills loaded from the repository/workspace catalog.\n`,
+    bmad_core: `\n# BMAD Core Methodology (Global AI Agent Rule)\n- Zero-Pollution: Your primary source of truth is the project's documentation. Do NOT rely on ephemeral chat history.\n- Read Before Coding: Before altering source code, you MUST actively search for and read the relevant specifications.\n- The Bilingual Rule: Chat with USER, walkthrough.md, implementation_plan.md in Portuguese (PT-BR). Code and everything else in English (EN-US).\n- Privacy & Security: NEVER hardcode API keys, passwords, or tokens in logs or code. All secrets reside in .env files.\n- Persona Shift Loop: PM -> Architect -> Developer -> QA using state.json local telemetry.\n`,
+    bmad_jit_skills_protocol: `\n# Protocolo JIT-Skills (Seleção Inteligente de Habilidades Offline)\nO agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa ou nova tarefa complexa:\n1. Diagnóstico Cognitivo: Analisar se a tarefa envolve planejamento, código, testes, etc.\n2. Consulta ao Catálogo: Consultar o catálogo mestre de indexação utilizando a ferramenta correspondente.\n3. Carregamento Offline: Ler o arquivo SKILL.md correspondente de C:\\AG SKILLS\\<nome-da-skill>\\SKILL.md.\n4. Transparência: Notificar o usuário sobre quais habilidades offline foram incorporadas.\n`
+  };
+
+  for (const [ruleName, ruleBody] of Object.entries(templateRules)) {
+    const tagStart = `<RULE[${ruleName}]>`;
+    const tagEnd = `</RULE[${ruleName}]>`;
+
+    if (existingRules[ruleName] !== undefined) {
+      const userBody = existingRules[ruleName];
+      const oldDefault = defaultOldRules[ruleName] || "";
+
+      const isModified = userBody.trim() !== oldDefault.trim();
+      const isAlreadyNew = userBody.trim() === ruleBody.trim();
+
+      if (isModified && !isAlreadyNew) {
+        console.log(`⚠️  Warning: A regra '${ruleName}' possui customizações manuais. Sobrescrita evitada para este bloco.`);
+      } else if (!isAlreadyNew) {
+        const ruleRegex = new RegExp(`<RULE\\[${ruleName}\\]>([\\s\\S]*?)<\/RULE\\[${ruleName}\\]>`, 'g');
+        updatedContent = updatedContent.replace(ruleRegex, `${tagStart}${ruleBody}${tagEnd}`);
+        console.log(`🔄 Regra padrão atualizada com sucesso: '${ruleName}'`);
+      }
+    } else {
+      updatedContent = updatedContent.trim() + `\n\n${tagStart}${ruleBody}${tagEnd}\n`;
+      console.log(`➕ Novo bloco de regra injetado: '${ruleName}'`);
+    }
+  }
+
+  return updatedContent;
+}
+
+function createJunctionLink(target, linkPath) {
+  if (fs.existsSync(linkPath)) {
+    try {
+      const stats = fs.lstatSync(linkPath);
+      if (stats.isSymbolicLink() || stats.isDirectory()) {
+        return;
+      }
+    } catch (e) {}
+  }
+  try {
+    fs.symlinkSync(target, linkPath, 'junction');
+    console.log(`✅ Directory Junction link criado: ${path.basename(linkPath)} -> ${path.basename(target)}`);
+  } catch (err) {
+    console.warn(`⚠️ Warning: Falha ao criar Directory Junction link: ${err.message}`);
+  }
+}
+
 program
   .command('init')
   .description('Inicializa o framework Synapse Engine no projeto atual')
@@ -71,23 +155,31 @@ program
       console.log('✅ Copied core personas to .agents/agents/');
     }
 
-    // 4. Injetar CLAUDE.md e AGENTS.md na raiz do projeto consumidor
-    const claudeFile = path.resolve(projectDir, 'CLAUDE.md');
-    const claudeTemplatePath = path.resolve(TEMPLATES_DIR, 'CLAUDE.template.md');
-    if (fs.existsSync(claudeTemplatePath)) {
-      let content = fs.readFileSync(claudeTemplatePath, 'utf8');
-      content = content.replace(/\{\{PROJECT_NAME\}\}/g, projectName).replace(/\{\{DATE\}\}/g, dateStr);
-      fs.writeFileSync(claudeFile, content, 'utf8');
-      console.log('✅ Created CLAUDE.md');
+    // 4. Injetar GEMINI.md e AGENTS.md na raiz de forma idempotente e segura
+    const geminiFile = path.resolve(projectDir, 'GEMINI.md');
+    const geminiTemplatePath = path.resolve(TEMPLATES_DIR, 'GEMINI.template.md');
+    if (fs.existsSync(geminiTemplatePath)) {
+      if (!fs.existsSync(geminiFile)) {
+        let content = fs.readFileSync(geminiTemplatePath, 'utf8');
+        content = content.replace(/\{\{PROJECT_NAME\}\}/g, projectName).replace(/\{\{DATE\}\}/g, dateStr);
+        fs.writeFileSync(geminiFile, content, 'utf8');
+        console.log('✅ Created GEMINI.md (Antigravity Global Ruleset)');
+      } else {
+        console.log('[INFO] GEMINI.md already exists. Skipping creation to preserve your file.');
+      }
     }
 
     const agentsFile = path.resolve(projectDir, 'AGENTS.md');
     const agentsTemplatePath = path.resolve(TEMPLATES_DIR, 'AGENTS.template.md');
     if (fs.existsSync(agentsTemplatePath)) {
-      let content = fs.readFileSync(agentsTemplatePath, 'utf8');
-      content = content.replace(/\{\{PROJECT_NAME\}\}/g, projectName);
-      fs.writeFileSync(agentsFile, content, 'utf8');
-      console.log('✅ Created AGENTS.md');
+      if (!fs.existsSync(agentsFile)) {
+        let content = fs.readFileSync(agentsTemplatePath, 'utf8');
+        content = content.replace(/\{\{PROJECT_NAME\}\}/g, projectName);
+        fs.writeFileSync(agentsFile, content, 'utf8');
+        console.log('✅ Created AGENTS.md');
+      } else {
+        console.log('[INFO] AGENTS.md already exists. Skipping creation to preserve your file.');
+      }
     }
 
     // 5. Injetar scripts no package.json local
@@ -98,7 +190,8 @@ program
         pkg.scripts = pkg.scripts || {};
         pkg.scripts['harness:tdd'] = 'synapse tdd';
         pkg.scripts['harness:status'] = 'synapse status';
-        pkg.scripts['harness:graphify'] = 'graphify update .';
+        pkg.scripts['harness:graphify'] = 'synapse graphify';
+        pkg.scripts['harness:sync-memory'] = 'powershell -File ./scripts/sync-memory.ps1';
         fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2), 'utf8');
         console.log('✅ Injected npm scripts into local package.json');
       } catch (err) {
@@ -112,7 +205,8 @@ program
         scripts: {
           "harness:tdd": "synapse tdd",
           "harness:status": "synapse status",
-          "harness:graphify": "graphify update ."
+          "harness:graphify": "synapse graphify",
+          "harness:sync-memory": "powershell -File ./scripts/sync-memory.ps1"
         }
       };
       fs.writeFileSync(packageJsonPath, JSON.stringify(basePkg, null, 2), 'utf8');
@@ -211,9 +305,52 @@ decision_maker: AI Agent & Tech Lead
       gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
     }
     if (!gitignoreContent.includes('graphify-out')) {
-      const entry = '\n# Graphify outputs\ngraphify-out/\n';
-      fs.writeFileSync(gitignorePath, gitignoreContent + entry, 'utf8');
+      gitignoreContent += '\n# Graphify outputs\ngraphify-out/\n';
+      fs.writeFileSync(gitignorePath, gitignoreContent, 'utf8');
       console.log('✅ Added graphify-out/ to .gitignore');
+    }
+
+    // 8. Inicializar Camada de Memória Local (Obsidian Vault)
+    console.log('📁 Setting up local declarative memory layer (Obsidian Vault)...');
+    const vaultDir = path.resolve(projectDir, '.obsidian-vault');
+    const permDir = path.resolve(vaultDir, 'permanent');
+    const chatsDir = path.resolve(vaultDir, 'chats');
+
+    fs.mkdirSync(permDir, { recursive: true });
+    fs.mkdirSync(chatsDir, { recursive: true });
+
+    // Criar READMEs explicativos no Vault do projeto consumidor
+    const permReadme = path.resolve(permDir, 'README.md');
+    if (!fs.existsSync(permReadme)) {
+      fs.writeFileSync(permReadme, '# Permanent Notes\n\nThis directory contains immutable business rules, specifications, and long-term concepts.\n', 'utf8');
+    }
+    const chatsReadme = path.resolve(chatsDir, 'README.md');
+    if (!fs.existsSync(chatsReadme)) {
+      fs.writeFileSync(chatsReadme, '# Chat Logs & Session Memory\n\nThis directory holds Markdown summaries of development sessions to fight context amnesia.\n', 'utf8');
+    }
+
+    // Criar Directory Junction apontando para graphify-out
+    const linkPath = path.resolve(vaultDir, 'graphify-links');
+    const targetPath = path.resolve(projectDir, 'graphify-out');
+    if (fs.existsSync(targetPath)) {
+      createJunctionLink(targetPath, linkPath);
+    }
+
+    // Copiar o script de sincronização de memória
+    const scriptsFolder = path.resolve(projectDir, 'scripts');
+    fs.mkdirSync(scriptsFolder, { recursive: true });
+    const syncScriptDest = path.resolve(scriptsFolder, 'sync-memory.ps1');
+    const syncScriptTemplate = path.resolve(TEMPLATES_DIR, 'sync-memory.template.ps1');
+    if (fs.existsSync(syncScriptTemplate) && !fs.existsSync(syncScriptDest)) {
+      fs.copyFileSync(syncScriptTemplate, syncScriptDest);
+      console.log('✅ Deployed sync-memory.ps1 automation script to ./scripts/');
+    }
+
+    // Blindagem no .gitignore local
+    if (!gitignoreContent.includes('.obsidian-vault/')) {
+      gitignoreContent += '\n# Obsidian Vault (Local Persistent Memory)\n.obsidian-vault/\n';
+      fs.writeFileSync(gitignorePath, gitignoreContent, 'utf8');
+      console.log('✅ Added .obsidian-vault/ to .gitignore');
     }
 
     console.log('🎉 Synapse Engine initialized successfully!');
@@ -232,13 +369,73 @@ program
       process.exit(1);
     }
 
-    // Copiar personas core atualizadas
+    // 1. Copiar personas core atualizadas
     if (fs.existsSync(CORE_AGENTS_DIR)) {
       const files = fs.readdirSync(CORE_AGENTS_DIR);
       files.forEach(file => {
         fs.copyFileSync(path.resolve(CORE_AGENTS_DIR, file), path.resolve(localAgentsDir, file));
       });
       console.log('✅ Updated personas core files in .agents/agents/');
+    }
+
+    // 2. Realizar backup e atualização incremental e segura do AGENTS.md local
+    const agentsFile = path.resolve(projectDir, 'AGENTS.md');
+    const agentsTemplatePath = path.resolve(TEMPLATES_DIR, 'AGENTS.template.md');
+    if (fs.existsSync(agentsFile) && fs.existsSync(agentsTemplatePath)) {
+      backupFileSafe(agentsFile);
+      const userContent = fs.readFileSync(agentsFile, 'utf8');
+      const templateContent = fs.readFileSync(agentsTemplatePath, 'utf8');
+      const mergedContent = mergeRulesContent(userContent, templateContent);
+      fs.writeFileSync(agentsFile, mergedContent, 'utf8');
+      console.log('✅ Audited and updated local AGENTS.md rules cleanly.');
+    }
+
+    // 3. Garantir infraestrutura física do Vault
+    const vaultDir = path.resolve(projectDir, '.obsidian-vault');
+    const permDir = path.resolve(vaultDir, 'permanent');
+    const chatsDir = path.resolve(vaultDir, 'chats');
+    fs.mkdirSync(permDir, { recursive: true });
+    fs.mkdirSync(chatsDir, { recursive: true });
+
+    // Junction do Graphify
+    const linkPath = path.resolve(vaultDir, 'graphify-links');
+    const targetPath = path.resolve(projectDir, 'graphify-out');
+    if (fs.existsSync(targetPath)) {
+      createJunctionLink(targetPath, linkPath);
+    }
+
+    // Garantir sync script local
+    const scriptsFolder = path.resolve(projectDir, 'scripts');
+    fs.mkdirSync(scriptsFolder, { recursive: true });
+    const syncScriptDest = path.resolve(scriptsFolder, 'sync-memory.ps1');
+    const syncScriptTemplate = path.resolve(TEMPLATES_DIR, 'sync-memory.template.ps1');
+    if (fs.existsSync(syncScriptTemplate) && !fs.existsSync(syncScriptDest)) {
+      fs.copyFileSync(syncScriptTemplate, syncScriptDest);
+      console.log('✅ Deployed missing sync-memory.ps1 script.');
+    }
+
+    // Garantir package.json script e .gitignore
+    const packageJsonPath = path.resolve(projectDir, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      try {
+        const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+        pkg.scripts = pkg.scripts || {};
+        if (!pkg.scripts['harness:sync-memory']) {
+          pkg.scripts['harness:sync-memory'] = 'powershell -File ./scripts/sync-memory.ps1';
+          fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2), 'utf8');
+          console.log('✅ Injected harness:sync-memory script to package.json');
+        }
+      } catch (e) {}
+    }
+
+    const gitignorePath = path.resolve(projectDir, '.gitignore');
+    if (fs.existsSync(gitignorePath)) {
+      let gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
+      if (!gitignoreContent.includes('.obsidian-vault/')) {
+        gitignoreContent += '\n# Obsidian Vault (Local Persistent Memory)\n.obsidian-vault/\n';
+        fs.writeFileSync(gitignorePath, gitignoreContent, 'utf8');
+        console.log('✅ Added .obsidian-vault/ to .gitignore');
+      }
     }
 
     console.log('🎉 Synapse Engine local Harness updated successfully!');
@@ -259,7 +456,7 @@ program
     const geminiConfigDir = path.resolve(homeDir, '.gemini/config');
     fs.mkdirSync(geminiConfigDir, { recursive: true });
 
-    // 1. Injetar/atualizar AGENTS.md global
+    // 1. Injetar/atualizar AGENTS.md global de forma segura
     const globalAgentsFile = path.resolve(geminiConfigDir, 'AGENTS.md');
     const bmadGlobalRules = `# 🌐 Antigravity Global Agent Rules
 This file contains the global rules and behavioral guidelines for the Antigravity AI Agent.
@@ -282,8 +479,16 @@ O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa 
 4. Transparência: Notificar o usuário sobre quais habilidades offline foram incorporadas.
 </RULE[bmad_jit_skills_protocol]>
 `;
-    fs.writeFileSync(globalAgentsFile, bmadGlobalRules, 'utf8');
-    console.log('✅ Updated global AGENTS.md rules in ' + globalAgentsFile);
+    if (fs.existsSync(globalAgentsFile)) {
+      backupFileSafe(globalAgentsFile);
+      const existingGlobal = fs.readFileSync(globalAgentsFile, 'utf8');
+      const mergedGlobal = mergeRulesContent(existingGlobal, bmadGlobalRules);
+      fs.writeFileSync(globalAgentsFile, mergedGlobal, 'utf8');
+      console.log('✅ Audited and updated global AGENTS.md rules cleanly.');
+    } else {
+      fs.writeFileSync(globalAgentsFile, bmadGlobalRules, 'utf8');
+      console.log('✅ Created global AGENTS.md rules in ' + globalAgentsFile);
+    }
 
     // 2. Configurar skills.json global para registrar C:\AG SKILLS
     const skillsJsonPath = path.resolve(geminiConfigDir, 'skills.json');
@@ -396,6 +601,18 @@ program
     const result = getHardwareStatus(options.workload, options.size, options.override);
     console.log('⚡ Synapse Engine - Diagnóstico & Seleção Dinâmica de Hardware:');
     console.log(JSON.stringify(result, null, 2));
+  });
+
+program
+  .command('graphify')
+  .description('Executa a atualização incremental do gráfico de dependências do Graphify')
+  .action(() => {
+    const runner = path.resolve(__dirname, 'harness-graphify.js');
+    try {
+      fork(runner, [], { stdio: 'inherit' });
+    } catch (err) {
+      console.error('❌ Failed to execute graphify update runner:', err.message);
+    }
   });
 
 program.parse(process.argv);

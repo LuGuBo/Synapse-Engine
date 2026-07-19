@@ -45,8 +45,8 @@ describe('Synapse Engine CLI Integration Tests', () => {
     expect(fs.existsSync(path.resolve(localAgentsDir, 'bmad-master.md'))).toBe(true);
     expect(fs.existsSync(path.resolve(localAgentsDir, 'local-guardrails-policy.md'))).toBe(true);
 
-    // Verificar CLAUDE.md e AGENTS.md locais
-    expect(fs.existsSync(path.resolve(testProjectDir, 'CLAUDE.md'))).toBe(true);
+    // Verificar GEMINI.md e AGENTS.md locais
+    expect(fs.existsSync(path.resolve(testProjectDir, 'GEMINI.md'))).toBe(true);
     expect(fs.existsSync(path.resolve(testProjectDir, 'AGENTS.md'))).toBe(true);
 
     // Verificar se adicionou os scripts no package.json local

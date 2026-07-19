@@ -25,6 +25,7 @@ let loadedState = null;
 // Variáveis de controle de cache e estado para o auto-update do Graphify
 let lastGitHead = null;
 let lastCheckTime = 0;
+let lastGitIndexMtime = 0;
 let detectedGraphifyCmd = null;
 
 /**
@@ -67,14 +68,24 @@ function loadGraph(forceReload = false) {
   if (now - lastCheckTime > 10000 || forceReload) {
     lastCheckTime = now;
     try {
-      const currentGitHead = execSync('git rev-parse HEAD', { encoding: 'utf8', cwd: ROOT_DIR }).trim();
-      const hasLocalChanges = execSync('git status --porcelain', { encoding: 'utf8', cwd: ROOT_DIR }).trim().length > 0;
+      const gitIndexPath = path.join(ROOT_DIR, '.git', 'index');
+      let indexMtime = 0;
+      if (fs.existsSync(gitIndexPath)) {
+        indexMtime = fs.statSync(gitIndexPath).mtimeMs;
+      }
 
-      if (currentGitHead !== lastGitHead || hasLocalChanges || forceReload) {
-        const cmd = detectGraphifyCommand();
-        execSync(`${cmd} update .`, { stdio: 'ignore', cwd: ROOT_DIR });
-        lastGitHead = currentGitHead;
-        forceReload = true;
+      // Só executa subprocessos git se a data de modificação do index for alterada
+      if (indexMtime !== lastGitIndexMtime || forceReload) {
+        lastGitIndexMtime = indexMtime;
+        const currentGitHead = execSync('git rev-parse HEAD', { encoding: 'utf8', cwd: ROOT_DIR }).trim();
+        const hasLocalChanges = execSync('git status --porcelain', { encoding: 'utf8', cwd: ROOT_DIR }).trim().length > 0;
+
+        if (currentGitHead !== lastGitHead || hasLocalChanges || forceReload) {
+          const cmd = detectGraphifyCommand();
+          execSync(`${cmd} update .`, { stdio: 'ignore', cwd: ROOT_DIR });
+          lastGitHead = currentGitHead;
+          forceReload = true;
+        }
       }
     } catch (err) {
       // Ignora caso falhe a execução do Git ou do comando local
