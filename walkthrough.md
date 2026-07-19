@@ -1,64 +1,73 @@
-# Walkthrough - Evolução Segura da CLI & Camada de Memória Local (v2.2)
+# Walkthrough - Limpeza de Código e Publicação Segura no GitHub (v2.3)
 
-Este relatório apresenta a implantação da camada de memória local (Obsidian Vault) de forma 100% nativa e isolada no **Synapse Engine**, bem como a evolução de sua CLI para distribuição global de forma idempotente, não-destrutiva e com barreiras rígidas de segurança contra sobrescritas.
+Este relatório apresenta os resultados da varredura, limpeza de redundâncias e publicação do repositório **Synapse Engine** no GitHub.
 
 ## 🤖 Agentes Utilizados & Skills Invocadas
 
 ### 🎭 Agentes Mobilizados (Personas)
 | Agente / Persona | Papel Desempenhado | Fase da Tarefa |
 | :--- | :--- | :--- |
-| **Product Manager (PM)** | Análise funcional do isolamento de dados do cofre local no .gitignore e blindagem do histórico customizado do usuário. | Fase de Requisitos e Conformidade |
-| **Software Architect** | Modelagem de segregação de escopos (local vs global), padrão de idempotência para o comando `init` e mesclagem incremental por tags XML com detecção de drift para o comando `update`. | Fase de Design e Arquitetura |
-| **Software Developer** | Implementação física em Node.js (Junctions sem privilégios via `symlinkSync`, backup por timestamp) e criação do script utilitário PowerShell ASCII (`sync-memory.ps1`). | Fase de Implementação de Código |
-| **QA Engineer** | Escrita e rodada de testes adversariais automatizados em sandbox (`test_cli_upgrade.js`), execução de suíte unitária Jest e análise de benchmarks antes/depois. | Fase de Validação e Testes |
+| **Product Manager (PM)** | Verificação e conformidade das diretivas de ignore e segurança de dados sensíveis antes do push. | Fase de Requisitos e Conformidade |
+| **Software Architect** | Modelagem da estrutura de testes em Python para compatibilidade com o runner unittest padrão (resolvendo conflitos de nomes de arquivos com ponto extra). | Fase de Design e Arquitetura |
+| **Software Developer** | Remoção física da pasta `.agents/bin/` e reestruturação dos arquivos de testes redundantes e incompatíveis. | Fase de Implementação de Código |
+| **QA Engineer** | Execução e validação das suítes de testes completas (Jest e unittest em Python) pós-limpeza. | Fase de Validação e Testes |
 
 ### 🛠️ Skills Invocadas (Globais, Locais e Offline)
 | Nome da Skill | Tipo de Escopo | Propósito da Invocação |
 | :--- | :--- | :--- |
 | **synapse-supreme-orchestrator** | Offline (`C:\AG SKILLS\`) | Governança JIT de personas e aplicação do protocolo de conformidade. |
 | **ag_master_index** | Global Config (`.gemini/config/`) | Ponto de entrada JIT para catálogo de skills e governança de caminhos. |
-| **ecc-memory** | Global Config (`.gemini/config/`) | Divisão e análise de redundância de escopo (memória de sessão global vs memória declarativa local). |
-| **local-guardrails-policy** | Local (`.agents/skills/`) | Aplicação de políticas locais de integridade de código, tratamento de exceções e TDD. |
+| **local-guardrails-policy** | Local (`.agents/skills/`) | Aplicação de políticas locais de integridade de código e testes. |
 
 ---
 
-## 📊 Medição de Desempenho e Coexistência de Benchmarks
+## 🧹 Varredura e Limpeza Realizadas
 
-Rodamos os benchmarks de performance da API MCP local (`prepare.js`) e os testes unitários do repositório (`npm test`) antes e depois das modificações:
+Durante a varredura no código, identificamos e removemos redundâncias que não faziam mais sentido na estrutura atual:
 
-| Métrica Analisada | Baseline (Antes) | Pós-Implementação (v2.2) | Variação / Diagnóstico |
-| :--- | :--- | :--- | :--- |
-| **Status dos Testes (Jest)** | Passou (100%) | Passou (100%) | Nenhuma regressão inserida no framework |
-| **Latência Média RPC (MCP)** | `49.41 ms` | `52.22 ms` | Flutuação normal de latência de IPC |
-| **Payload Médio RPC** | `0.661 KB` | `0.661 KB` | `0%` (Sem acréscimo de peso de transmissão) |
-| **Tempo de Execução Jest** | `3619 ms` | `1860 ms` | Execução mais rápida no host no momento do teste |
-| **Tamanho das Regras (`AGENTS.md`)** | `3450 bytes` | `4099 bytes` | `+649 bytes` (~162 tokens) para governança local |
-| **Tempo do Graphify CLI** | `~3.0s` | `~3.1s` | Junction físico sem impacto no tempo de indexação |
-| **Drift Detection (Sandbox)** | N/A | Passou (100%) | Regras customizadas do usuário foram perfeitamente salvas |
-| **Segurança por Backups** | N/A | Passou (100%) | Cópias `.bak_[timestamp]` geradas com sucesso |
+1. **Remoção de Duplicidade de Scripts (`.agents/bin/`)**:
+   - A pasta `.agents/bin/` continha duplicatas de `state-manager.js` e `tdd-gate.js`.
+   - Como os scripts na raiz (`bin/`) já resolvem o arquivo de estado dinamicamente através de `process.cwd()`, a pasta `.agents/bin/` foi completamente excluída para evitar conflitos de versão e simplificar a árvore do projeto.
+
+2. **Resolução de Redundância e Incompatibilidade de Testes Python**:
+   - O arquivo `tests/test_hardware_selector.py` era 100% idêntico a `tests/hardware_selector.test.py`.
+   - Além disso, arquivos contendo múltiplos pontos no nome (como `*.test.py`) criavam falhas de importação no módulo nativo `unittest` do Python (pois o interpretador tenta resolver o ponto como um subpacote).
+   - Mantivemos a nomenclatura padrão `test_*.py`.
+   - O arquivo `tests/hardware_selector.test.py` foi renomeado para `tests/test_hardware_selector.py`.
+   - O arquivo `tests/synapse_forge.test.py` (que usava padrão antigo do pytest) foi convertido para usar a classe `unittest.TestCase` e renomeado para `tests/test_synapse_forge.py`, garantindo que 100% dos testes em Python sejam executados e validados pelo runner padrão do interpretador.
 
 ---
 
-## 🛠️ Alterações Físicas Implementadas e Distribuição Segura
+## 🔒 Proteção de Dados Sensíveis e Regras do `.gitignore`
 
-### 1. Evolução Idempotente do Comando `init`
-*   Refatoramos o comando `init` em [bin/synapse-cli.js](file:///c:/AG%20PROJETOS/Synapse%20Engine/bin/synapse-cli.js) para verificar a existência de `AGENTS.md` e `GEMINI.md` na raiz do projeto consumidor. Se os arquivos existirem, eles não são sobrescritos (preservando alterações vitais do desenvolvedor).
-*   O `init` agora cria automaticamente a pasta `.obsidian-vault/` com as subpastas em Markdown (`permanent/`, `chats/`).
-*   Configura de forma silenciosa e multiplataforma uma **Directory Junction** (`symlinkSync`) vinculando `graphify-out/` a `.obsidian-vault/graphify-links` sem exigir privilégios de administrador no Windows.
-*   Cria a pasta `scripts/` e copia o script de sincronização e auditoria [templates/sync-memory.template.ps1](file:///c:/AG%20PROJETOS/Synapse%20Engine/templates/sync-memory.template.ps1) para `scripts/sync-memory.ps1` no projeto consumidor.
-*   Mescla de forma segura o script `"harness:sync-memory"` no `package.json` do projeto e injeta a entrada `.obsidian-vault/` no `.gitignore`.
+- Validamos que o arquivo `.env` (que armazena credenciais e tokens como o `GITHUB_PAT`) está 100% isolado no `.gitignore` local e não foi enviado ao repositório.
+- A pasta `.obsidian-vault/` (utilizada para o cofre de notas locais) também foi devidamente resguardada sob a regra inserida na versão anterior.
 
-### 2. Comando `update` Segurado (Backup e Drift Detection)
-*   Refatoramos o comando `update` para realizar atualizações cirúrgicas de governança a nível de regras locais.
-*   **Backup Físico**: Antes de escrever qualquer alteração em arquivos de regras locais ou globais (`AGENTS.md`, `GEMINI.md` ou equivalentes), a CLI faz uma cópia do arquivo com o carimbo de data/hora no nome (ex: `AGENTS.md.bak_YYYYMMDD_HHMMSS`).
-*   **Drift Detection**: A CLI lê as regras XML (`<RULE[nome]>`). Se a regra no arquivo do usuário for diferente da versão padrão original da release anterior (drift manual pelo usuário), a CLI pula a atualização desse bloco e emite um alerta. Se a regra estiver padrão ou for nova, ela é atualizada com sucesso.
+---
 
-### 3. Orquestração do `setup --global` Segurado
-*   Aplicamos o mesmo algoritmo de backup por timestamp e detecção de drift nas tags XML para o `AGENTS.md` global em `.gemini/config/AGENTS.md`.
+## 🧪 Resultados dos Testes de Validação
 
-### 4. Criação dos Templates Padrões do Framework
-*   **[templates/AGENTS.template.md](file:///c:/AG%20PROJETOS/Synapse%20Engine/templates/AGENTS.template.md)**: Atualizado para incluir a regra modular `<RULE[persistent_memory]>` contendo as diretivas em inglês para a orquestração do cofre.
-*   **[templates/sync-memory.template.ps1](file:///c:/AG%20PROJETOS/Synapse%20Engine/templates/sync-memory.template.ps1)**: Criado para distribuição via CLI. É um script PowerShell limpo em ASCII para compatibilidade universal do host Windows.
+Rodamos os testes para validar se a limpeza afetou alguma dependência estrutural:
 
-### 5. Suite Adversarial de Sandbox Concluída
-*   Desenvolvemos um script de teste de integridade em **[.playground/test_cli_upgrade.js](file:///c:/AG%20PROJETOS/Synapse%20Engine/.playground/test_cli_upgrade.js)**. Ele cria uma pasta sandbox temporária, simula arquivos com regras customizadas e scripts no `package.json`, roda a nova CLI e valida se todos os backups, detecções de desvios e arquivos do vault foram preservados e instalados corretamente. O teste passou com **100% de sucesso**.
+### 1. Testes de Integração Jest (JavaScript/Node.js)
+```bash
+npm test
+```
+- **Resultado**: 6 suites de testes executadas e aprovadas com sucesso (20 testes no total).
+
+### 2. Testes Unitários Python
+```bash
+python -m unittest discover -s tests -p "*.py"
+```
+- **Resultado**: 5 testes unitários executados e aprovados com sucesso (incluindo a validação de inicialização do `SynapseEngineHybridEngine` e seletor de hardware).
+
+---
+
+## 🚀 Publicação no GitHub
+
+As alterações limpas e auditadas foram publicadas com sucesso para a branch remota:
+```bash
+git push origin master
+```
+- **Destino**: `https://github.com/LuGuBo/Synapse-Engine.git`
+- **Status**: Atualizado com sucesso (`f86ca5a..f6d016a master -> master`).

@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "jest",
-    "harness:graphify": "node bin/synapse-cli.js graphify"
+    "harness:graphify": "node bin/synapse-cli.js graphify",
+    "release": "node scripts/release.js"
   },
   "dependencies": {
     "commander": "^11.0.0"

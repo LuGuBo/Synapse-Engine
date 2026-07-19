@@ -25,7 +25,6 @@
   "active_personas": ["PM", "ARCHITECT", "DEVELOPER", "QA", "BOSS"],
   "skills_compliance": {
     "local-guardrails-policy": { "always_on": true },
-    "grill-and-evolve": { "always_on": true },
     "harness_dynamic_index": { "always_on": true }
   }
 }

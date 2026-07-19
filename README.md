@@ -78,6 +78,21 @@ Gerencia o Servidor MCP Nativo (`stdio` JSON-RPC) do Synapse Engine.
 synapse mcp benchmark
 ```
 
+### 7. `synapse hardware [options]`
+Exibe o diagnóstico e a seleção dinâmica de hardware (CPU vs. GPU) com base na latência e tipo de operação (DirectML/CUDA).
+*   `--check`: Executa o teste de latência e exibe a prioridade de roteamento de hardware.
+
+```bash
+synapse hardware --check
+```
+
+### 8. `synapse graphify`
+Atualiza incrementalmente o gráfico de dependências AST do projeto local (`graphify-out/graph.json`) para consumo otimizado via MCP.
+
+```bash
+synapse graphify
+```
+
 ---
 
 ## 📊 Benchmark de Economia de Tokens (Servidor MCP Nativo)
@@ -91,8 +106,23 @@ O Synapse Engine inclui um servidor MCP stdio ultraleve (`bin/synapse-mcp-server
 
 ---
 
+## 📦 Tags, Releases & Ciclo de Vida do Projeto
+
+Este projeto utiliza uma esteira automatizada de publicação para sincronizar as versões de desenvolvimento com as releases oficiais no GitHub:
+
+1. As atualizações de versão de infraestrutura e CLI devem ser incrementadas no `package.json`.
+2. O histórico detalhado de mudanças deve ser inserido sob a respectiva tag de versão em `CHANGELOG.md`.
+3. A publicação oficial de releases e tags remotas é orquestrada rodando o script unificado:
+   ```bash
+   npm run release
+   ```
+   *Nota: O script garante a execução prévia da suíte de testes (`npm test`), cria o commit residual de build, gera a tag correspondente localmente (`vX.Y.Z`), envia os commits e tags para o GitHub remoto e cria a Release oficial via API do GitHub usando o `GITHUB_PAT` configurado no arquivo `.env`.*
+
+---
+
 ## 🏛️ Documentação de Arquitetura & ADRs
 * Consulte a especificação técnica do servidor MCP em [mcp_server_specification.md](00_docs/02_tech_specs/mcp_server_specification.md).
 * Consulte o Registro de Decisão Arquitetural em [0002-mcp-stdio-harness-architecture.md](00_docs/04_adrs/0002-mcp-stdio-harness-architecture.md).
 * Consulte o guia de onboarding manual em [global_setup_guide.md](00_docs/global_setup_guide.md).
+
 
