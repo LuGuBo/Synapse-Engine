@@ -37,10 +37,9 @@ Removemos todas as ocorrências físicas rígidas de drives locais (`C:\Users\lg
 - **`workspace_knowledge.md`:** Alterado para utilizar caminhos relativos ao workspace (`./00_docs/`, `./.agents/skills/`), de forma a se auto-adaptar ao diretório de clonagem do repositório.
 - **`global_setup_guide.md`:** Atualizado para refletir o uso de `AG_SKILLS_PATH` no processo de setup manual.
 
-### 3. Investigação e Diagnóstico da Release `v2.0.0`
-- Criamos e rodamos scripts utilitários no `.playground/` (`check_token.js` e `create_release_v2.0.0.js`) que validaram que o token `GITHUB_PAT` no arquivo `.env` está ativo e associado ao proprietário `LuGuBo`.
-- **Diagnóstico:** O token está ativo, mas não possui escopos de escrita em repositório (scopes vazios no Classic Token ou falta de autorização no Fine-grained Token para este novo repositório privado), o que retorna `404 Not Found` na API de criação de release do GitHub.
-- **Solução/Recomendação:** A tag `v2.0.0` já está publicada remotamente no Git. O usuário pode criar a visualização visual da release diretamente no painel web do GitHub associando-a à tag `v2.0.0`, ou atualizar o `GITHUB_PAT` no arquivo `.env` para que futuras execuções automáticas de `npm run release` funcionem perfeitamente.
+### 3. Criação da Release `v2.0.0` no GitHub
+- Com as novas credenciais de acesso concedidas, executamos com sucesso o script `.playground/create_release_v2.0.0.js`.
+- A API do GitHub criou com êxito a **Release oficial v2.0.0** vinculada à tag correspondente. A página de Releases do repositório remoto está agora ativa e devidamente configurada.
 
 ### 4. Documentação Premium do `README.md`
 Reescrevemos o README.md na raiz do projeto com o máximo de profundidade técnica e concisão, adicionando:
@@ -48,6 +47,9 @@ Reescrevemos o README.md na raiz do projeto com o máximo de profundidade técni
 - **Fundamentos do Graphify AST:** Explicação do Context Sharding e da navegação cirúrgica de dependências com redução de 99.9% de tokens.
 - **Integração Obsidian:** Explicação das Directory Junctions (`.obsidian-vault/graphify-links` -> `graphify-out`) e o script de auditoria e validação de metadados das notas (`npm run harness:sync-memory`).
 - **APIs e Comandos:** Tabelas explicativas com assinaturas, retornos e descrição detalhada de cada módulo.
+
+### 5. Publicação Higienizada das Modificações
+- Consolidamos todas as alterações de caminhos relativos e dinâmicos e demos push direto para a branch `master` remota do GitHub. Os arquivos no site agora estão totalmente livres de referências absolutas locais de drives.
 
 ---
 
