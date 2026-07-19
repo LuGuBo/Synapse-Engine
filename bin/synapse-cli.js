@@ -475,7 +475,7 @@ This file contains the global rules and behavioral guidelines for the Antigravit
 O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa ou nova tarefa complexa:
 1. Diagnóstico Cognitivo: Analisar se a tarefa envolve planejamento, código, testes, etc.
 2. Consulta ao Catálogo: Consultar o catálogo mestre de indexação utilizando a ferramenta correspondente.
-3. Carregamento Offline: Ler o arquivo SKILL.md correspondente de C:\\AG SKILLS\\<nome-da-skill>\\SKILL.md.
+3. Carregamento Offline: Ler o arquivo SKILL.md correspondente a partir do diretório de habilidades globais (ex: C:\\AG SKILLS\\<nome-da-skill>\\SKILL.md ou caminho configurado pela variável de ambiente AG_SKILLS_PATH).
 4. Transparência: Notificar o usuário sobre quais habilidades offline foram incorporadas.
 </RULE[bmad_jit_skills_protocol]>
 `;
@@ -490,7 +490,9 @@ O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa 
       console.log('✅ Created global AGENTS.md rules in ' + globalAgentsFile);
     }
 
-    // 2. Configurar skills.json global para registrar C:\AG SKILLS
+    // 2. Configurar skills.json global para registrar o diretório de skills globais
+    const rawSkillsDir = process.env.AG_SKILLS_PATH || process.env.AG_SKILLS_DIR || 'C:\\AG SKILLS';
+    const skillsDir = path.resolve(rawSkillsDir);
     const skillsJsonPath = path.resolve(geminiConfigDir, 'skills.json');
     let skillsJson = { entries: [] };
     if (fs.existsSync(skillsJsonPath)) {
@@ -502,16 +504,17 @@ O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa 
     }
 
     skillsJson.entries = skillsJson.entries || [];
+    const normalizedTarget = skillsDir.replace(/\\/g, '/').toLowerCase();
     const hasPath = skillsJson.entries.some(entry => 
-      entry && entry.path && entry.path.replace(/\\/g, '/').toLowerCase() === 'c:/ag skills'
+      entry && entry.path && path.resolve(entry.path).replace(/\\/g, '/').toLowerCase() === normalizedTarget
     );
 
     if (!hasPath) {
-      skillsJson.entries.push({ path: 'C:\\AG SKILLS' });
+      skillsJson.entries.push({ path: skillsDir });
       fs.writeFileSync(skillsJsonPath, JSON.stringify(skillsJson, null, 2), 'utf8');
-      console.log('✅ Added C:\\AG SKILLS registry to global skills.json configuration.');
+      console.log(`✅ Added ${skillsDir} registry to global skills.json configuration.`);
     } else {
-      console.log('[INFO] C:\\AG SKILLS registry already exists in global skills.json. Skipping.');
+      console.log(`[INFO] ${skillsDir} registry already exists in global skills.json. Skipping.`);
     }
 
     // 3. Configurar mcp_config.json global para registrar o Synapse MCP Server

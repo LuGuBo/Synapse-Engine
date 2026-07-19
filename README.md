@@ -1,103 +1,134 @@
 # ⚡ Synapse Engine V2
 
-**Synapse Engine** é um framework de linha de comando (CLI) em Node.js projetado para orquestração de desenvolvimento assistido por IA. Ele implementa o Harness de automação local, governança baseada na metodologia **BMAD (Breakthrough Method for Agile AI-Driven Development)**, redução crítica de tokens (Context Sharding), e integração com o mapeamento topológico **Graphify**.
+**Synapse Engine** é um framework de linha de comando (CLI) em Node.js de alta performance projetado para orquestração de desenvolvimento assistido por IA. Ele implementa o Harness de automação local, governança baseada na metodologia **BMAD (Breakthrough Method for Agile AI-Driven Development)**, redução crítica de tokens através de Context Sharding com **Graphify AST**, e persistência de memória contínua baseada no **Obsidian Zettelkasten Vault**.
 
 ---
 
-## 🚀 Como Instalar
+## 🏛️ Diagrama de Arquitetura e Comunicação
 
-Como o Synapse Engine é um pacote Node.js CLI hospedado no GitHub, você pode instalá-lo de forma global no terminal:
+O diagrama abaixo ilustra o fluxo de dados entre o LLM (IDE), o Servidor MCP do Synapse, a CLI local, o Git e a estrutura de persistência local:
+
+```mermaid
+graph TD
+    subgraph IDE_Context ["Contexto da IDE & Agentes"]
+        IDE["IDE Antigravity / Claude"]
+        LLM["Agente de IA (Persona Ativa)"]
+    end
+
+    subgraph Synapse_Engine ["Synapse Engine Core"]
+        MCP["Synapse MCP Server (bin/synapse-mcp-server.js)"]
+        CLI["Synapse CLI (bin/synapse-cli.js)"]
+        StateMgr["State Manager (bin/state-manager.js)"]
+        TDDGate["TDD Gate (bin/tdd-gate.js)"]
+        HwSelector["Hardware Selector (src/hardware_selector.py)"]
+        GraphifyInt["Graphify Integration (bin/harness-graphify.js)"]
+    end
+
+    subgraph Workspace_Persistence ["Workspace & Persistência Local"]
+        State[".agents/state.json"]
+        Docs["00_docs/ (PRD, ADRs, Rules)"]
+        GraphFile["graphify-out/graph.json"]
+        Obsidian[".obsidian-vault/ (Memory Vault)"]
+    end
+
+    IDE <-->|stdio JSON-RPC IPC| MCP
+    MCP <-->|Lê Estado e Grafo AST| State & GraphFile
+    MCP <-->|JIT Skills Search| AG_SKILLS_PATH["$AG_SKILLS_PATH (Habilidades Globais)"]
+    
+    CLI -->|Executa Comandos| StateMgr & TDDGate & GraphifyInt
+    StateMgr <-->|Atualiza Sprint/Meta/Persona| State
+    TDDGate -->|Valida Staged Files| Git["Git Status (Staged Code)"]
+    TDDGate -->|Grava Status| State
+    
+    GraphifyInt -->|Compila dependências AST| GraphFile
+    Obsidian -.->|Junction Link| GraphFile
+```
+
+---
+
+## 🔑 Fundamentos Técnicos Principais
+
+### 1. Grafo de Dependências AST (Graphify AST Integration)
+O Synapse Engine integra-se ao mapeamento topológico **Graphify** para expor a árvore de sintaxe abstrata (AST) do projeto de forma cirúrgica para o LLM. 
+*   **Problema:** Carregar arquivos de grafo gigantescos no contexto do LLM consome milhares de tokens e gera ruído.
+*   **Solução:** O servidor MCP nativo expõe ferramentas (`query_graph`, `shortest_path`, `get_node`) que consultam incrementalmente o grafo estruturado em `graphify-out/graph.json`. Em vez do LLM ler arquivos cegamente ou realizar buscas extensivas, ele navega pelas dependências diretas de código usando apenas frações de tokens.
+
+### 2. Memória Persistente (Obsidian Zettelkasten Vault)
+Para manter o alinhamento contextual em múltiplas sessões de desenvolvimento, o Synapse adota a arquitetura de Zettelkasten em `.obsidian-vault/`:
+*   `permanent/`: Notas técnicas permanentes e especificações de negócios do projeto. Lidas pelo agente antes de propor grandes mudanças arquiteturais (Pre-flight Architectural Read).
+*   `chats/`: Resumos atômicos pós-tarefa que detalham as soluções aplicadas, decisões de design e testes executados (Session Serialization).
+*   **Junction Link:** O comando `synapse init` cria automaticamente uma junção física de diretórios no Windows (Directory Junction) vinculando `.obsidian-vault/graphify-links` a `graphify-out`, permitindo que o Obsidian leia de forma nativa e indexe os relatórios gerados pelo Graphify.
+*   **Sincronização (`npm run harness:sync-memory`):** Roda o script de automação em PowerShell (`scripts/sync-memory.ps1`) para atualizar o grafo AST, verificar a integridade do link de junção e auditar a formatação do Frontmatter YAML das notas Markdown no vault Obsidian para evitar erros de sintaxe.
+
+---
+
+## 🛠️ Comandos Disponíveis da CLI
+
+| Comando | Descrição | Sintaxe / Exemplo |
+| :--- | :--- | :--- |
+| **`init`** | Inicializa o Harness no repositório, injeta a pasta `.agents/`, regras locais e cria o Junction Link com o Obsidian. | `synapse init` |
+| **`update`** | Atualiza os componentes do Harness a partir do repositório mestre, preservando `state.json`. | `synapse update` |
+| **`setup --global`** | Configura a governança global da IDE na pasta do usuário e registra o diretório de skills globais. | `synapse setup --global` |
+| **`status`** | Consulta ou atualiza o estado local do Harness (Sprint, Persona Ativa, Meta Cirúrgica). | `synapse status show`<br>`synapse status set persona DEVELOPER` |
+| **`tdd`** | Portão de validação TDD: Garante que os arquivos staged no Git possuem testes válidos e atualiza o status de validação. | `synapse tdd` |
+| **`mcp`** | Inicia o servidor Stdio JSON-RPC ou roda benchmarks de latência e consumo de tokens. | `synapse mcp start`<br>`synapse mcp benchmark` |
+| **`hardware`** | Diagnóstico dinâmico e seleção de aceleração de hardware (DirectML/CUDA) para inferência neuronal. | `synapse hardware --check` |
+| **`graphify`** | Atualiza incrementalmente o gráfico de dependências AST local. | `synapse graphify` |
+
+---
+
+## 📦 Estrutura do Projeto & Módulos Técnicos
+
+O repositório do Synapse Engine está estruturado de forma desacoplada e portátil:
+
+```
+├── .agents/
+│   ├── rules/                 # Regras locais injetadas (graphify.md, synapse-core.md, etc.)
+│   ├── skills/                # Habilidades exclusivas do projeto local
+│   └── state.json             # Telemetria ativa (Sprint, Persona, Alvo Cirúrgico)
+├── 00_docs/                   # Taxonomia semântica (PRD, Tech Specs, ADRs, Rules)
+├── bin/
+│   ├── synapse-cli.js         # Ponto de entrada CLI (utiliza commander.js)
+│   ├── synapse-mcp-server.js  # Servidor stdio JSON-RPC MCP
+│   ├── state-manager.js       # Script utilitário para manipulação do state.json
+│   ├── tdd-gate.js            # Validador de qualidade de testes e arquivos staged no git
+│   ├── hardware-selector.js   # Interface Node.js para o seletor de hardware em Python
+│   └── harness-graphify.js    # Interface para gatilho e auditoria incremental do Graphify
+├── src/
+│   ├── synapse_forge.py       # Scaffolding de diretórios, templates ADR (MADR 4.0.0) e inicializador Graphify
+│   └── hardware_selector.py   # Seletor lógico de GPU (CUDA, DirectML) vs CPU baseado em latência e payload
+├── scripts/
+│   ├── release.js             # Pipeline unificado de testes, versionamento, tag e release no GitHub
+│   └── sync-memory.ps1        # Sincronizador e validador do Obsidian Vault e Graphify
+```
+
+---
+
+## 🚀 Como Instalar e Configurar
+
+Instale o Synapse Engine de forma global a partir do repositório GitHub:
 
 ```bash
 npm install -g git+https://github.com/LuGuBo/Synapse-Engine.git
 ```
 
-ou executá-lo de forma temporária sob demanda utilizando `npx` (sem precisar instalar nada de forma permanente):
+### Portabilidade e Variável de Ambiente `AG_SKILLS_PATH`
+Para evitar caminhos absolutos hardcoded em setups de múltiplas máquinas ou ambientes multiusuários, a CLI e o Servidor MCP resolvem dinamicamente a localização do repositório centralizado de habilidades globais (*Global Skills Vault*) seguindo a ordem de prioridade:
 
-```bash
-npx git+https://github.com/LuGuBo/Synapse-Engine.git init
+1.  Caminho definido na variável de ambiente do sistema: **`AG_SKILLS_PATH`**
+2.  Fallback Windows: `C:\AG SKILLS`
+3.  Fallback Unix/macOS: `~/ag-skills`
+
+Para configurar em seu ambiente Windows (Powershell):
+```powershell
+[System.Environment]::SetEnvironmentVariable("AG_SKILLS_PATH", "D:\SeuCaminho\AG SKILLS", "User")
 ```
 
 ---
 
-## 🛠️ Comandos Disponíveis
+## 📈 Benchmark de Economia de Tokens (Servidor MCP Nativo)
 
-A CLI expõe comandos fáceis e padronizados para gerenciar o ecossistema:
-
-### 1. `synapse init`
-Inicializa o framework no seu repositório de projeto atual.
-*   Cria a pasta local de telemetria `.agents/` (no plural).
-*   Injeta o arquivo de estado `.agents/state.json` com os valores padrão.
-*   Copia as personas core dos agentes para `.agents/agents/`.
-*   Injeta os arquivos de governança local `GEMINI.md` e `AGENTS.md` na raiz do projeto.
-*   Configura os scripts npm de atalho no seu `package.json` local.
-*   Verifica a instalação do **Graphify** no sistema e roda o primeiro mapeamento de dependências.
-
-```bash
-synapse init
-```
-
-### 2. `synapse update`
-Atualiza os executáveis e as personas do Harness local do projeto atual a partir da última versão do repositório mestre do GitHub. Mantém intacto o seu progresso local em `state.json`.
-
-```bash
-synapse update
-```
-
-### 3. `synapse setup --global`
-Configura de forma automatizada a pasta centralizada do usuário (`~/.gemini/config/`) injetando a governança global (`AGENTS.md`) e vinculando o repositório centralizado de skills offline em `C:\AG SKILLS` ao arquivo `skills.json` da IDE.
-
-```bash
-synapse setup --global
-```
-
-*Nota: Veja o [Guia de Setup Global](00_docs/global_setup_guide.md) para realizar esses passos manualmente de forma transparente.*
-
-### 4. `synapse status [args]`
-Consulta ou atualiza o estado local do Harness (gerencia sprint ativo, persona atual e meta cirúrgica no `.agents/state.json`).
-
-```bash
-synapse status show
-synapse synapse status set persona DEVELOPER
-synapse synapse status set target backend/app/main.py 10 50
-```
-
-### 5. `synapse tdd`
-Executa o portão automatizado de validação TDD. Garante que qualquer arquivo de produção staged no Git tenha um teste correspondente e que o status de validação no `state.json` esteja correto.
-
-```bash
-synapse tdd
-```
-
-### 6. `synapse mcp [start | benchmark]`
-Gerencia o Servidor MCP Nativo (`stdio` JSON-RPC) do Synapse Engine.
-* `synapse mcp start`: Inicia o servidor stdio para integração direta com a IDE Antigravity / Claude.
-* `synapse mcp benchmark`: Executa a verificação automatizada e exibe em tempo real a tabela comparativa de consumo de tokens.
-
-```bash
-synapse mcp benchmark
-```
-
-### 7. `synapse hardware [options]`
-Exibe o diagnóstico e a seleção dinâmica de hardware (CPU vs. GPU) com base na latência e tipo de operação (DirectML/CUDA).
-*   `--check`: Executa o teste de latência e exibe a prioridade de roteamento de hardware.
-
-```bash
-synapse hardware --check
-```
-
-### 8. `synapse graphify`
-Atualiza incrementalmente o gráfico de dependências AST do projeto local (`graphify-out/graph.json`) para consumo otimizado via MCP.
-
-```bash
-synapse graphify
-```
-
----
-
-## 📊 Benchmark de Economia de Tokens (Servidor MCP Nativo)
-
-O Synapse Engine inclui um servidor MCP stdio ultraleve (`bin/synapse-mcp-server.js`) em Node.js puro sem dependências externas. Ele expõe a topologia **Graphify AST** e o estado de governança **TDD** diretamente ao LLM.
+O servidor stdio JSON-RPC MCP (`bin/synapse-mcp-server.js`) elimina a sobrecarga de tokens nas interações do agente:
 
 | Abordagem | Tamanho do Payload | Tokens Estimados | Latência IPC | Eficiência de Contexto |
 | :--- | :--- | :--- | :--- | :--- |
@@ -106,23 +137,14 @@ O Synapse Engine inclui um servidor MCP stdio ultraleve (`bin/synapse-mcp-server
 
 ---
 
-## 📦 Tags, Releases & Ciclo de Vida do Projeto
+## 🚀 Script de Release Automatizado
 
-Este projeto utiliza uma esteira automatizada de publicação para sincronizar as versões de desenvolvimento com as releases oficiais no GitHub:
-
-1. As atualizações de versão de infraestrutura e CLI devem ser incrementadas no `package.json`.
-2. O histórico detalhado de mudanças deve ser inserido sob a respectiva tag de versão em `CHANGELOG.md`.
-3. A publicação oficial de releases e tags remotas é orquestrada rodando o script unificado:
-   ```bash
-   npm run release
-   ```
-   *Nota: O script garante a execução prévia da suíte de testes (`npm test`), cria o commit residual de build, gera a tag correspondente localmente (`vX.Y.Z`), envia os commits e tags para o GitHub remoto e cria a Release oficial via API do GitHub usando o `GITHUB_PAT` configurado no arquivo `.env`.*
-
----
-
-## 🏛️ Documentação de Arquitetura & ADRs
-* Consulte a especificação técnica do servidor MCP em [mcp_server_specification.md](00_docs/02_tech_specs/mcp_server_specification.md).
-* Consulte o Registro de Decisão Arquitetural em [0002-mcp-stdio-harness-architecture.md](00_docs/04_adrs/0002-mcp-stdio-harness-architecture.md).
-* Consulte o guia de onboarding manual em [global_setup_guide.md](00_docs/global_setup_guide.md).
-
-
+O Synapse Engine inclui um pipeline de publicação executável através do comando:
+```bash
+npm run release
+```
+Este script (`scripts/release.js`):
+1.  Roda a suíte de testes locais (`jest`) como portão de qualidade.
+2.  Cria o commit residual de build (`chore(release): prepare release vX.Y.Z`).
+3.  Gera e envia a tag local e os commits para o repositório origin remoto no GitHub.
+4.  Cria a Release visual no GitHub através da API REST utilizando o token configurado na variável **`GITHUB_PAT`** do arquivo `.env` local.

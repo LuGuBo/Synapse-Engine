@@ -493,10 +493,25 @@ function handleSelectDevice(workloadType, payloadSizeKb, override) {
 }
 
 /**
- * Resource Helper: List available skills in C:\AG SKILLS
+ * Resolves the global offline skills directory dynamically.
+ */
+function getGlobalSkillsDir() {
+  const envPath = process.env.AG_SKILLS_PATH || process.env.AG_SKILLS_DIR;
+  if (envPath) {
+    return path.resolve(envPath);
+  }
+  if (os.platform() === 'win32') {
+    return 'C:\\AG SKILLS';
+  } else {
+    return path.join(os.homedir(), 'ag-skills');
+  }
+}
+
+/**
+ * Resource Helper: List available skills in global offline skills directory
  */
 function handleListResources() {
-  const skillsDir = 'C:\\AG SKILLS';
+  const skillsDir = getGlobalSkillsDir();
   if (!fs.existsSync(skillsDir)) return [];
   try {
     const folders = fs.readdirSync(skillsDir);
@@ -509,7 +524,7 @@ function handleListResources() {
           uri: `skills://${folder}`,
           name: folder,
           mimeType: 'text/markdown',
-          description: `Dynamic offline skill ${folder} loaded from C:\\AG SKILLS`
+          description: `Dynamic offline skill ${folder} loaded from ${skillsDir}`
         });
       }
     });
@@ -536,7 +551,7 @@ function minifySkillPrompt(content) {
 }
 
 /**
- * Resource Helper: Read specific skill content from C:\AG SKILLS, config, or local workspace
+ * Resource Helper: Read specific skill content from global skills, config, or local workspace
  */
 function handleReadResource(id, uri) {
   if (!uri || !uri.startsWith('skills://')) {
@@ -549,7 +564,7 @@ function handleReadResource(id, uri) {
 
   const skillName = uri.replace('skills://', '');
   const searchPaths = [
-    path.join('C:\\AG SKILLS', skillName, 'SKILL.md'),
+    path.join(getGlobalSkillsDir(), skillName, 'SKILL.md'),
     path.join(os.homedir(), '.gemini', 'config', 'skills', skillName, 'SKILL.md'),
     path.join(ROOT_DIR, '.agents', 'skills', skillName, 'SKILL.md')
   ];

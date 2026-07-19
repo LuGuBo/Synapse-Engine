@@ -16,11 +16,13 @@ O agente de IA (Antigravity) gerencia regras globais que são carregadas logo na
 
 ---
 
-## 📦 2. O Repositório de Habilidades Compartilhado (`C:\AG SKILLS\`)
+## 📦 2. O Repositório de Habilidades Compartilhado (`AG_SKILLS_PATH`)
 
-Para manter o ecossistema modular e limpo, todas as ferramentas e guias especializados offline (ex: `postgres-best-practices`, `qa`, `senior-architect`) residem no diretório compartilhado:
+Para manter o ecossistema modular e limpo, todas as ferramentas e guias especializados offline (ex: `postgres-best-practices`, `qa`, `senior-architect`) residem em um diretório compartilhado configurado no sistema. 
 
-*   **Caminho Físico:** `C:\AG SKILLS\`
+Por padrão, o Synapse utiliza a variável de ambiente **`AG_SKILLS_PATH`** para localizar este diretório. Caso não esteja configurada, o sistema adota os seguintes caminhos padrão (fallbacks):
+*   **No Windows:** `C:\AG SKILLS\`
+*   **No Unix/macOS:** `~/ag-skills/`
 
 Este diretório deve ser tratado como um **repositório Git independente**. Ele pode ser compartilhado com times ou clonado a partir de um repositório central de skills no GitHub, permitindo atualização e extensão de habilidades sem alterar os códigos comerciais de aplicação.
 
@@ -56,13 +58,13 @@ This file contains the global rules and behavioral guidelines for the Antigravit
 O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa ou nova tarefa complexa:
 1. Diagnóstico Cognitivo: Analisar se a tarefa envolve planejamento, código, testes, etc.
 2. Consulta ao Catálogo: Consultar o catálogo mestre de indexação utilizando a ferramenta correspondente.
-3. Carregamento Offline: Ler o arquivo SKILL.md correspondente de C:\AG SKILLS\<nome-da-skill>\SKILL.md.
+3. Carregamento Offline: Ler o arquivo SKILL.md correspondente a partir do diretório de habilidades globais (ex: C:\AG SKILLS\<nome-da-skill>\SKILL.md ou caminho configurado pela variável de ambiente AG_SKILLS_PATH).
 4. Transparência: Notificar o usuário sobre quais habilidades offline foram incorporadas.
 </RULE[bmad_jit_skills_protocol]>
 ```
 
 ### Passo C: Configurar o Mapeador de Skills (`skills.json`)
-Crie o arquivo `skills.json` dentro de `C:\Users\<Seu-Usuario>\.gemini\config\` com o seguinte conteúdo JSON:
+Crie o arquivo `skills.json` dentro de `C:\Users\<Seu-Usuario>\.gemini\config\` com o seguinte conteúdo JSON, apontando para o seu diretório de habilidades (exemplo usando o caminho padrão do Windows):
 
 ```json
 {
@@ -72,7 +74,7 @@ Crie o arquivo `skills.json` dentro de `C:\Users\<Seu-Usuario>\.gemini\config\` 
 }
 ```
 
-Isso instruirá a IDE a ler nativamente todas as habilidades armazenadas em `C:\AG SKILLS\`.
+Isso instruirá a IDE a ler nativamente todas as habilidades armazenadas na pasta indicada.
 
 ---
 
