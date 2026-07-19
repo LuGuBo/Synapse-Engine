@@ -166,16 +166,25 @@ const req = https.request(options, (res) => {
       log(`🔗 URL da Release: ${releaseInfo.html_url}`);
       process.exit(0);
     } else {
-      errorLog(`Falha ao criar release no GitHub. Código de Status: ${res.statusCode}`);
-      errorLog(`Resposta da API: ${responseData}`);
-      process.exit(1);
+      log(`----------------------------------------------------------------------`);
+      log(`⚠️  Nota: Os commits e a tag '${tag}' foram enviados com SUCESSO ao GitHub.`);
+      log(`⚠️  Contudo, a criação da Release visual via API REST falhou (Código: ${res.statusCode}).`);
+      log(`⚠️  Isso geralmente ocorre se o GITHUB_PAT no arquivo .env estiver expirado ou sem escopo 'repo'.`);
+      log(`👉 Você pode criar a release manualmente no site a partir da tag '${tag}' já enviada.`);
+      log(`👉 Para futuras releases automáticas, atualize o GITHUB_PAT no .env com permissões de leitura/escrita.`);
+      log(`----------------------------------------------------------------------`);
+      process.exit(0); // Exit with success since Git changes were successfully published
     }
   });
 });
 
 req.on('error', (e) => {
-  errorLog(`Erro na requisição da API do GitHub: ${e.message}`);
-  process.exit(1);
+  log(`----------------------------------------------------------------------`);
+  log(`⚠️  Nota: Os commits e a tag '${tag}' foram enviados com SUCESSO ao GitHub.`);
+  log(`⚠️  Contudo, houve erro na chamada HTTP da API do GitHub: ${e.message}`);
+  log(`👉 Você pode criar a release manualmente no site a partir da tag '${tag}' já enviada.`);
+  log(`----------------------------------------------------------------------`);
+  process.exit(0);
 });
 
 // Envia os dados no corpo da requisição
