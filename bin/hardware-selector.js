@@ -56,7 +56,7 @@ function getHardwareStatus(workload = 'auto', payloadSizeKb = 0.0, override = nu
     if (override) {
       args.push(override);
     }
-    const output = execFileSync(pythonCmd, args, { encoding: 'utf8', timeout: 5000 });
+    const output = execFileSync(pythonCmd, args, { encoding: 'utf8', timeout: 250 });
     return JSON.parse(output.trim());
   } catch (err) {
     // Graceful fallback to pure JS CPU response

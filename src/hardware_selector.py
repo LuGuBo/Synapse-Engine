@@ -11,7 +11,13 @@ class HardwareSelector:
     """
     def __init__(self):
         self.cpu_cores = os.cpu_count() or 4
-        self.gpu_info = self._detect_gpu_acceleration()
+        self._gpu_info = None
+
+    @property
+    def gpu_info(self):
+        if self._gpu_info is None:
+            self._gpu_info = self._detect_gpu_acceleration()
+        return self._gpu_info
 
     def _detect_gpu_acceleration(self):
         gpu_detected = False
@@ -20,15 +26,31 @@ class HardwareSelector:
 
         if sys.platform == "win32":
             try:
-                cmd = 'powershell -NoProfile -Command "Get-CimInstance -ClassName Win32_VideoController | Select-Object -ExpandProperty Name"'
-                res = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=3)
-                if res.returncode == 0 and res.stdout.strip():
-                    gpus = [g.strip() for g in res.stdout.strip().split('\n') if g.strip()]
-                    if gpus:
-                        gpu_detected = True
-                        gpu_name = ", ".join(gpus)
-                        provider = "DirectML"
-            except Exception:
+                import winreg
+                path = r"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}"
+                key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
+                gpus = []
+                for i in range(100):
+                    try:
+                        sub_key_name = winreg.EnumKey(key, i)
+                        if sub_key_name.isdigit():
+                            sub_key = winreg.OpenKey(key, sub_key_name)
+                            try:
+                                driver_desc, _ = winreg.QueryValueEx(sub_key, "DriverDesc")
+                                if driver_desc:
+                                    gpus.append(driver_desc)
+                            except OSError:
+                                driver_desc = None
+                            finally:
+                                sub_key.Close()
+                    except OSError:
+                        break
+                key.Close()
+                if gpus:
+                    gpu_detected = True
+                    gpu_name = ", ".join(gpus)
+                    provider = "DirectML"
+            except OSError:
                 gpu_detected = False
 
         try:
@@ -38,7 +60,7 @@ class HardwareSelector:
                 provider = "CUDA"
                 gpu_name = torch.cuda.get_device_name(0)
         except ImportError:
-            pass
+            driver_desc = None
 
         return {
             "gpu_available": gpu_detected,
@@ -47,39 +69,45 @@ class HardwareSelector:
         }
 
     def select_execution_device(self, workload_type, payload_size_kb=0.0, user_override=None):
-        if user_override and user_override.lower() in ["cpu", "gpu"]:
-            device = user_override.upper()
-            reason = f"User explicit override ('{user_override}')"
-            if device == "GPU" and not self.gpu_info["gpu_available"]:
-                device = "CPU"
-                reason = "Requested GPU override, but no acceleration device detected. Falling back to CPU."
+        w_type = workload_type.lower()
+
+        # Otimização extrema de curto-circuito para responder CPU instantaneamente
+        # sem acessar a propriedade gpu_info (evitando inicialização/detecção de GPU)
+        is_cpu_workload = w_type in ["mcp_ipc", "ast_query", "json_state", "secret_scan", "git_diff"]
+        is_cpu_override = user_override and user_override.lower() == "cpu"
+
+        if is_cpu_override or (is_cpu_workload and not (user_override and user_override.lower() == "gpu")):
+            return {
+                "selected_device": "CPU",
+                "reason": "User explicit override ('cpu')" if is_cpu_override else f"Workload type '{workload_type}' requires ultra-low latency IPC (<0.5ms). CPU preferred.",
+                "gpu_available": False,
+                "gpu_name": "None",
+                "provider": "CPU"
+            }
+
+        # Override manual para GPU
+        if user_override and user_override.lower() == "gpu":
+            gpu_info = self.gpu_info
+            device = "GPU" if gpu_info["gpu_available"] else "CPU"
+            reason = "User explicit override ('gpu')" if gpu_info["gpu_available"] else "Requested GPU override, but no acceleration device detected. Falling back to CPU."
             return {
                 "selected_device": device,
                 "reason": reason,
-                "gpu_available": self.gpu_info["gpu_available"],
-                "gpu_name": self.gpu_info["gpu_name"],
-                "provider": self.gpu_info["provider"]
+                "gpu_available": gpu_info["gpu_available"],
+                "gpu_name": gpu_info["gpu_name"],
+                "provider": gpu_info["provider"]
             }
 
-        w_type = workload_type.lower()
-
-        if w_type in ["mcp_ipc", "ast_query", "json_state", "secret_scan", "git_diff"]:
-            return {
-                "selected_device": "CPU",
-                "reason": f"Workload type '{workload_type}' requires ultra-low latency IPC (<0.5ms). CPU preferred.",
-                "gpu_available": self.gpu_info["gpu_available"],
-                "gpu_name": self.gpu_info["gpu_name"],
-                "provider": self.gpu_info["provider"]
-            }
+        gpu_info = self.gpu_info
 
         if w_type in ["batch_embeddings", "neural_inference", "matrix_compute"]:
-            if self.gpu_info["gpu_available"]:
+            if gpu_info["gpu_available"]:
                 return {
                     "selected_device": "GPU",
-                    "reason": f"Heavy workload '{workload_type}' benefits from parallel GPU compute ({self.gpu_info['provider']}).",
+                    "reason": f"Heavy workload '{workload_type}' benefits from parallel GPU compute ({gpu_info['provider']}).",
                     "gpu_available": True,
-                    "gpu_name": self.gpu_info["gpu_name"],
-                    "provider": self.gpu_info["provider"]
+                    "gpu_name": gpu_info["gpu_name"],
+                    "provider": gpu_info["provider"]
                 }
             else:
                 return {
@@ -90,22 +118,22 @@ class HardwareSelector:
                     "provider": "CPU"
                 }
 
-        if payload_size_kb >= 1024.0 and self.gpu_info["gpu_available"]:
+        if payload_size_kb >= 1024.0 and gpu_info["gpu_available"]:
             return {
                 "selected_device": "GPU",
                 "reason": f"Payload size ({payload_size_kb:.2f} KB) exceeds 1MB threshold. Routing to GPU for throughput.",
                 "gpu_available": True,
-                "gpu_name": self.gpu_info["gpu_name"],
-                "provider": self.gpu_info["provider"]
+                "gpu_name": gpu_info["gpu_name"],
+                "provider": gpu_info["provider"]
             }
         else:
-            reason = f"Payload size ({payload_size_kb:.2f} KB) below 1MB threshold." if self.gpu_info["gpu_available"] else "No GPU available."
+            reason = f"Payload size ({payload_size_kb:.2f} KB) below 1MB threshold." if gpu_info["gpu_available"] else "No GPU available."
             return {
                 "selected_device": "CPU",
                 "reason": f"{reason} Routing to CPU for zero setup overhead.",
-                "gpu_available": self.gpu_info["gpu_available"],
-                "gpu_name": self.gpu_info["gpu_name"],
-                "provider": self.gpu_info["provider"]
+                "gpu_available": gpu_info["gpu_available"],
+                "gpu_name": gpu_info["gpu_name"],
+                "provider": gpu_info["provider"]
             }
 
 def main():

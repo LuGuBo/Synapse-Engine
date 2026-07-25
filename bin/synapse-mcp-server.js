@@ -326,7 +326,7 @@ ${skillsList}`;
 /**
  * Tool 8: Scan Secrets (OWASP)
  */
-function handleScanSecrets() {
+function handleScanSecrets(responseFormat = 'markdown') {
   const secretPatterns = [
     { name: 'AWS Access Key', regex: /AKIA[0-9A-Z]{16}/g },
     { name: 'GitHub Token', regex: /gh[pous]_[A-Za-z0-9_]{36,}/g },
@@ -362,11 +362,24 @@ function handleScanSecrets() {
 
   scanDir(ROOT_DIR);
 
-  return {
+  const rawResult = {
     clean: violations.length === 0,
     violationCount: violations.length,
     violations: violations.slice(0, 10)
   };
+
+  if (responseFormat === 'json') {
+    return rawResult;
+  }
+
+  if (rawResult.clean) {
+    return `### 🛡️ OWASP Secret Scan Result\n\n✅ No secrets or credentials leaked in tracked codebase files. Context is clean!`;
+  }
+
+  const tableHeader = `### 🚨 OWASP Secret Scan Violations Detected!\n\n| File | Leak Type | Sneak Peek |\n| :--- | :--- | :--- |\n`;
+  const tableRows = rawResult.violations.map(v => `| [${v.file}](file:///${path.resolve(ROOT_DIR, v.file).replace(/\\/g, '/')}) | **${v.type}** | \`${v.snippet}\` |`).join('\n');
+  
+  return `${tableHeader}${tableRows}\n\nTotal Violations: **${rawResult.violationCount}** (showing top 10). Please remove these hardcoded secrets immediately and use a \`.env\` file.`;
 }
 
 /**
@@ -435,7 +448,7 @@ function handleSearchSkills(query) {
 /**
  * Tool 11: Context Health Check
  */
-function handleContextHealthCheck() {
+function handleContextHealthCheck(responseFormat = 'markdown') {
   const largeFiles = [];
   function checkDir(dir) {
     const files = fs.readdirSync(dir);
@@ -470,7 +483,7 @@ function handleContextHealthCheck() {
     gitignoreCompliant = content.includes('.env') && content.includes('graphify-out');
   }
 
-  return {
+  const rawResult = {
     healthy: largeFiles.length === 0 && gitignoreCompliant,
     largeFilesCount: largeFiles.length,
     largeFiles: largeFiles.slice(0, 10),
@@ -479,6 +492,31 @@ function handleContextHealthCheck() {
       protectsEnvAndGraphify: gitignoreCompliant
     }
   };
+
+  if (responseFormat === 'json') {
+    return rawResult;
+  }
+
+  const statusStr = rawResult.healthy ? '🟢 healthy' : '🔴 unhealthy';
+  const gitignoreCheck = rawResult.gitignoreStatus.exists 
+    ? (rawResult.gitignoreStatus.protectsEnvAndGraphify ? '✅ Exists and blocks .env / graphify-out' : '⚠️ Exists but misses .env or graphify-out entries') 
+    : '❌ Missing .gitignore!';
+
+  let md = `### 🩺 Workspace Context Health Check: **${statusStr.toUpperCase()}**\n\n`;
+  md += `- **.gitignore status**: ${gitignoreCheck}\n`;
+  md += `- **Large files count (>500 lines)**: **${rawResult.largeFilesCount}**\n\n`;
+
+  if (rawResult.largeFilesCount > 0) {
+    md += `| File | Line Count |\n| :--- | :--- |\n`;
+    rawResult.largeFiles.forEach(f => {
+      md += `| [${f.file}](file:///${path.resolve(ROOT_DIR, f.file).replace(/\\/g, '/')}) | ${f.lineCount} lines |\n`;
+    });
+    md += `\n*Tip: Split these large files to keep agent context window load to a minimum.*`;
+  } else {
+    md += `✅ All source files are under 500 lines. Clean context chunking!`;
+  }
+
+  return md;
 }
 
 /**
@@ -613,6 +651,12 @@ const TOOLS = [
       type: 'object',
       properties: { targetFile: { type: 'string', description: 'Relative file path or node name' } },
       required: ['targetFile']
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
     }
   },
   {
@@ -622,17 +666,35 @@ const TOOLS = [
       type: 'object',
       properties: { targetFile: { type: 'string', description: 'Relative file path' } },
       required: ['targetFile']
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
     }
   },
   {
     name: 'graphify_check_circular',
     description: 'Check AST graph for circular dependencies.',
-    inputSchema: { type: 'object', properties: {} }
+    inputSchema: { type: 'object', properties: {} },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
+    }
   },
   {
     name: 'synapse_tdd_status',
     description: 'Get current TDD state, active persona, and surgical target.',
-    inputSchema: { type: 'object', properties: {} }
+    inputSchema: { type: 'object', properties: {} },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
+    }
   },
   {
     name: 'synapse_shift_persona',
@@ -641,6 +703,12 @@ const TOOLS = [
       type: 'object',
       properties: { active_persona: { type: 'string', description: 'Persona: PM, ARCHITECT, DEVELOPER, QA, BOSS' } },
       required: ['active_persona']
+    },
+    annotations: {
+      readOnlyHint: false,
+      idempotentHint: false,
+      destructiveHint: false,
+      openWorldHint: false
     }
   },
   {
@@ -649,11 +717,17 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        file_path: { type: 'string' },
-        line_range_start: { type: 'number' },
-        line_range_end: { type: 'number' }
+        file_path: { type: 'string', description: 'Relative path of the target file to edit' },
+        line_range_start: { type: 'number', description: 'Starting line number of the edit scope (1-indexed)' },
+        line_range_end: { type: 'number', description: 'Ending line number of the edit scope (1-indexed)' }
       },
       required: ['file_path']
+    },
+    annotations: {
+      readOnlyHint: false,
+      idempotentHint: false,
+      destructiveHint: false,
+      openWorldHint: false
     }
   },
   {
@@ -662,20 +736,48 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        activePersona: { type: 'string' },
-        skillsUsed: { type: 'array', items: { type: 'string' } }
+        activePersona: { type: 'string', description: 'Persona name to display in the audit tables' },
+        skillsUsed: { type: 'array', items: { type: 'string' }, description: 'Array of skill names invoked during execution' }
       }
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
     }
   },
   {
     name: 'synapse_scan_secrets',
     description: 'Scan workspace for OWASP secret leaks (API keys, tokens, hardcoded passwords).',
-    inputSchema: { type: 'object', properties: {} }
+    inputSchema: {
+      type: 'object',
+      properties: {
+        response_format: {
+          type: 'string',
+          enum: ['markdown', 'json'],
+          default: 'markdown',
+          description: "Format of the response: 'markdown' for formatted text tables or 'json' for raw structured JSON"
+        }
+      }
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
+    }
   },
   {
     name: 'synapse_get_clean_diff',
     description: 'Get compact staged Git diff summary.',
-    inputSchema: { type: 'object', properties: {} }
+    inputSchema: { type: 'object', properties: {} },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
+    }
   },
   {
     name: 'synapse_search_skills',
@@ -683,17 +785,45 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: { query: { type: 'string', description: 'Search term or keyword' } }
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
     }
   },
   {
     name: 'synapse_context_health_check',
     description: 'Check workspace context health (large files >500 lines and .gitignore status).',
-    inputSchema: { type: 'object', properties: {} }
+    inputSchema: {
+      type: 'object',
+      properties: {
+        response_format: {
+          type: 'string',
+          enum: ['markdown', 'json'],
+          default: 'markdown',
+          description: "Format of the response: 'markdown' for formatted text tables or 'json' for raw structured JSON"
+        }
+      }
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
+    }
   },
   {
     name: 'synapse_hardware_status',
     description: 'Get CPU/GPU hardware specs and active acceleration provider.',
-    inputSchema: { type: 'object', properties: {} }
+    inputSchema: { type: 'object', properties: {} },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
+    }
   },
   {
     name: 'synapse_select_device',
@@ -705,6 +835,12 @@ const TOOLS = [
         payloadSizeKb: { type: 'number', description: 'Payload size in KB' },
         override: { type: 'string', description: 'Explicit override: cpu or gpu' }
       }
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
     }
   }
 ];
@@ -758,52 +894,72 @@ function processRPCRequest(request) {
     const { name, arguments: args } = params || {};
     let resultData = {};
 
-    switch (name) {
-      case 'graphify_get_deps':
-        resultData = handleGetDeps(args?.targetFile);
-        break;
-      case 'graphify_get_impacted_tests':
-        resultData = handleGetImpactedTests(args?.targetFile);
-        break;
-      case 'graphify_check_circular':
-        resultData = handleCheckCircular();
-        break;
-      case 'synapse_tdd_status':
-        resultData = handleGetTddStatus();
-        break;
-      case 'synapse_shift_persona':
-        resultData = handleShiftPersona(args?.active_persona);
-        break;
-      case 'synapse_set_target':
-        resultData = handleSetTarget(args?.file_path, args?.line_range_start, args?.line_range_end);
-        break;
-      case 'synapse_generate_audit_tables':
-        resultData = handleGenerateAuditTables(args?.activePersona, args?.skillsUsed);
-        break;
-      case 'synapse_scan_secrets':
-        resultData = handleScanSecrets();
-        break;
-      case 'synapse_get_clean_diff':
-        resultData = handleGetCleanDiff();
-        break;
-      case 'synapse_search_skills':
-        resultData = handleSearchSkills(args?.query);
-        break;
-      case 'synapse_context_health_check':
-        resultData = handleContextHealthCheck();
-        break;
-      case 'synapse_hardware_status':
-        resultData = handleHardwareStatus();
-        break;
-      case 'synapse_select_device':
-        resultData = handleSelectDevice(args?.workloadType, args?.payloadSizeKb, args?.override);
-        break;
-      default:
-        return {
-          jsonrpc: '2.0',
-          id,
-          error: { code: -32601, message: `Tool not found: ${name}` }
-        };
+    try {
+      switch (name) {
+        case 'graphify_get_deps':
+          resultData = handleGetDeps(args?.targetFile);
+          break;
+        case 'graphify_get_impacted_tests':
+          resultData = handleGetImpactedTests(args?.targetFile);
+          break;
+        case 'graphify_check_circular':
+          resultData = handleCheckCircular();
+          break;
+        case 'synapse_tdd_status':
+          resultData = handleGetTddStatus();
+          break;
+        case 'synapse_shift_persona':
+          resultData = handleShiftPersona(args?.active_persona);
+          break;
+        case 'synapse_set_target':
+          resultData = handleSetTarget(args?.file_path, args?.line_range_start, args?.line_range_end);
+          break;
+        case 'synapse_generate_audit_tables':
+          resultData = handleGenerateAuditTables(args?.activePersona, args?.skillsUsed);
+          break;
+        case 'synapse_scan_secrets':
+          resultData = handleScanSecrets(args?.response_format);
+          break;
+        case 'synapse_get_clean_diff':
+          resultData = handleGetCleanDiff();
+          break;
+        case 'synapse_search_skills':
+          resultData = handleSearchSkills(args?.query);
+          break;
+        case 'synapse_context_health_check':
+          resultData = handleContextHealthCheck(args?.response_format);
+          break;
+        case 'synapse_hardware_status':
+          resultData = handleHardwareStatus();
+          break;
+        case 'synapse_select_device':
+          resultData = handleSelectDevice(args?.workloadType, args?.payloadSizeKb, args?.override);
+          break;
+        default:
+          return {
+            jsonrpc: '2.0',
+            id,
+            error: { code: -32601, message: `Tool not found: ${name}` }
+          };
+      }
+    } catch (err) {
+      resultData = { success: false, error: err.message };
+    }
+
+    const isStringResult = typeof resultData === 'string';
+    const isError = resultData && (resultData.error !== undefined || resultData.success === false);
+    
+    let responseText = '';
+    if (isError) {
+      if (args?.response_format === 'json') {
+        responseText = JSON.stringify(resultData);
+      } else {
+        responseText = resultData.error ? `Error: ${resultData.error}` : 'Error: Operation failed';
+      }
+    } else if (isStringResult) {
+      responseText = resultData;
+    } else {
+      responseText = JSON.stringify(resultData);
     }
 
     return {
@@ -813,9 +969,10 @@ function processRPCRequest(request) {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(resultData)
+            text: responseText
           }
-        ]
+        ],
+        ...(isError ? { isError: true } : {})
       }
     };
   }
