@@ -4,7 +4,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 const https = require('https');
 
-// Função para logar mensagens formatadas em português
+// Helper function to log formatted messages in English
 function log(msg) {
   console.log(`[RELEASE] ${msg}`);
 }
@@ -13,12 +13,12 @@ function errorLog(msg) {
   console.error(`[RELEASE ERROR] ❌ ${msg}`);
 }
 
-// 1. Carregar variáveis do arquivo .env
+// 1. Load environment variables from .env file
 const envPath = path.resolve(process.cwd(), '.env');
 let githubPat = process.env.GITHUB_PAT || process.env.GH_TOKEN;
 
 if (fs.existsSync(envPath)) {
-  log('Carregando configurações do arquivo .env local...');
+  log('Loading configurations from local .env file...');
   const envContent = fs.readFileSync(envPath, 'utf8');
   const match = envContent.match(/GITHUB_PAT=["']?([^"'\r\n]+)["']?/);
   if (match) {
@@ -27,113 +27,113 @@ if (fs.existsSync(envPath)) {
 }
 
 if (!githubPat) {
-  errorLog('GITHUB_PAT não configurado no ambiente nem no arquivo .env.');
+  errorLog('GITHUB_PAT is not configured in the environment or .env file.');
   process.exit(1);
 }
 
-// 2. Obter a versão atual do package.json
+// 2. Obtain current version from package.json
 const packageJsonPath = path.resolve(process.cwd(), 'package.json');
 if (!fs.existsSync(packageJsonPath)) {
-  errorLog('package.json não encontrado na raiz do projeto.');
+  errorLog('package.json not found in workspace root.');
   process.exit(1);
 }
 
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const version = packageJson.version;
-log(`Versão detectada para release: v${version}`);
+log(`Detected target release version: v${version}`);
 
-// 3. Extrair notas da versão do CHANGELOG.md
+// 3. Extract release notes from CHANGELOG.md
 const changelogPath = path.resolve(process.cwd(), 'CHANGELOG.md');
-let releaseBody = `Release oficial da versão v${version} do Synapse Engine.`;
+let releaseBody = `Official release for version v${version} of Synapse Engine.`;
 
 if (fs.existsSync(changelogPath)) {
-  log('Extraindo notas da versão do CHANGELOG.md...');
+  log('Extracting release notes from CHANGELOG.md...');
   const changelog = fs.readFileSync(changelogPath, 'utf8');
   const versionEscaped = version.replace(/\./g, '\\.');
   const regex = new RegExp(`##\\s*\\[?${versionEscaped}\\]?(?:[\\s\\S]*?)(?=\\n##|$)`);
   const match = changelog.match(regex);
   if (match) {
-    // Remove o cabeçalho '## [X.Y.Z]' para pegar apenas as descrições
+    // Strip header '## [X.Y.Z]' to extract description body
     releaseBody = match[0].replace(/##\s*\[?[\d\.]+\]?.*?\n/, '').trim();
-    log('Notas de versão extraídas com sucesso.');
+    log('Release notes extracted successfully.');
   } else {
-    log(`Aviso: Notas da versão v${version} não encontradas no CHANGELOG.md. Usando descrição padrão.`);
+    log(`Warning: Version notes for v${version} not found in CHANGELOG.md. Falling back to default description.`);
   }
 } else {
-  log('Aviso: CHANGELOG.md não encontrado na raiz. Usando descrição padrão.');
+  log('Warning: CHANGELOG.md not found in root. Falling back to default description.');
 }
 
-// 4. Executar os testes Jest para garantir integridade
+// 4. Run Jest unit test suite quality gate
 try {
-  log('Rodando suíte de testes unitários para verificação de portão de qualidade...');
+  log('Executing unit test suite quality gate...');
   execSync('npm test', { stdio: 'inherit' });
-  log('Testes passaram com sucesso.');
+  log('All quality gate tests passed successfully.');
 } catch (e) {
-  errorLog('A suíte de testes falhou. Abortando release para proteção da integridade.');
+  errorLog('Unit test suite failed. Aborting release for integrity protection.');
   process.exit(1);
 }
 
-// 5. Garantir que tudo está comitado localmente
+// 5. Ensure git working directory is clean
 try {
-  log('Verificando status de arquivos modificados no Git...');
+  log('Auditing Git modified working directory status...');
   const gitStatus = execSync('git status --porcelain', { encoding: 'utf8' }).trim();
   if (gitStatus) {
-    log('Detectadas alterações não salvas. Criando commit automático de release...');
+    log('Uncommitted changes detected. Creating automated release preparation commit...');
     execSync('git add .', { stdio: 'inherit' });
     execSync(`git commit -m "chore(release): prepare release v${version}"`, { stdio: 'inherit' });
-    log('Commit de preparação de release criado.');
+    log('Release preparation commit created successfully.');
   } else {
-    log('Repositório limpo, nenhum commit residual necessário.');
+    log('Clean workspace repository; no residual commit required.');
   }
 } catch (e) {
-  errorLog(`Falha ao preparar commit no Git: ${e.message}`);
+  errorLog(`Failed to prepare Git commit: ${e.message}`);
   process.exit(1);
 }
 
-// 6. Verificar se a tag já existe localmente ou remotamente
+// 6. Verify if local or remote tag exists
 const tag = `v${version}`;
 try {
-  log(`Verificando se a tag ${tag} já existe localmente...`);
+  log(`Checking if tag ${tag} exists locally...`);
   const localTags = execSync('git tag', { encoding: 'utf8' });
   if (localTags.split('\n').includes(tag)) {
-    log(`A tag ${tag} já existe localmente. Removendo tag local antiga...`);
+    log(`Tag ${tag} exists locally. Deleting previous local tag...`);
     execSync(`git tag -d ${tag}`, { stdio: 'inherit' });
   }
 } catch (e) {
-  errorLog(`Falha ao inspecionar tags do Git: ${e.message}`);
+  errorLog(`Failed to inspect Git tags: ${e.message}`);
 }
 
-// 7. Criar tag localmente
+// 7. Create local Git tag
 try {
-  log(`Criando tag local ${tag}...`);
+  log(`Creating local tag ${tag}...`);
   execSync(`git tag -a ${tag} -m "Release ${tag}"`, { stdio: 'inherit' });
-  log(`Tag ${tag} criada localmente.`);
+  log(`Tag ${tag} created locally.`);
 } catch (e) {
-  errorLog(`Falha ao criar tag Git local: ${e.message}`);
+  errorLog(`Failed to create local Git tag: ${e.message}`);
   process.exit(1);
 }
 
-// 8. Enviar commits e tag para o GitHub
+// 8. Push commits and tags to GitHub
 try {
-  log('Enviando ramificação master para origin remoto...');
+  log('Pushing master branch to origin remote...');
   execSync('git push origin master', { stdio: 'inherit' });
-  log(`Enviando tag ${tag} para origin remoto...`);
+  log(`Pushing tag ${tag} to origin remote...`);
   execSync(`git push origin ${tag} --force`, { stdio: 'inherit' });
-  log('Git push efetuado com sucesso.');
+  log('Git push executed successfully.');
 } catch (e) {
-  errorLog(`Falha ao fazer push no Git origin: ${e.message}`);
+  errorLog(`Failed to push to Git origin: ${e.message}`);
   process.exit(1);
 }
 
-// 9. Criar a Release no GitHub via REST API usando https nativo
-log('Iniciando chamada HTTP para criação da Release oficial no GitHub...');
+// 9. Create GitHub Release entry via REST API using native HTTPS
+log('Initiating HTTP request for GitHub Release creation...');
 const repoOwner = 'LuGuBo';
 const repoName = 'Synapse-Engine';
 
 const postData = JSON.stringify({
   tag_name: tag,
   target_commitish: 'master',
-  name: `v${version} - Core Refactoring & Skill Decoupling`,
+  name: `v${version} - Multi-Model Connectors, Intelligent Routing & AST Architecture`,
   body: releaseBody,
   draft: false,
   prerelease: false
@@ -162,31 +162,26 @@ const req = https.request(options, (res) => {
   res.on('end', () => {
     if (res.statusCode === 201) {
       const releaseInfo = JSON.parse(responseData);
-      log(`🎉 Release oficial criada com sucesso no GitHub!`);
-      log(`🔗 URL da Release: ${releaseInfo.html_url}`);
+      log(`🎉 Official Release successfully created on GitHub!`);
+      log(`🔗 Release URL: ${releaseInfo.html_url}`);
       process.exit(0);
     } else {
       log(`----------------------------------------------------------------------`);
-      log(`⚠️  Nota: Os commits e a tag '${tag}' foram enviados com SUCESSO ao GitHub.`);
-      log(`⚠️  Contudo, a criação da Release visual via API REST falhou (Código: ${res.statusCode}).`);
-      log(`⚠️  Isso geralmente ocorre se o GITHUB_PAT no arquivo .env estiver expirado ou sem escopo 'repo'.`);
-      log(`👉 Você pode criar a release manualmente no site a partir da tag '${tag}' já enviada.`);
-      log(`👉 Para futuras releases automáticas, atualize o GITHUB_PAT no .env com permissões de leitura/escrita.`);
+      log(`⚠️  Note: Commits and tag '${tag}' pushed to GitHub successfully.`);
+      log(`⚠️  However, REST API Release creation returned status code: ${res.statusCode}.`);
       log(`----------------------------------------------------------------------`);
-      process.exit(0); // Exit with success since Git changes were successfully published
+      process.exit(0);
     }
   });
 });
 
 req.on('error', (e) => {
   log(`----------------------------------------------------------------------`);
-  log(`⚠️  Nota: Os commits e a tag '${tag}' foram enviados com SUCESSO ao GitHub.`);
-  log(`⚠️  Contudo, houve erro na chamada HTTP da API do GitHub: ${e.message}`);
-  log(`👉 Você pode criar a release manualmente no site a partir da tag '${tag}' já enviada.`);
+  log(`⚠️  Note: Commits and tag '${tag}' pushed to GitHub successfully.`);
+  log(`⚠️  HTTP API error encountered: ${e.message}`);
   log(`----------------------------------------------------------------------`);
   process.exit(0);
 });
 
-// Envia os dados no corpo da requisição
 req.write(postData);
 req.end();

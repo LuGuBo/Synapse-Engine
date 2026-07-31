@@ -8,7 +8,7 @@ const program = new Command();
 
 program
   .name('synapse')
-  .description('Synapse Engine CLI - Gestão de Governança, TDD Harness e Skills Offline')
+  .description('Synapse Engine CLI - Governance Management, TDD Harness & Offline Skills')
   .version('2.0.0');
 
 // Localização dos templates dentro do pacote synapse-engine instalado
@@ -101,7 +101,7 @@ function createJunctionLink(target, linkPath) {
 
 program
   .command('init')
-  .description('Inicializa o framework Synapse Engine no projeto atual')
+  .description('Initializes Synapse Engine framework in the current directory')
   .action(() => {
     console.log('Initiating Synapse Engine initialization in current directory...');
     const projectDir = process.cwd();
@@ -358,7 +358,7 @@ decision_maker: AI Agent & Tech Lead
 
 program
   .command('update')
-  .description('Atualiza os executáveis e personas do Harness local para a versão mais recente')
+  .description('Updates local Harness executables and core personas to latest version')
   .action(() => {
     console.log('Updating Synapse Engine local components...');
     const projectDir = process.cwd();
@@ -443,7 +443,7 @@ program
 
 program
   .command('setup')
-  .description('Configura as dependências globais e a governança global na IDE')
+  .description('Configures global IDE governance and dependencies')
   .option('--global', 'Executa o setup global na pasta do usuário')
   .action((options) => {
     if (!options.global) {
@@ -543,7 +543,7 @@ O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa 
 
 program
   .command('mcp [action]')
-  .description('Inicia o servidor MCP stdio local ou roda o benchmark de economia de tokens (start | benchmark)')
+  .description('Starts local stdio MCP server or runs token economy benchmark suite (start | benchmark)')
   .action((action) => {
     const mcpScript = path.resolve(__dirname, 'synapse-mcp-server.js');
     if (action === 'benchmark') {
@@ -595,20 +595,20 @@ program
 
 program
   .command('hardware')
-  .description('Exibe o diagnóstico e a seleção dinâmica de hardware (CPU vs. GPU)')
+  .description('Displays diagnostics and dynamic hardware routing (CPU vs GPU)')
   .option('-w, --workload <type>', 'Tipo de carga de trabalho (mcp_ipc, ast_query, batch_embeddings, neural_inference, auto)', 'auto')
   .option('-s, --size <kb>', 'Tamanho do payload em KB', parseFloat, 0.0)
   .option('-o, --override <device>', 'Sobrescrita manual (cpu ou gpu)', null)
   .action((options) => {
     const { getHardwareStatus } = require('./hardware-selector');
     const result = getHardwareStatus(options.workload, options.size, options.override);
-    console.log('⚡ Synapse Engine - Diagnóstico & Seleção Dinâmica de Hardware:');
+    console.log('⚡ Synapse Engine - Hardware Diagnostics & Selection:');
     console.log(JSON.stringify(result, null, 2));
   });
 
 program
   .command('graphify')
-  .description('Executa a atualização incremental do gráfico de dependências do Graphify')
+  .description('Executes incremental AST dependency graph update via Graphify')
   .action(() => {
     const runner = path.resolve(__dirname, 'harness-graphify.js');
     try {
@@ -620,9 +620,9 @@ program
 
 program
   .command('doctor')
-  .description('Executa o autodiagnóstico completo do ecossistema e ambiente do Synapse Engine')
+  .description('Executes full environment autodiagnostics for Synapse Engine')
   .action(() => {
-    console.log('🩺 Executando autodiagnóstico completo do Synapse Engine...\n');
+    console.log('🩺 Executing full Synapse Engine autodiagnostics...\n');
     const os = require('os');
     const homeDir = os.homedir();
     const cwd = process.cwd();
@@ -633,14 +633,14 @@ program
     try {
       execSync('graphify --version', { stdio: 'ignore' });
       graphifyOk = true;
-      graphifyMsg = 'Instalado globalmente no PATH';
+      graphifyMsg = 'Globally installed on PATH';
     } catch (e) {
       const localBinGraphify = path.join(homeDir, '.local', 'bin', os.platform() === 'win32' ? 'graphify.exe' : 'graphify');
       if (fs.existsSync(localBinGraphify)) {
         graphifyOk = true;
-        graphifyMsg = `Fallback encontrado em ${localBinGraphify}`;
+        graphifyMsg = `Fallback binary found at ${localBinGraphify}`;
       } else {
-        graphifyMsg = 'Não encontrado. Execute: pip install graphify ou uv tool install graphifyy';
+        graphifyMsg = 'Not found. Please run: pip install graphify or uv tool install graphifyy';
       }
     }
 
@@ -653,42 +653,42 @@ program
         const mcpConf = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf8'));
         if (mcpConf.mcpServers && mcpConf.mcpServers['synapse-graphify']) {
           mcpOk = true;
-          mcpMsg = 'Servidor synapse-graphify registrado em mcp_config.json';
+          mcpMsg = 'synapse-graphify server registered in mcp_config.json';
         } else {
-          mcpMsg = 'mcp_config.json existe, mas o servidor synapse-graphify não foi registrado. Execute: synapse setup --global';
+          mcpMsg = 'mcp_config.json exists, but synapse-graphify server is not registered. Run: synapse setup --global';
         }
       } catch (e) {
-        mcpMsg = `Erro ao ler mcp_config.json: ${e.message}`;
+        mcpMsg = `Error reading mcp_config.json: ${e.message}`;
       }
     } else {
-      mcpMsg = `Arquivo mcp_config.json não encontrado em ${mcpConfigPath}. Execute: synapse setup --global`;
+      mcpMsg = `mcp_config.json file not found at ${mcpConfigPath}. Run: synapse setup --global`;
     }
 
     // 3. State & Persona Telemetry Check
     const statePath = path.join(cwd, '.agents', 'state.json');
     const stateOk = fs.existsSync(statePath);
-    const stateMsg = stateOk ? 'Presente e rastreando persona local' : 'Ausente. Execute: synapse init';
+    const stateMsg = stateOk ? 'Present and tracking local persona state' : 'Missing. Run: synapse init';
 
     // 4. Obsidian Vault Check
     const vaultPath = path.join(cwd, '.obsidian-vault');
     const vaultOk = fs.existsSync(vaultPath);
-    const vaultMsg = vaultOk ? 'Estrutura de memória local configurada' : 'Ausente. Execute: synapse init ou synapse update';
+    const vaultMsg = vaultOk ? 'Local memory structure configured' : 'Missing. Run: synapse init or synapse update';
 
     // 5. AST Topology Check
     const graphPath = path.join(cwd, 'graphify-out', 'graph.json');
     const graphOk = fs.existsSync(graphPath);
-    const graphMsg = graphOk ? 'Mapa AST gerado em graphify-out/graph.json' : 'Indisponível. Execute: synapse graphify';
+    const graphMsg = graphOk ? 'AST map generated at graphify-out/graph.json' : 'Unavailable. Run: synapse graphify';
 
     console.table([
-      { Componente: 'Graphify CLI', Status: graphifyOk ? '🟢 OK' : '🔴 Falha', Detalhe: graphifyMsg },
-      { Componente: 'IDE MCP Server', Status: mcpOk ? '🟢 OK' : '🟡 Alerta', Detalhe: mcpMsg },
-      { Componente: 'Estado Local (.agents/state.json)', Status: stateOk ? '🟢 OK' : '🔴 Falha', Detalhe: stateMsg },
-      { Componente: 'Memória Obsidian Vault (.obsidian-vault)', Status: vaultOk ? '🟢 OK' : '🟡 Alerta', Detalhe: vaultMsg },
-      { Componente: 'Grafo AST (graphify-out)', Status: graphOk ? '🟢 OK' : '🟡 Alerta', Detalhe: graphMsg }
+      { Component: 'Graphify CLI', Status: graphifyOk ? '🟢 OK' : '🔴 Failed', Detail: graphifyMsg },
+      { Component: 'IDE MCP Server', Status: mcpOk ? '🟢 OK' : '🟡 Alert', Detail: mcpMsg },
+      { Component: 'Local State (.agents/state.json)', Status: stateOk ? '🟢 OK' : '🔴 Failed', Detail: stateMsg },
+      { Component: 'Obsidian Vault (.obsidian-vault)', Status: vaultOk ? '🟢 OK' : '🟡 Alert', Detail: vaultMsg },
+      { Component: 'AST Graph (graphify-out)', Status: graphOk ? '🟢 OK' : '🟡 Alert', Detail: graphMsg }
     ]);
 
     const allOk = graphifyOk && mcpOk && stateOk && vaultOk && graphOk;
-    console.log(`\nDiagnóstico Final: ${allOk ? '🎉 Ambiente 100% operacional!' : '⚠️ Foram detectados alertas. Veja os detalhes acima.'}\n`);
+    console.log(`\nFinal Diagnosis: ${allOk ? '🎉 Environment 100% operational!' : '⚠️ Alerts detected. Check details above.'}\n`);
   });
 
 program.parse(process.argv);

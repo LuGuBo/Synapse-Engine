@@ -71,10 +71,10 @@ describe('Synapse Engine CLI Integration Tests', () => {
       fail(`synapse doctor failed to execute: ${err.message}`);
     }
 
-    expect(output).toContain('autodiagnóstico');
+    expect(output).toContain('autodiagnostics');
     expect(output).toContain('Graphify CLI');
     expect(output).toContain('IDE MCP Server');
-    expect(output).toContain('Estado Local');
+    expect(output).toContain('Local State');
   });
 });
 

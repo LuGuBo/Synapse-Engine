@@ -1,8 +1,10 @@
-# 🏛️ Documentação do Workspace - BMAD Harness
+# 🏛️ Workspace Documentation — BMAD Harness
 
-Este diretório contém a história viva e a documentação estática do projeto. 
+This directory contains the persistent technical specifications, PRDs, ADRs, and rules governing the project.
 
-## 📂 Organização de Arquivos
-* **`SPEC.md`**: Especificações de requisitos funcionais (escrito em Inglês).
-* **`PLAN.md`**: Plano arquitetural e registros de decisões técnicas - ADRs (escrito em Português).
-* **`walkthrough.md`**: Relatório de homologação e resultados de testes (escrito em Português).
+## 📂 Directory Structure
+* **`01_prd/`**: Product Requirements Documents and functional specifications (`SPEC.md`).
+* **`02_tech_specs/`**: Technical design specifications and MCP server architecture manifests.
+* **`03_rules/`**: Injected workspace rules and setup guides.
+* **`04_adrs/`**: Architectural Decision Records following MADR 4.0.0 standards.
+

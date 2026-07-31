@@ -4,25 +4,26 @@ date: 2026-07-03
 decision_maker: AI Agent & Tech Lead (LuGuBo)
 ---
 
-# 0002. Implementação do Servidor MCP Nativo Stdio no Synapse Engine V2
+# ADR 0002: Native Stdio MCP Server Implementation in Synapse Engine V2
 
 ## Context and Problem Statement
 
-O **Synapse Engine V2** utiliza a topologia **Graphify** (`./graphify-out/graph.json`) e a telemetria local (`.agents/state.json`) para orquestrar o desenvolvimento via metodologia BMAD. 
+**Synapse Engine V2** uses **Graphify** topology mapping (`./graphify-out/graph.json`) and local telemetry (`.agents/state.json`) to orchestrate development under the BMAD framework.
 
-Anteriormente, para consultar conexões entre arquivos ou verificar testes impactados, o agente de IA precisava ler o arquivo `graph.json` bruto. Em projetos de porte médio a grande, esse arquivo atinge mais de 200 KB (~60.000 tokens), sobrecarregando a janela de contexto da IA, gerando lentidão e custos desnecessários de tokens.
+Previously, to inspect file connectivity or resolve impacted test suites, the AI agent was required to read raw `graph.json` files. In medium-to-large repositories, this file exceeds 200 KB (~60,000 tokens), causing prompt context pollution, high latency, and unnecessary token consumption.
 
 ## Decision Outcome
 
-* **Opção Escolhida:** Desenvolver um servidor MCP nativo e ultraleve em Node.js (`bin/synapse-mcp-server.js`) utilizando o protocolo padrão `stdio` (JSON-RPC 2.0) sem dependências externas npm.
-* **Status:** Aceito (Accepted)
+* **Chosen Option:** Implement a lightweight, zero-dependency Node.js native MCP server (`bin/synapse-mcp-server.js`) operating over standard `stdio` transport (JSON-RPC 2.0).
+* **Status:** Accepted
 
 ### Consequences
 
 * **Good:**
-  * **99.90% de Redução no Consumo de Tokens:** As respostas de dependência e testes caíram de ~60.000 tokens para **~58 tokens** por consulta.
-  * **Latência Sub-Milissegundo (0.81 ms):** Execução via IPC `stdio` local ultrarrápida.
-  * **Zero-Dependency:** Não adiciona nenhuma biblioteca de terceiros ao `package.json`, garantindo instalação limpa.
-  * **Exportabilidade:** Registrado automaticamente no `~/.gemini/antigravity-ide/mcp_config.json` e exportável para outros repositórios via `synapse setup --global`.
+  * **99.90% Token Consumption Reduction:** Dependency lookup and test resolution responses reduced from ~60,000 tokens to **~58 tokens** per query.
+  * **Sub-Millisecond Latency (0.81 ms):** Ultra-fast local `stdio` IPC execution.
+  * **Zero-Dependency:** Adds zero third-party packages to `package.json`, ensuring clean global installation.
+  * **Ecosystem Exportability:** Registered automatically in `~/.gemini/antigravity-ide/mcp_config.json` and exportable across workspaces via `synapse setup --global`.
 * **Bad:**
-  * Requer que o ambiente Node.js esteja presente na máquina do usuário para interpretar o executável `bin/synapse-mcp-server.js`.
+  * Requires a local Node.js environment to interpret the executable `bin/synapse-mcp-server.js`.
+
