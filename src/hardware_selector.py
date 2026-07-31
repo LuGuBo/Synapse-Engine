@@ -2,27 +2,50 @@ import os
 import sys
 import json
 import subprocess
+from typing import Dict, Any, Optional
 
 class HardwareSelector:
     """
     Dynamic Hardware Selector for Synapse Engine.
-    Routes execution to CPU or GPU based on workload classification, payload size,
-    and available hardware acceleration providers (DirectML, CUDA, etc.).
+    Routes execution to CPU, GPU, or NPU based on workload classification, payload size,
+    and available hardware acceleration providers (DirectML, CUDA, OpenVINO, VitisAI, etc.).
     """
-    def __init__(self):
-        self.cpu_cores = os.cpu_count() or 4
-        self._gpu_info = None
+    _torch_checked: bool = False
+    _torch_cuda_available: bool = False
+    _torch_device_name: str = "None"
+
+    def __init__(self) -> None:
+        self.cpu_cores: int = os.cpu_count() or 4
+        self._gpu_info: Optional[Dict[str, Any]] = None
+
+    @classmethod
+    def _check_torch_cuda(cls) -> None:
+        """
+        Memoized PyTorch CUDA detection to avoid repeated ImportError checks (O(1) after init).
+        """
+        if cls._torch_checked:
+            return
+        cls._torch_checked = True
+        try:
+            import torch
+            if torch.cuda.is_available():
+                cls._torch_cuda_available = True
+                cls._torch_device_name = torch.cuda.get_device_name(0)
+        except ImportError:
+            cls._torch_cuda_available = False
 
     @property
-    def gpu_info(self):
+    def gpu_info(self) -> Dict[str, Any]:
         if self._gpu_info is None:
-            self._gpu_info = self._detect_gpu_acceleration()
+            self._gpu_info = self._detect_hardware_acceleration()
         return self._gpu_info
 
-    def _detect_gpu_acceleration(self):
+    def _detect_hardware_acceleration(self) -> Dict[str, Any]:
         gpu_detected = False
         gpu_name = "None"
         provider = "CPU"
+        npu_detected = False
+        npu_name = "None"
 
         if sys.platform == "win32":
             try:
@@ -30,6 +53,7 @@ class HardwareSelector:
                 path = r"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}"
                 key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
                 gpus = []
+                npus = []
                 for i in range(100):
                     try:
                         sub_key_name = winreg.EnumKey(key, i)
@@ -38,9 +62,13 @@ class HardwareSelector:
                             try:
                                 driver_desc, _ = winreg.QueryValueEx(sub_key, "DriverDesc")
                                 if driver_desc:
-                                    gpus.append(driver_desc)
+                                    desc_lower = driver_desc.lower()
+                                    if "npu" in desc_lower or "vitis" in desc_lower or "ai boost" in desc_lower or "ryzen ai" in desc_lower:
+                                        npus.append(driver_desc)
+                                    else:
+                                        gpus.append(driver_desc)
                             except OSError:
-                                driver_desc = None
+                                pass
                             finally:
                                 sub_key.Close()
                     except OSError:
@@ -50,31 +78,46 @@ class HardwareSelector:
                     gpu_detected = True
                     gpu_name = ", ".join(gpus)
                     provider = "DirectML"
+                if npus:
+                    npu_detected = True
+                    npu_name = ", ".join(npus)
             except OSError:
                 gpu_detected = False
 
-        try:
-            import torch
-            if torch.cuda.is_available():
-                gpu_detected = True
-                provider = "CUDA"
-                gpu_name = torch.cuda.get_device_name(0)
-        except ImportError:
-            driver_desc = None
+        self._check_torch_cuda()
+        if self._torch_cuda_available:
+            gpu_detected = True
+            provider = "CUDA"
+            gpu_name = self._torch_device_name
+
+        accelerator_type = "CPU"
+        if gpu_detected and npu_detected:
+            accelerator_type = "HYBRID"
+        elif gpu_detected:
+            accelerator_type = "GPU"
+        elif npu_detected:
+            accelerator_type = "NPU"
 
         return {
             "gpu_available": gpu_detected,
             "gpu_name": gpu_name,
-            "provider": provider
+            "provider": provider,
+            "npu_available": npu_detected,
+            "npu_name": npu_name,
+            "accelerator_type": accelerator_type
         }
 
-    def select_execution_device(self, workload_type, payload_size_kb=0.0, user_override=None):
+    def select_execution_device(
+        self,
+        workload_type: str,
+        payload_size_kb: float = 0.0,
+        user_override: Optional[str] = None
+    ) -> Dict[str, Any]:
         w_type = workload_type.lower()
 
-        # Otimização extrema de curto-circuito para responder CPU instantaneamente
-        # sem acessar a propriedade gpu_info (evitando inicialização/detecção de GPU)
+        # Ultra-fast short-circuit optimization for CPU-bound tasks
         is_cpu_workload = w_type in ["mcp_ipc", "ast_query", "json_state", "secret_scan", "git_diff"]
-        is_cpu_override = user_override and user_override.lower() == "cpu"
+        is_cpu_override = user_override is not None and user_override.lower() == "cpu"
 
         if is_cpu_override or (is_cpu_workload and not (user_override and user_override.lower() == "gpu")):
             return {
@@ -82,10 +125,12 @@ class HardwareSelector:
                 "reason": "User explicit override ('cpu')" if is_cpu_override else f"Workload type '{workload_type}' requires ultra-low latency IPC (<0.5ms). CPU preferred.",
                 "gpu_available": False,
                 "gpu_name": "None",
-                "provider": "CPU"
+                "provider": "CPU",
+                "npu_available": False,
+                "accelerator_type": "CPU"
             }
 
-        # Override manual para GPU
+        # Explicit user override for GPU
         if user_override and user_override.lower() == "gpu":
             gpu_info = self.gpu_info
             device = "GPU" if gpu_info["gpu_available"] else "CPU"
@@ -95,7 +140,9 @@ class HardwareSelector:
                 "reason": reason,
                 "gpu_available": gpu_info["gpu_available"],
                 "gpu_name": gpu_info["gpu_name"],
-                "provider": gpu_info["provider"]
+                "provider": gpu_info["provider"],
+                "npu_available": gpu_info["npu_available"],
+                "accelerator_type": gpu_info["accelerator_type"]
             }
 
         gpu_info = self.gpu_info
@@ -107,15 +154,29 @@ class HardwareSelector:
                     "reason": f"Heavy workload '{workload_type}' benefits from parallel GPU compute ({gpu_info['provider']}).",
                     "gpu_available": True,
                     "gpu_name": gpu_info["gpu_name"],
-                    "provider": gpu_info["provider"]
+                    "provider": gpu_info["provider"],
+                    "npu_available": gpu_info["npu_available"],
+                    "accelerator_type": gpu_info["accelerator_type"]
+                }
+            elif gpu_info["npu_available"]:
+                return {
+                    "selected_device": "NPU",
+                    "reason": f"Workload '{workload_type}' routed to NPU for energy-efficient neural inference.",
+                    "gpu_available": False,
+                    "gpu_name": "None",
+                    "provider": "VitisAI/DirectML",
+                    "npu_available": True,
+                    "accelerator_type": gpu_info["accelerator_type"]
                 }
             else:
                 return {
                     "selected_device": "CPU",
-                    "reason": f"Workload '{workload_type}' prefers GPU, but no GPU was detected. Falling back to CPU.",
+                    "reason": f"Workload '{workload_type}' prefers acceleration, but no GPU or NPU was detected. Falling back to CPU.",
                     "gpu_available": False,
                     "gpu_name": "None",
-                    "provider": "CPU"
+                    "provider": "CPU",
+                    "npu_available": False,
+                    "accelerator_type": "CPU"
                 }
 
         if payload_size_kb >= 1024.0 and gpu_info["gpu_available"]:
@@ -124,7 +185,9 @@ class HardwareSelector:
                 "reason": f"Payload size ({payload_size_kb:.2f} KB) exceeds 1MB threshold. Routing to GPU for throughput.",
                 "gpu_available": True,
                 "gpu_name": gpu_info["gpu_name"],
-                "provider": gpu_info["provider"]
+                "provider": gpu_info["provider"],
+                "npu_available": gpu_info["npu_available"],
+                "accelerator_type": gpu_info["accelerator_type"]
             }
         else:
             reason = f"Payload size ({payload_size_kb:.2f} KB) below 1MB threshold." if gpu_info["gpu_available"] else "No GPU available."
@@ -133,10 +196,12 @@ class HardwareSelector:
                 "reason": f"{reason} Routing to CPU for zero setup overhead.",
                 "gpu_available": gpu_info["gpu_available"],
                 "gpu_name": gpu_info["gpu_name"],
-                "provider": gpu_info["provider"]
+                "provider": gpu_info["provider"],
+                "npu_available": gpu_info["npu_available"],
+                "accelerator_type": gpu_info["accelerator_type"]
             }
 
-def main():
+def main() -> None:
     selector = HardwareSelector()
     if len(sys.argv) > 1 and sys.argv[1] == "--json":
         workload = sys.argv[2] if len(sys.argv) > 2 else "auto"
@@ -150,6 +215,9 @@ def main():
         print(f"GPU Available: {info['gpu_available']}")
         print(f"GPU Name: {info['gpu_name']}")
         print(f"Provider: {info['provider']}")
+        print(f"NPU Available: {info['npu_available']}")
+        print(f"Accelerator Type: {info['accelerator_type']}")
 
 if __name__ == "__main__":
     main()
+

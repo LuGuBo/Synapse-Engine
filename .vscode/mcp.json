@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "github-local": {
-      "command": "C:\\AG PROJETOS\\Synapse Engine\\bin\\github-mcp-server.exe",
+      "command": "${workspaceFolder}/bin/github-mcp-server.exe",
       "args": [
         "stdio",
         "--toolsets=all"

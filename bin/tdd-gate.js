@@ -49,8 +49,8 @@ function main() {
 
   const trackedFiles = getTrackedFiles();
 
-  // Filter production files (starting with src/, lib/, or app/)
-  const prodFiles = stagedFiles.filter(f => f.startsWith('src/') || f.startsWith('lib/') || f.startsWith('app/'));
+  // Filter production files (starting with src/, lib/, or app/, excluding __init__.py)
+  const prodFiles = stagedFiles.filter(f => (f.startsWith('src/') || f.startsWith('lib/') || f.startsWith('app/')) && !f.endsWith('__init__.py'));
 
   // Verify dynamic validation_status in state.json if editing production files
   if (prodFiles.length > 0) {

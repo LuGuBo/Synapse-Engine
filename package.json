@@ -1,6 +1,6 @@
 {
   "name": "synapse-engine",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Synapse Engine - Framework de Governança de Agentes e Ciclo de Vida BMAD",
   "main": "index.js",
   "bin": {

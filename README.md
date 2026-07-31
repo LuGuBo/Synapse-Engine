@@ -69,11 +69,13 @@ Para manter o alinhamento contextual em múltiplas sessões de desenvolvimento, 
 | **`init`** | Inicializa o Harness no repositório, injeta a pasta `.agents/`, regras locais e cria o Junction Link com o Obsidian. | `synapse init` |
 | **`update`** | Atualiza os componentes do Harness a partir do repositório mestre, preservando `state.json`. | `synapse update` |
 | **`setup --global`** | Configura a governança global da IDE na pasta do usuário e registra o diretório de skills globais. | `synapse setup --global` |
+| **`doctor`** | Autodiagnóstico completo do ambiente (Graphify, MCP Server, State, Vault, Grafo AST). | `synapse doctor` |
 | **`status`** | Consulta ou atualiza o estado local do Harness (Sprint, Persona Ativa, Meta Cirúrgica). | `synapse status show`<br>`synapse status set persona DEVELOPER` |
 | **`tdd`** | Portão de validação TDD: Garante que os arquivos staged no Git possuem testes válidos e atualiza o status de validação. | `synapse tdd` |
 | **`mcp`** | Inicia o servidor Stdio JSON-RPC ou roda benchmarks de latência e consumo de tokens. | `synapse mcp start`<br>`synapse mcp benchmark` |
 | **`hardware`** | Diagnóstico dinâmico e seleção de aceleração de hardware (DirectML/CUDA) para inferência neuronal. | `synapse hardware --check` |
 | **`graphify`** | Atualiza incrementalmente o gráfico de dependências AST local. | `synapse graphify` |
+
 
 ---
 
@@ -90,6 +92,7 @@ O repositório do Synapse Engine está estruturado de forma desacoplada e portá
 ├── bin/
 │   ├── synapse-cli.js         # Ponto de entrada CLI (utiliza commander.js)
 │   ├── synapse-mcp-server.js  # Servidor stdio JSON-RPC MCP
+│   ├── github-mcp-server.exe  # Servidor MCP Stdio para integração com GitHub API
 │   ├── state-manager.js       # Script utilitário para manipulação do state.json
 │   ├── tdd-gate.js            # Validador de qualidade de testes e arquivos staged no git
 │   ├── hardware-selector.js   # Interface Node.js para o seletor de hardware em Python
@@ -97,6 +100,10 @@ O repositório do Synapse Engine está estruturado de forma desacoplada e portá
 ├── src/
 │   ├── synapse_forge.py       # Scaffolding de diretórios, templates ADR (MADR 4.0.0) e inicializador Graphify
 │   └── hardware_selector.py   # Seletor lógico de GPU (CUDA, DirectML) vs CPU baseado em latência e payload
+├── tests/                     # Suíte de testes automatizados (Jest em JS e Pytest em Python)
+│   ├── synapse_mcp_benchmark.test.js  # Benchmarks de latência e consumo de tokens MCP
+│   ├── hardware_selector.test.py       # Suíte TDD completa do seletor de hardware em Python
+│   └── synapse_cli.test.js            # Testes de integração da CLI
 ├── scripts/
 │   ├── release.js             # Pipeline unificado de testes, versionamento, tag e release no GitHub
 │   └── sync-memory.ps1        # Sincronizador e validador do Obsidian Vault e Graphify
@@ -116,12 +123,12 @@ npm install -g git+https://github.com/LuGuBo/Synapse-Engine.git
 Para evitar caminhos absolutos hardcoded em setups de múltiplas máquinas ou ambientes multiusuários, a CLI e o Servidor MCP resolvem dinamicamente a localização do repositório centralizado de habilidades globais (*Global Skills Vault*) seguindo a ordem de prioridade:
 
 1.  Caminho definido na variável de ambiente do sistema: **`AG_SKILLS_PATH`**
-2.  Fallback Windows: `C:\AG SKILLS`
+2.  Fallback Windows: `C:\ag-skills`
 3.  Fallback Unix/macOS: `~/ag-skills`
 
 Para configurar em seu ambiente Windows (Powershell):
 ```powershell
-[System.Environment]::SetEnvironmentVariable("AG_SKILLS_PATH", "D:\SeuCaminho\AG SKILLS", "User")
+[System.Environment]::SetEnvironmentVariable("AG_SKILLS_PATH", "D:\SeuCaminho\ag-skills", "User")
 ```
 
 ---

@@ -1,4 +1,4 @@
-# Walkthrough: Execução da Conformidade, Quality Gates & Importação do Karpathy Autoresearch
+﻿# Walkthrough: Execução da Conformidade, Quality Gates & Importação do Karpathy Autoresearch
 
 Este documento consolida a execução final do plano de implementação, englobando o retrofit de conformidade do **Synapse Engine**, a ativação automatizada das portas de qualidade via Git Hooks, a importação direta do repositório oficial **`karpathy/autoresearch`** e a sincronização completa no GitHub.
 
@@ -20,8 +20,8 @@ Conforme estipulado no padrão de governança BMAD (`AGENTS.md`), segue o regist
 | :--- | :--- | :--- |
 | `bmad-master` | Global (`~/.gemini/config`) | Supremacia da documentação, Protocolo Bilíngue e estrutura BMAD Core. |
 | `ag_master_index` | Global (`~/.gemini/config`) | Roteamento do catálogo mestre de habilidades. |
-| `autoresearch` | Global (`C:\AG SKILLS\autoresearch`) | Skill offline global importada do repositório `karpathy/autoresearch` (Invocação pontual JIT-Skills). |
-| `product-manager-toolkit` | Global (`C:\AG SKILLS`) | RICE Prioritization & Matriz Value vs Effort para o PM Roadmap. |
+| `autoresearch` | Global (`C:\ag-skills\autoresearch`) | Skill offline global importada do repositório `karpathy/autoresearch` (Invocação pontual JIT-Skills). |
+| `product-manager-toolkit` | Global (`C:\ag-skills`) | RICE Prioritization & Matriz Value vs Effort para o PM Roadmap. |
 | `harness_dynamic_index` | Local (`.agents/skills`) | Indexação de regras e validações locais do projeto Synapse Engine. |
 | `local-guardrails-policy` | Local (`.agents/skills`) | Auditoria de exceções genéricas e política TDD com `always_on: true`. |
 | `grill-and-evolve` | Local (`.agents/skills`) | Protocolo Socrático /grill-me e restrições de simplicidade do Karpathy. |
@@ -36,11 +36,11 @@ Conforme estipulado no padrão de governança BMAD (`AGENTS.md`), segue o regist
   - **Gate 0**: `python .agents/skills/grill-and-evolve/scripts/analyze_project_metrics.py --audit-only` (Bloqueia commits com erros estáticos ou exceções genéricas silenciadas).
   - **Gate 1**: `node bin/tdd-gate.js` e `npm test` (Bloqueia commits se houver testes falhando).
 
-### 2. Centralização Global do Repositório `karpathy/autoresearch` (`C:\AG SKILLS\`)
-- Arquivos oficiais do repositório de Andrej Karpathy (`https://github.com/karpathy/autoresearch`) gravados centralizadamente no repositório global `C:\AG SKILLS\autoresearch\` sem poluir o workspace local:
+### 2. Centralização Global do Repositório `karpathy/autoresearch` (`C:\ag-skills\`)
+- Arquivos oficiais do repositório de Andrej Karpathy (`https://github.com/karpathy/autoresearch`) gravados centralizadamente no repositório global `C:\ag-skills\autoresearch\` sem poluir o workspace local:
   - `program.md`: Instrução original do Karpathy para ciclos autônomos de pesquisa.
   - `README.md`: Documentação oficial do Karpathy.
-  - `SKILL.md`: Manifesto da skill instanciado em `C:\AG SKILLS\autoresearch\SKILL.md`.
+  - `SKILL.md`: Manifesto da skill instanciado em `C:\ag-skills\autoresearch\SKILL.md`.
   - Atualizado o catálogo mestre em `C:\Users\lgbon\.gemini\config\skills\ag_master_index\SKILL.md`.
 
 ### 3. Sincronização e Push no GitHub
@@ -64,3 +64,4 @@ npm test
   - `synapse_cli.test.js` (PASS)
   - `synapse_forge.test.js` (PASS)
 - **Status da Integração**: Sincronização concluída com sucesso no GitHub.
+

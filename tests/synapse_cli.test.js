@@ -62,4 +62,19 @@ describe('Synapse Engine CLI Integration Tests', () => {
     expect(fs.existsSync(path.resolve(testProjectDir, '00_docs/04_adrs'))).toBe(true);
     expect(fs.existsSync(path.resolve(testProjectDir, '00_docs/04_adrs/0001-template-madr.md'))).toBe(true);
   });
+
+  test('should successfully execute synapse doctor diagnostic command', () => {
+    let output = '';
+    try {
+      output = execSync(`node "${cliPath}" doctor`, { cwd: testProjectDir, encoding: 'utf8', stdio: 'pipe' });
+    } catch (err) {
+      fail(`synapse doctor failed to execute: ${err.message}`);
+    }
+
+    expect(output).toContain('autodiagnóstico');
+    expect(output).toContain('Graphify CLI');
+    expect(output).toContain('IDE MCP Server');
+    expect(output).toContain('Estado Local');
+  });
 });
+

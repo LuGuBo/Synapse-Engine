@@ -246,6 +246,232 @@ function handleCheckCircular() {
 }
 
 /**
+ * Tool: Find shortest path between two nodes in graphify AST
+ */
+function handleGetPath(startFile, targetFile) {
+  const graph = loadGraph();
+  if (!startFile || !targetFile) {
+    return { error: 'Both startFile and targetFile arguments are required' };
+  }
+
+  const normStart = path.normalize(startFile).replace(/\\/g, '/').toLowerCase();
+  const normTarget = path.normalize(targetFile).replace(/\\/g, '/').toLowerCase();
+
+  const findNode = (term) => {
+    return (graph.nodes || []).find(n => {
+      const candidates = [n.source_file, n.label, n.id, n.norm_label, n.name].filter(Boolean).map(c => String(c).replace(/\\/g, '/').toLowerCase());
+      return candidates.some(c => c.includes(term) || term.includes(c));
+    });
+  };
+
+  const startNode = findNode(normStart);
+  const targetNode = findNode(normTarget);
+
+  if (!startNode || !targetNode) {
+    return {
+      found: false,
+      startNode: startNode ? (startNode.id || startNode.label) : normStart,
+      targetNode: targetNode ? (targetNode.id || targetNode.label) : normTarget,
+      message: 'One or both nodes were not found in graphify AST.'
+    };
+  }
+
+  const startId = startNode.id || startNode.label;
+  const targetId = targetNode.id || targetNode.label;
+
+  if (startId === targetId) {
+    return { found: true, distance: 0, path: [startId] };
+  }
+
+  const isDirected = graph.directed === true;
+  const adj = {};
+  (graph.edges || []).forEach(e => {
+    if (!adj[e.source]) adj[e.source] = [];
+    adj[e.source].push(e.target);
+    if (!isDirected) {
+      if (!adj[e.target]) adj[e.target] = [];
+      adj[e.target].push(e.source);
+    }
+  });
+
+  const queue = [[startId]];
+  const visited = new Set([startId]);
+
+  while (queue.length > 0) {
+    const currentPath = queue.shift();
+    const currentNode = currentPath[currentPath.length - 1];
+
+    const neighbors = adj[currentNode] || [];
+    for (const neighbor of neighbors) {
+      if (neighbor === targetId) {
+        return {
+          found: true,
+          distance: currentPath.length,
+          path: [...currentPath, neighbor]
+        };
+      }
+      if (!visited.has(neighbor)) {
+        visited.add(neighbor);
+        queue.push([...currentPath, neighbor]);
+      }
+    }
+  }
+
+  return {
+    found: false,
+    startNode: startId,
+    targetNode: targetId,
+    message: 'No path found between specified nodes in AST graph.'
+  };
+}
+
+/**
+ * Tool: Get scoped subgraph for a root node up to depth
+ */
+function handleGetSubgraph(rootFile, depth = 2) {
+  const graph = loadGraph();
+  if (!rootFile) {
+    return { error: 'rootFile argument is required' };
+  }
+
+  const normRoot = path.normalize(rootFile).replace(/\\/g, '/').toLowerCase();
+  const rootNode = (graph.nodes || []).find(n => {
+    const candidates = [n.source_file, n.label, n.id, n.norm_label, n.name].filter(Boolean).map(c => String(c).replace(/\\/g, '/').toLowerCase());
+    return candidates.some(c => c.includes(normRoot) || normRoot.includes(c));
+  });
+
+  if (!rootNode) {
+    return { found: false, root: rootFile, message: 'Root node not found in graphify AST.' };
+  }
+
+  const rootId = rootNode.id || rootNode.label;
+  const maxDepth = Math.max(1, Math.min(depth || 2, 5));
+
+  const isDirected = graph.directed === true;
+  const adj = {};
+  (graph.edges || []).forEach(e => {
+    if (!adj[e.source]) adj[e.source] = [];
+    adj[e.source].push(e.target);
+    if (!isDirected) {
+      if (!adj[e.target]) adj[e.target] = [];
+      adj[e.target].push(e.source);
+    }
+  });
+
+  const includedNodes = new Set([rootId]);
+  let currentLevel = [rootId];
+
+  for (let d = 0; d < maxDepth; d++) {
+    const nextLevel = [];
+    currentLevel.forEach(node => {
+      const neighbors = adj[node] || [];
+      neighbors.forEach(nbr => {
+        if (!includedNodes.has(nbr)) {
+          includedNodes.add(nbr);
+          nextLevel.push(nbr);
+        }
+      });
+    });
+    currentLevel = nextLevel;
+  }
+
+  const subEdges = (graph.edges || []).filter(e => includedNodes.has(e.source) && includedNodes.has(e.target));
+
+  return {
+    found: true,
+    root: rootId,
+    depth: maxDepth,
+    nodesCount: includedNodes.size,
+    edgesCount: subEdges.length,
+    nodes: Array.from(includedNodes),
+    edges: subEdges
+  };
+}
+
+
+/**
+ * Tool: Read declarative memory note from .obsidian-vault
+ */
+function handleReadMemory(category, noteName) {
+  const targetCategory = (category || 'permanent').toLowerCase();
+  const validCategories = ['permanent', 'chats'];
+
+  if (!validCategories.includes(targetCategory)) {
+    return { error: `Invalid category '${category}'. Valid options: ${validCategories.join(', ')}` };
+  }
+
+  const vaultDir = path.join(ROOT_DIR, '.obsidian-vault', targetCategory);
+  if (!fs.existsSync(vaultDir)) {
+    return { error: `Obsidian Vault category directory does not exist: ${vaultDir}` };
+  }
+
+  if (!noteName) {
+    try {
+      const files = fs.readdirSync(vaultDir).filter(f => f.endsWith('.md'));
+      return { category: targetCategory, noteCount: files.length, notes: files };
+    } catch (e) {
+      return { error: e.message };
+    }
+  }
+
+  const targetFile = noteName.endsWith('.md') ? noteName : `${noteName}.md`;
+  const filePath = path.join(vaultDir, targetFile);
+
+  if (!fs.existsSync(filePath)) {
+    return { error: `Memory note '${targetFile}' not found in category '${targetCategory}'.` };
+  }
+
+  try {
+    const rawContent = fs.readFileSync(filePath, 'utf8');
+    const minified = minifySkillPrompt(rawContent);
+    return {
+      found: true,
+      category: targetCategory,
+      noteName: targetFile,
+      content: minified
+    };
+  } catch (e) {
+    return { error: `Failed to read memory note: ${e.message}` };
+  }
+}
+
+/**
+ * Tool: Sync declarative memory (Obsidian Vault structure)
+ */
+function handleSyncMemory() {
+  const vaultDir = path.join(ROOT_DIR, '.obsidian-vault');
+  const permDir = path.join(vaultDir, 'permanent');
+  const chatsDir = path.join(vaultDir, 'chats');
+
+  fs.mkdirSync(permDir, { recursive: true });
+  fs.mkdirSync(chatsDir, { recursive: true });
+
+  const graphifyOut = path.join(ROOT_DIR, 'graphify-out');
+  const graphifyLink = path.join(vaultDir, 'graphify-links');
+  let junctionStatus = 'not_needed';
+
+  if (fs.existsSync(graphifyOut) && !fs.existsSync(graphifyLink)) {
+    try {
+      fs.symlinkSync(graphifyOut, graphifyLink, 'junction');
+      junctionStatus = 'created';
+    } catch (e) {
+      junctionStatus = `error: ${e.message}`;
+    }
+  } else if (fs.existsSync(graphifyLink)) {
+    junctionStatus = 'exists';
+  }
+
+  return {
+    success: true,
+    vaultPath: vaultDir,
+    permanentNotesCount: fs.readdirSync(permDir).length,
+    chatsCount: fs.readdirSync(chatsDir).length,
+    junctionStatus
+  };
+}
+
+
+/**
  * Tool 4: Get TDD status from state.json
  */
 function handleGetTddStatus() {
@@ -335,17 +561,28 @@ function handleScanSecrets(responseFormat = 'markdown') {
 
   const violations = [];
   function scanDir(dir) {
-    const files = fs.readdirSync(dir);
+    let files;
+    try {
+      files = fs.readdirSync(dir);
+    } catch (e) {
+      return;
+    }
     for (const file of files) {
       if (['node_modules', '.git', '.venv', 'graphify-out', 'dist', 'build'].includes(file)) continue;
       const fullPath = path.join(dir, file);
-      const stat = fs.statSync(fullPath);
+      let stat;
+      try {
+        stat = fs.statSync(fullPath);
+      } catch (e) {
+        continue;
+      }
       if (stat.isDirectory()) {
         scanDir(fullPath);
       } else if (stat.isFile() && /\.(js|py|json|md|env|yml|yaml|ts)$/i.test(file)) {
         try {
           const content = fs.readFileSync(fullPath, 'utf8');
           secretPatterns.forEach(p => {
+            p.regex.lastIndex = 0;
             let match;
             while ((match = p.regex.exec(content)) !== null) {
               violations.push({
@@ -408,7 +645,7 @@ function handleGetCleanDiff() {
 function handleSearchSkills(query) {
   const searchTerm = (query || '').toLowerCase();
   const searchDirs = [
-    'C:\\AG SKILLS',
+    'C:\\ag-skills',
     path.join(os.homedir(), '.gemini', 'config', 'skills'),
     path.join(ROOT_DIR, '.agents', 'skills')
   ];
@@ -451,11 +688,21 @@ function handleSearchSkills(query) {
 function handleContextHealthCheck(responseFormat = 'markdown') {
   const largeFiles = [];
   function checkDir(dir) {
-    const files = fs.readdirSync(dir);
+    let files;
+    try {
+      files = fs.readdirSync(dir);
+    } catch (e) {
+      return;
+    }
     for (const file of files) {
       if (['node_modules', '.git', '.venv', 'graphify-out', 'dist', 'build', 'package-lock.json'].includes(file)) continue;
       const fullPath = path.join(dir, file);
-      const stat = fs.statSync(fullPath);
+      let stat;
+      try {
+        stat = fs.statSync(fullPath);
+      } catch (e) {
+        continue;
+      }
       if (stat.isDirectory()) {
         checkDir(fullPath);
       } else if (stat.isFile() && /\.(js|py|ts|json|md)$/i.test(file)) {
@@ -539,37 +786,61 @@ function getGlobalSkillsDir() {
     return path.resolve(envPath);
   }
   if (os.platform() === 'win32') {
-    return 'C:\\AG SKILLS';
+    return 'C:\\ag-skills';
   } else {
     return path.join(os.homedir(), 'ag-skills');
   }
 }
 
 /**
- * Resource Helper: List available skills in global offline skills directory
+ * Resource Helper: List available resources (static state, AST topology, and dynamic offline skills)
  */
 function handleListResources() {
-  const skillsDir = getGlobalSkillsDir();
-  if (!fs.existsSync(skillsDir)) return [];
-  try {
-    const folders = fs.readdirSync(skillsDir);
-    const resources = [];
-    folders.forEach(folder => {
-      const skillPath = path.join(skillsDir, folder);
-      const manifest = path.join(skillPath, 'SKILL.md');
-      if (fs.existsSync(manifest)) {
-        resources.push({
-          uri: `skills://${folder}`,
-          name: folder,
-          mimeType: 'text/markdown',
-          description: `Dynamic offline skill ${folder} loaded from ${skillsDir}`
-        });
-      }
-    });
-    return resources;
-  } catch (e) {
-    return [];
-  }
+  const resources = [
+    {
+      uri: 'state://current',
+      name: 'Current Telemetry State',
+      mimeType: 'application/json',
+      description: 'Current local BMAD persona and TDD telemetry state from .agents/state.json'
+    },
+    {
+      uri: 'graph://topology',
+      name: 'AST Graph Topology',
+      mimeType: 'application/json',
+      description: 'Summarized Graphify AST topology metrics and node samples'
+    }
+  ];
+
+  const searchDirs = [
+    getGlobalSkillsDir(),
+    path.join(os.homedir(), '.gemini', 'config', 'skills'),
+    path.join(ROOT_DIR, '.agents', 'skills')
+  ];
+
+  const addedSkills = new Set();
+
+  searchDirs.forEach(dir => {
+    if (!fs.existsSync(dir)) return;
+    try {
+      const folders = fs.readdirSync(dir);
+      folders.forEach(folder => {
+        if (addedSkills.has(folder)) return;
+        const skillPath = path.join(dir, folder);
+        const manifest = path.join(skillPath, 'SKILL.md');
+        if (fs.existsSync(manifest)) {
+          addedSkills.add(folder);
+          resources.push({
+            uri: `skills://${folder}`,
+            name: folder,
+            mimeType: 'text/markdown',
+            description: `Dynamic offline skill ${folder} loaded from ${dir}`
+          });
+        }
+      });
+    } catch (e) {}
+  });
+
+  return resources;
 }
 
 /**
@@ -589,56 +860,103 @@ function minifySkillPrompt(content) {
 }
 
 /**
- * Resource Helper: Read specific skill content from global skills, config, or local workspace
+ * Resource Helper: Read specific resource content (skills://, state://current, graph://topology)
  */
 function handleReadResource(id, uri) {
-  if (!uri || !uri.startsWith('skills://')) {
+  if (!uri) {
     return {
       jsonrpc: '2.0',
       id,
-      error: { code: -32602, message: `Invalid resource URI: ${uri}` }
+      error: { code: -32602, message: 'Resource URI is required' }
     };
   }
 
-  const skillName = uri.replace('skills://', '');
-  const searchPaths = [
-    path.join(getGlobalSkillsDir(), skillName, 'SKILL.md'),
-    path.join(os.homedir(), '.gemini', 'config', 'skills', skillName, 'SKILL.md'),
-    path.join(ROOT_DIR, '.agents', 'skills', skillName, 'SKILL.md')
-  ];
+  if (uri === 'state://current') {
+    const state = loadState();
+    return {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(state, null, 2)
+          }
+        ]
+      }
+    };
+  }
 
-  let fileContent = null;
-  for (const p of searchPaths) {
-    if (fs.existsSync(p)) {
-      try {
-        fileContent = fs.readFileSync(p, 'utf8');
-        break;
-      } catch (e) {}
+  if (uri === 'graph://topology') {
+    const graph = loadGraph();
+    const summary = {
+      nodesCount: (graph.nodes || []).length,
+      edgesCount: (graph.edges || []).length,
+      sampleNodes: (graph.nodes || []).slice(0, 10).map(n => n.name || n.id)
+    };
+    return {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify(summary, null, 2)
+          }
+        ]
+      }
+    };
+  }
+
+  if (uri.startsWith('skills://')) {
+    const skillName = uri.replace('skills://', '');
+    const searchPaths = [
+      path.join(getGlobalSkillsDir(), skillName, 'SKILL.md'),
+      path.join(os.homedir(), '.gemini', 'config', 'skills', skillName, 'SKILL.md'),
+      path.join(ROOT_DIR, '.agents', 'skills', skillName, 'SKILL.md')
+    ];
+
+    let fileContent = null;
+    for (const p of searchPaths) {
+      if (fs.existsSync(p)) {
+        try {
+          fileContent = fs.readFileSync(p, 'utf8');
+          break;
+        } catch (e) {}
+      }
     }
-  }
 
-  if (fileContent === null) {
+    if (fileContent === null) {
+      return {
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32602, message: `Skill resource not found: ${skillName}` }
+      };
+    }
+
+    const optimizedText = minifySkillPrompt(fileContent);
+
     return {
       jsonrpc: '2.0',
       id,
-      error: { code: -32602, message: `Skill resource not found: ${skillName}` }
+      result: {
+        contents: [
+          {
+            uri,
+            mimeType: 'text/markdown',
+            text: optimizedText
+          }
+        ]
+      }
     };
   }
-
-  const optimizedText = minifySkillPrompt(fileContent);
 
   return {
     jsonrpc: '2.0',
     id,
-    result: {
-      contents: [
-        {
-          uri,
-          mimeType: 'text/markdown',
-          text: optimizedText
-        }
-      ]
-    }
+    error: { code: -32602, message: `Unsupported or invalid resource URI: ${uri}` }
   };
 }
 
@@ -781,7 +1099,7 @@ const TOOLS = [
   },
   {
     name: 'synapse_search_skills',
-    description: 'Search offline SKILL.md manifests in C:\\AG SKILLS and local directory.',
+    description: 'Search offline SKILL.md manifests in C:\\ag-skills and local directory.',
     inputSchema: {
       type: 'object',
       properties: { query: { type: 'string', description: 'Search term or keyword' } }
@@ -842,8 +1160,73 @@ const TOOLS = [
       destructiveHint: false,
       openWorldHint: false
     }
+  },
+  {
+    name: 'graphify_get_path',
+    description: 'Find shortest dependency path between startFile and targetFile in graphify AST topology.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        startFile: { type: 'string', description: 'Source file path or node name' },
+        targetFile: { type: 'string', description: 'Destination file path or node name' }
+      },
+      required: ['startFile', 'targetFile']
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
+    }
+  },
+  {
+    name: 'graphify_get_subgraph',
+    description: 'Get focused sub-graph around a root node up to specified depth.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        rootFile: { type: 'string', description: 'Root file path or node name' },
+        depth: { type: 'number', description: 'Traversal depth hops (default: 2, max: 5)' }
+      },
+      required: ['rootFile']
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
+    }
+  },
+  {
+    name: 'synapse_read_memory',
+    description: 'Read or list declarative memory notes from .obsidian-vault (permanent or chats).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        category: { type: 'string', enum: ['permanent', 'chats'], default: 'permanent', description: 'Memory vault category' },
+        noteName: { type: 'string', description: 'Specific note file name (e.g. testing_quality_manifest.md)' }
+      }
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
+    }
+  },
+  {
+    name: 'synapse_sync_memory',
+    description: 'Synchronize Obsidian Vault folder structure, permanent notes and graphify junction links.',
+    inputSchema: { type: 'object', properties: {} },
+    annotations: {
+      readOnlyHint: false,
+      idempotentHint: true,
+      destructiveHint: false,
+      openWorldHint: false
+    }
   }
 ];
+
 
 /**
  * Handle JSON-RPC request over stdio
@@ -935,6 +1318,19 @@ function processRPCRequest(request) {
         case 'synapse_select_device':
           resultData = handleSelectDevice(args?.workloadType, args?.payloadSizeKb, args?.override);
           break;
+        case 'graphify_get_path':
+          resultData = handleGetPath(args?.startFile, args?.targetFile);
+          break;
+        case 'graphify_get_subgraph':
+          resultData = handleGetSubgraph(args?.rootFile, args?.depth);
+          break;
+        case 'synapse_read_memory':
+          resultData = handleReadMemory(args?.category, args?.noteName);
+          break;
+        case 'synapse_sync_memory':
+          resultData = handleSyncMemory();
+          break;
+
         default:
           return {
             jsonrpc: '2.0',
@@ -1020,6 +1416,10 @@ module.exports = {
   handleGetDeps,
   handleGetImpactedTests,
   handleCheckCircular,
+  handleGetPath,
+  handleGetSubgraph,
+  handleReadMemory,
+  handleSyncMemory,
   handleGetTddStatus,
   handleShiftPersona,
   handleSetTarget,
@@ -1035,6 +1435,7 @@ module.exports = {
   handleReadResource,
   TOOLS
 };
+
 
 if (require.main === module) {
   startServer();

@@ -18,7 +18,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
     expect(response.result.serverInfo.name).toBe('synapse-mcp-server');
   });
 
-  test('MCP Server lists available tools (13 tools)', () => {
+  test('MCP Server lists available tools (17 tools)', () => {
     const request = {
       jsonrpc: '2.0',
       id: 2,
@@ -26,10 +26,15 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
       params: {}
     };
     const response = processRPCRequest(request);
-    expect(response.result.tools).toHaveLength(13);
+    expect(response.result.tools).toHaveLength(17);
     const toolNames = response.result.tools.map(t => t.name);
     expect(toolNames).toContain('graphify_get_deps');
+    expect(toolNames).toContain('graphify_get_path');
+    expect(toolNames).toContain('graphify_get_subgraph');
+    expect(toolNames).toContain('synapse_read_memory');
+    expect(toolNames).toContain('synapse_sync_memory');
     expect(toolNames).toContain('synapse_shift_persona');
+
     expect(toolNames).toContain('synapse_scan_secrets');
     expect(toolNames).toContain('synapse_search_skills');
     expect(toolNames).toContain('synapse_hardware_status');
@@ -171,7 +176,170 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
     expect(selectData.selected_device).toBe('CPU');
   });
 
+  test('MCP Server handles resources/list and resources/read', () => {
+    // 1. Test resources/list
+    const listReq = {
+      jsonrpc: '2.0',
+      id: 200,
+      method: 'resources/list',
+      params: {}
+    };
+    const listRes = processRPCRequest(listReq);
+    expect(listRes.result.resources).toBeDefined();
+    const uris = listRes.result.resources.map(r => r.uri);
+    expect(uris).toContain('state://current');
+    expect(uris).toContain('graph://topology');
+
+    // 2. Test resources/read for state://current
+    const stateReq = {
+      jsonrpc: '2.0',
+      id: 201,
+      method: 'resources/read',
+      params: { uri: 'state://current' }
+    };
+    const stateRes = processRPCRequest(stateReq);
+    expect(stateRes.result.contents[0].uri).toBe('state://current');
+    const stateContent = JSON.parse(stateRes.result.contents[0].text);
+    expect(stateContent.active_persona).toBeDefined();
+
+    // 3. Test resources/read for graph://topology
+    const graphReq = {
+      jsonrpc: '2.0',
+      id: 202,
+      method: 'resources/read',
+      params: { uri: 'graph://topology' }
+    };
+    const graphRes = processRPCRequest(graphReq);
+    expect(graphRes.result.contents[0].uri).toBe('graph://topology');
+    const graphContent = JSON.parse(graphRes.result.contents[0].text);
+    expect(graphContent.nodesCount).toBeDefined();
+  });
+
+  test('Triple Vector Test: graphify_get_path (Real Pathing, Error Handling & Same Node)', () => {
+    // Vector A: Real positive path search between existing nodes in graphify AST
+    const pathReq = {
+      jsonrpc: '2.0',
+      id: 301,
+      method: 'tools/call',
+      params: {
+        name: 'graphify_get_path',
+        arguments: { startFile: 'synapse-cli.js', targetFile: 'hardware-selector.js' }
+      }
+    };
+    const pathRes = processRPCRequest(pathReq);
+    expect(pathRes.result.content[0].type).toBe('text');
+    const pathData = JSON.parse(pathRes.result.content[0].text);
+    expect(pathData.found).toBeDefined();
+
+    // Test same-node distance zero
+    const sameReq = {
+      jsonrpc: '2.0',
+      id: 302,
+      method: 'tools/call',
+      params: {
+        name: 'graphify_get_path',
+        arguments: { startFile: 'synapse-cli.js', targetFile: 'synapse-cli.js' }
+      }
+    };
+    const sameRes = processRPCRequest(sameReq);
+    const sameData = JSON.parse(sameRes.result.content[0].text);
+    expect(sameData.found).toBe(true);
+    expect(sameData.distance).toBe(0);
+
+    // Vector B: Edge case with non-existent node
+    const invalidReq = {
+      jsonrpc: '2.0',
+      id: 303,
+      method: 'tools/call',
+      params: {
+        name: 'graphify_get_path',
+        arguments: { startFile: 'non_existent_file_xyz.js', targetFile: 'synapse-cli.js' }
+      }
+    };
+    const invalidRes = processRPCRequest(invalidReq);
+    const invalidData = JSON.parse(invalidRes.result.content[0].text);
+    expect(invalidData.found).toBe(false);
+    expect(invalidData.message).toContain('not found');
+  });
+
+  test('Triple Vector Test: graphify_get_subgraph (Scoped Traversal with Depth)', () => {
+    // Vector A: Subgraph extraction with depth=1
+    const sub1Req = {
+      jsonrpc: '2.0',
+      id: 310,
+      method: 'tools/call',
+      params: {
+        name: 'graphify_get_subgraph',
+        arguments: { rootFile: 'synapse-cli.js', depth: 1 }
+      }
+    };
+    const sub1Res = processRPCRequest(sub1Req);
+    const sub1Data = JSON.parse(sub1Res.result.content[0].text);
+    expect(sub1Data.found).toBe(true);
+    expect(sub1Data.depth).toBe(1);
+    expect(sub1Data.nodes).toContain('bin_synapse_cli');
+
+
+    // Vector B: Subgraph with missing root node
+    const missingSubReq = {
+      jsonrpc: '2.0',
+      id: 311,
+      method: 'tools/call',
+      params: {
+        name: 'graphify_get_subgraph',
+        arguments: { rootFile: 'non_existent_module_abc.js' }
+      }
+    };
+    const missingSubRes = processRPCRequest(missingSubReq);
+    const missingSubData = JSON.parse(missingSubRes.result.content[0].text);
+    expect(missingSubData.found).toBe(false);
+  });
+
+  test('Triple Vector Test: synapse_read_memory & synapse_sync_memory (Real File Persistence & Content)', () => {
+    // Vector C: Run sync memory tool to ensure vault directories exist
+    const syncReq = {
+      jsonrpc: '2.0',
+      id: 320,
+      method: 'tools/call',
+      params: { name: 'synapse_sync_memory', arguments: {} }
+    };
+    const syncRes = processRPCRequest(syncReq);
+    const syncData = JSON.parse(syncRes.result.content[0].text);
+    expect(syncData.success).toBe(true);
+    expect(fs.existsSync(syncData.vaultPath)).toBe(true);
+
+    // Vector A: Read actual note testing_quality_manifest.md from permanent category
+    const readNoteReq = {
+      jsonrpc: '2.0',
+      id: 321,
+      method: 'tools/call',
+      params: {
+        name: 'synapse_read_memory',
+        arguments: { category: 'permanent', noteName: 'testing_quality_manifest.md' }
+      }
+    };
+    const readNoteRes = processRPCRequest(readNoteReq);
+    const readNoteData = JSON.parse(readNoteRes.result.content[0].text);
+    expect(readNoteData.found).toBe(true);
+    expect(readNoteData.content).toContain('anti_tautological_testing_protocol');
+
+    // Vector B: Read non-existent note
+    const readMissingReq = {
+      jsonrpc: '2.0',
+      id: 322,
+      method: 'tools/call',
+      params: {
+        name: 'synapse_read_memory',
+        arguments: { category: 'permanent', noteName: 'ghost_note_12345.md' }
+      }
+    };
+    const readMissingRes = processRPCRequest(readMissingReq);
+    expect(readMissingRes.result.isError).toBe(true);
+    expect(readMissingRes.result.content[0].text).toContain('not found');
+  });
+
   test('🔥 EXPLICIT BENCHMARK: Native File Read vs MCP Stdio Tool Call', () => {
+
     let fullGraphText = '';
     if (fs.existsSync(GRAPH_PATH)) {
       fullGraphText = fs.readFileSync(GRAPH_PATH, 'utf8');

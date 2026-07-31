@@ -4,10 +4,14 @@ import json
 import shutil
 import subprocess
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Any, Optional
 
 class SynapseEngineHybridEngine:
-    def __init__(self, global_config_dir: str = "~/.gemini/config/skills", local_workspace_dir: str = ".agents/skills"):
+    def __init__(
+        self,
+        global_config_dir: str = "~/.gemini/config/skills",
+        local_workspace_dir: str = ".agents/skills"
+    ) -> None:
         # Resolve paths correctly
         if global_config_dir.startswith("~"):
             self.global_dir = Path.home() / global_config_dir.replace("~/", "").replace("~", "")
@@ -17,11 +21,12 @@ class SynapseEngineHybridEngine:
         self.local_dir = Path(local_workspace_dir)
         self.bmad_core_source = Path(".bmad-core")
 
-    def _parse_frontmatter(self, file_content: str) -> Dict:
+    def _parse_frontmatter(self, file_content: str) -> Dict[str, Any]:
         """
-        Parses YAML frontmatter manually to avoid external dependencies like PyYAML.
+        Parses YAML frontmatter manually without external dependencies.
+        Handles key-value pairs with multiple colons (e.g. URLs/timestamps), boolean strings, and strip inline comments.
         """
-        metadata = {}
+        metadata: Dict[str, Any] = {}
         if not file_content.startswith('---'):
             return metadata
         parts = file_content.split('---', 2)
@@ -31,6 +36,9 @@ class SynapseEngineHybridEngine:
                 line = line.strip()
                 if not line or line.startswith('#'):
                     continue
+                # Strip inline comments if not inside quotes
+                if ' #' in line:
+                    line = line.split(' #', 1)[0].strip()
                 if ':' in line:
                     key, val = line.split(':', 1)
                     key = key.strip()
@@ -43,7 +51,13 @@ class SynapseEngineHybridEngine:
                         metadata[key] = val
         return metadata
 
-    def _deploy_skill_isolated(self, target_directory: Path, role_name: str, skill_content: str, metadata: Dict):
+    def _deploy_skill_isolated(
+        self,
+        target_directory: Path,
+        role_name: str,
+        skill_content: str,
+        metadata: Dict[str, Any]
+    ) -> None:
         """
         Deploys a skill manifest (SKILL.md) in the target directory folder.
         """
@@ -68,7 +82,7 @@ class SynapseEngineHybridEngine:
             
         print(f"[OK] Deployed skill: {role_name} -> {skill_file}")
 
-    def _forge_methodology_scaffolding(self):
+    def _forge_methodology_scaffolding(self) -> None:
         """
         Creates semantic taxonomy directories and provides the MADR 4.0.0 template.
         """
@@ -108,22 +122,22 @@ decision_maker: AI Agent & Tech Lead
                 f.write(madr_template)
             print(f"[OK] Deployed MADR 4.0.0 Template -> {template_file}")
 
-    def _forge_graphify_integration(self):
+    def _forge_graphify_integration(self) -> None:
         """
-        Validates, installs, and runs Graphify for repository mapping.
+        Validates, installs, and runs Graphify for repository mapping safely without shell execution injection risks.
         """
         print("Checking Graphify integration...")
         
         # 1. Determine graphify command/executable path
         graphify_cmd = "graphify"
-        
-        # Check standard PATH
         graphify_installed = False
+        
+        # Check standard PATH using argument list (no shell=True)
         try:
-            result = subprocess.run("graphify --version", shell=True, capture_output=True, text=True, check=False)
+            result = subprocess.run(["graphify", "--version"], capture_output=True, text=True, check=False)
             if result.returncode == 0 or "graphify" in result.stdout.lower():
                 graphify_installed = True
-        except Exception:
+        except (FileNotFoundError, OSError, subprocess.SubprocessError):
             graphify_installed = False
 
         # If not in standard PATH, check local .local/bin
@@ -142,11 +156,10 @@ decision_maker: AI Agent & Tech Lead
                 subprocess.run([sys.executable, "-m", "pip", "install", "graphify"], check=True)
                 graphify_installed = True
                 print("[OK] Graphify installed successfully via pip.")
-            except Exception as e:
+            except (subprocess.SubprocessError, OSError) as e:
                 print(f"[ERROR] Failed to install graphify via pip: {e}")
-                print("[INFO] Attempting to install graphifyy via local uv...")
+                print("[INFO] Attempting to install graphify via local uv...")
                 try:
-                    # Try using uv if present in .venv/Scripts (or virtual environments)
                     uv_exe = Path(".venv") / ("Scripts" if os.name == "nt" else "bin") / ("uv.exe" if os.name == "nt" else "uv")
                     if uv_exe.exists():
                         subprocess.run([str(uv_exe), "tool", "install", "graphifyy"], check=True)
@@ -155,20 +168,20 @@ decision_maker: AI Agent & Tech Lead
                             graphify_cmd = str(local_bin_graphify)
                             graphify_installed = True
                             print(f"[OK] Graphify installed successfully via uv and mapped to: {graphify_cmd}")
-                except Exception as ex_uv:
+                except (subprocess.SubprocessError, OSError) as ex_uv:
                     print(f"[ERROR] Failed to install via uv: {ex_uv}")
                     print("[INFO] Please install it manually using: uv tool install graphifyy")
                 
-        # 2. Run graphify update to generate graphify-out if possible
+        # 2. Run graphify update safely via argument list
         if graphify_installed:
             print(f"[INFO] Running graphify update . to map repository topology using command '{graphify_cmd}'...")
             try:
-                res = subprocess.run(f'"{graphify_cmd}" update .', shell=True, capture_output=True, text=True, check=False)
+                res = subprocess.run([graphify_cmd, "update", "."], capture_output=True, text=True, check=False)
                 if res.returncode == 0:
                     print("[OK] Graphify mapping generated successfully in graphify-out/")
                 else:
                     print(f"[WARN] Graphify update returned code {res.returncode}. Output: {res.stderr or res.stdout}")
-            except Exception as e:
+            except (subprocess.SubprocessError, OSError) as e:
                 print(f"[WARN] Could not compile graphify map: {e}")
         else:
             print("[WARN] Skipping graphify generation due to missing installation.")
@@ -184,7 +197,7 @@ decision_maker: AI Agent & Tech Lead
                     f.write("\n# Graphify outputs\ngraphify-out/\n")
                 print("[OK] Added graphify-out/ to .gitignore")
 
-    def forge_hybrid_skills(self, required_roles_subset: List[str] = None):
+    def forge_hybrid_skills(self, required_roles_subset: Optional[List[str]] = None) -> None:
         """
         Orchestrates skill deployment based on metadata scope.
         """
@@ -221,7 +234,7 @@ decision_maker: AI Agent & Tech Lead
             if metadata.get("scope") == "global" or role == "bmad-master":
                 try:
                     self._deploy_skill_isolated(self.global_dir, role, content_body, metadata)
-                except Exception as e:
+                except (OSError, PermissionError) as e:
                     print(f"[WARN] Could not deploy global skill {role} (possibly due to OS permissions): {e}")
                     print(f"[INFO] Deploying it locally as fallback.")
                     self._deploy_skill_isolated(self.local_dir, role, content_body, metadata)
@@ -232,4 +245,5 @@ if __name__ == "__main__":
     print("Initiating Synapse Engine Hybrid Compilation in Antigravity Context...")
     forge = SynapseEngineHybridEngine()
     forge.forge_hybrid_skills(["bmad-master", "local-guardrails-policy"])
+
 

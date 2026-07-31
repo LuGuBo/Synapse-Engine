@@ -52,7 +52,7 @@ function mergeRulesContent(existingContent, templateContent) {
   const defaultOldRules = {
     local_governance: `\n# Local Governance Rules\n- All codebase file changes must be validated by the \`synapse tdd\` gate tool.\n- All work progress and active persona state transitions are tracked in \`.agents/state.json\`.\n- Every task delivery must include a \`walkthrough.md\` in Portuguese containing the **Agent & Skill Trace** audit table matching the agents/personas used and the skills loaded from the repository/workspace catalog.\n`,
     bmad_core: `\n# BMAD Core Methodology (Global AI Agent Rule)\n- Zero-Pollution: Your primary source of truth is the project's documentation. Do NOT rely on ephemeral chat history.\n- Read Before Coding: Before altering source code, you MUST actively search for and read the relevant specifications.\n- The Bilingual Rule: Chat with USER, walkthrough.md, implementation_plan.md in Portuguese (PT-BR). Code and everything else in English (EN-US).\n- Privacy & Security: NEVER hardcode API keys, passwords, or tokens in logs or code. All secrets reside in .env files.\n- Persona Shift Loop: PM -> Architect -> Developer -> QA using state.json local telemetry.\n`,
-    bmad_jit_skills_protocol: `\n# Protocolo JIT-Skills (Seleção Inteligente de Habilidades Offline)\nO agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa ou nova tarefa complexa:\n1. Diagnóstico Cognitivo: Analisar se a tarefa envolve planejamento, código, testes, etc.\n2. Consulta ao Catálogo: Consultar o catálogo mestre de indexação utilizando a ferramenta correspondente.\n3. Carregamento Offline: Ler o arquivo SKILL.md correspondente de C:\\AG SKILLS\\<nome-da-skill>\\SKILL.md.\n4. Transparência: Notificar o usuário sobre quais habilidades offline foram incorporadas.\n`
+    bmad_jit_skills_protocol: `\n# Protocolo JIT-Skills (Seleção Inteligente de Habilidades Offline)\nO agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa ou nova tarefa complexa:\n1. Diagnóstico Cognitivo: Analisar se a tarefa envolve planejamento, código, testes, etc.\n2. Consulta ao Catálogo: Consultar o catálogo mestre de indexação utilizando a ferramenta correspondente.\n3. Carregamento Offline: Ler o arquivo SKILL.md correspondente de C:\\ag-skills\\<nome-da-skill>\\SKILL.md.\n4. Transparência: Notificar o usuário sobre quais habilidades offline foram incorporadas.\n`
   };
 
   for (const [ruleName, ruleBody] of Object.entries(templateRules)) {
@@ -475,7 +475,7 @@ This file contains the global rules and behavioral guidelines for the Antigravit
 O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa ou nova tarefa complexa:
 1. Diagnóstico Cognitivo: Analisar se a tarefa envolve planejamento, código, testes, etc.
 2. Consulta ao Catálogo: Consultar o catálogo mestre de indexação utilizando a ferramenta correspondente.
-3. Carregamento Offline: Ler o arquivo SKILL.md correspondente a partir do diretório de habilidades globais (ex: C:\\AG SKILLS\\<nome-da-skill>\\SKILL.md ou caminho configurado pela variável de ambiente AG_SKILLS_PATH).
+3. Carregamento Offline: Ler o arquivo SKILL.md correspondente a partir do diretório de habilidades globais (ex: C:\\ag-skills\\<nome-da-skill>\\SKILL.md ou caminho configurado pela variável de ambiente AG_SKILLS_PATH).
 4. Transparência: Notificar o usuário sobre quais habilidades offline foram incorporadas.
 </RULE[bmad_jit_skills_protocol]>
 `;
@@ -491,7 +491,7 @@ O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa 
     }
 
     // 2. Configurar skills.json global para registrar o diretório de skills globais
-    const rawSkillsDir = process.env.AG_SKILLS_PATH || process.env.AG_SKILLS_DIR || 'C:\\AG SKILLS';
+    const rawSkillsDir = process.env.AG_SKILLS_PATH || process.env.AG_SKILLS_DIR || 'C:\\ag-skills';
     const skillsDir = path.resolve(rawSkillsDir);
     const skillsJsonPath = path.resolve(geminiConfigDir, 'skills.json');
     let skillsJson = { entries: [] };
@@ -618,6 +618,80 @@ program
     }
   });
 
+program
+  .command('doctor')
+  .description('Executa o autodiagnóstico completo do ecossistema e ambiente do Synapse Engine')
+  .action(() => {
+    console.log('🩺 Executando autodiagnóstico completo do Synapse Engine...\n');
+    const os = require('os');
+    const homeDir = os.homedir();
+    const cwd = process.cwd();
+
+    // 1. Graphify CLI Check
+    let graphifyOk = false;
+    let graphifyMsg = '';
+    try {
+      execSync('graphify --version', { stdio: 'ignore' });
+      graphifyOk = true;
+      graphifyMsg = 'Instalado globalmente no PATH';
+    } catch (e) {
+      const localBinGraphify = path.join(homeDir, '.local', 'bin', os.platform() === 'win32' ? 'graphify.exe' : 'graphify');
+      if (fs.existsSync(localBinGraphify)) {
+        graphifyOk = true;
+        graphifyMsg = `Fallback encontrado em ${localBinGraphify}`;
+      } else {
+        graphifyMsg = 'Não encontrado. Execute: pip install graphify ou uv tool install graphifyy';
+      }
+    }
+
+    // 2. MCP Server Configuration Check
+    const mcpConfigPath = path.join(homeDir, '.gemini', 'antigravity-ide', 'mcp_config.json');
+    let mcpOk = false;
+    let mcpMsg = '';
+    if (fs.existsSync(mcpConfigPath)) {
+      try {
+        const mcpConf = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf8'));
+        if (mcpConf.mcpServers && mcpConf.mcpServers['synapse-graphify']) {
+          mcpOk = true;
+          mcpMsg = 'Servidor synapse-graphify registrado em mcp_config.json';
+        } else {
+          mcpMsg = 'mcp_config.json existe, mas o servidor synapse-graphify não foi registrado. Execute: synapse setup --global';
+        }
+      } catch (e) {
+        mcpMsg = `Erro ao ler mcp_config.json: ${e.message}`;
+      }
+    } else {
+      mcpMsg = `Arquivo mcp_config.json não encontrado em ${mcpConfigPath}. Execute: synapse setup --global`;
+    }
+
+    // 3. State & Persona Telemetry Check
+    const statePath = path.join(cwd, '.agents', 'state.json');
+    const stateOk = fs.existsSync(statePath);
+    const stateMsg = stateOk ? 'Presente e rastreando persona local' : 'Ausente. Execute: synapse init';
+
+    // 4. Obsidian Vault Check
+    const vaultPath = path.join(cwd, '.obsidian-vault');
+    const vaultOk = fs.existsSync(vaultPath);
+    const vaultMsg = vaultOk ? 'Estrutura de memória local configurada' : 'Ausente. Execute: synapse init ou synapse update';
+
+    // 5. AST Topology Check
+    const graphPath = path.join(cwd, 'graphify-out', 'graph.json');
+    const graphOk = fs.existsSync(graphPath);
+    const graphMsg = graphOk ? 'Mapa AST gerado em graphify-out/graph.json' : 'Indisponível. Execute: synapse graphify';
+
+    console.table([
+      { Componente: 'Graphify CLI', Status: graphifyOk ? '🟢 OK' : '🔴 Falha', Detalhe: graphifyMsg },
+      { Componente: 'IDE MCP Server', Status: mcpOk ? '🟢 OK' : '🟡 Alerta', Detalhe: mcpMsg },
+      { Componente: 'Estado Local (.agents/state.json)', Status: stateOk ? '🟢 OK' : '🔴 Falha', Detalhe: stateMsg },
+      { Componente: 'Memória Obsidian Vault (.obsidian-vault)', Status: vaultOk ? '🟢 OK' : '🟡 Alerta', Detalhe: vaultMsg },
+      { Componente: 'Grafo AST (graphify-out)', Status: graphOk ? '🟢 OK' : '🟡 Alerta', Detalhe: graphMsg }
+    ]);
+
+    const allOk = graphifyOk && mcpOk && stateOk && vaultOk && graphOk;
+    console.log(`\nDiagnóstico Final: ${allOk ? '🎉 Ambiente 100% operacional!' : '⚠️ Foram detectados alertas. Veja os detalhes acima.'}\n`);
+  });
+
 program.parse(process.argv);
+
 
 
