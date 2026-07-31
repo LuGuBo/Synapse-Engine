@@ -1,44 +1,44 @@
-# 🌐 Guia de Configuração Global do Synapse Engine
+# 🌐 Synapse Engine Global Setup Guide
 
-Este guia descreve de forma transparente o funcionamento da governança global da IDE e detalha como configurar o ecossistema manualmente, garantindo controle total sobre as alterações realizadas na sua máquina.
-
----
-
-## 🏛️ 1. Como Funciona a Customização Global
-
-O agente de IA (Antigravity) gerencia regras globais que são carregadas logo na **primeira inicialização do contexto de cada chat**. Essas regras ficam localizadas no diretório do usuário:
-
-*   **Caminho do Windows:** `C:\Users\<Seu-Usuario>\.gemini\config\`
-
-### Arquivos Críticos de Configuração:
-1.  **`AGENTS.md` (A Alma do Agente):** Este arquivo central define as regras e restrições metodológicas obrigatórias (como o *Protocolo JIT-Skills* e a *Bilingual Rule*). Ele é lido antes de qualquer arquivo local do seu repositório de trabalho.
-2.  **`skills.json` (Registro de Auto-Descoberta):** Arquivo que instrui a IDE sobre quais caminhos de diretórios externos contêm conjuntos de habilidades (*skills*) adicionais que devem ser incorporados ao raciocínio operacional do agente.
+This guide describes the operation of the global IDE governance system and details how to manually configure the ecosystem, ensuring full control over machine configurations.
 
 ---
 
-## 📦 2. O Repositório de Habilidades Compartilhado (`AG_SKILLS_PATH`)
+## 🏛️ 1. How Global Customization Works
 
-Para manter o ecossistema modular e limpo, todas as ferramentas e guias especializados offline (ex: `postgres-best-practices`, `qa`, `senior-architect`) residem em um diretório compartilhado configurado no sistema. 
+The AI agent (Antigravity) manages global rules loaded upon the **first context initialization of every chat session**. These rules reside in the user's configuration directory:
 
-Por padrão, o Synapse utiliza a variável de ambiente **`AG_SKILLS_PATH`** para localizar este diretório. Caso não esteja configurada, o sistema adota os seguintes caminhos padrão (fallbacks):
-*   **No Windows:** `C:\ag-skills\`
-*   **No Unix/macOS:** `~/ag-skills/`
+*   **Windows Path:** `C:\Users\<Your-Username>\.gemini\config\`
 
-Este diretório deve ser tratado como um **repositório Git independente**. Ele pode ser compartilhado com times ou clonado a partir de um repositório central de skills no GitHub, permitindo atualização e extensão de habilidades sem alterar os códigos comerciais de aplicação.
+### Critical Configuration Files:
+1.  **`AGENTS.md` (Agent Governance Core):** Central file defining mandatory methodological rules and constraints (such as the *JIT-Skills Protocol* and the *Bilingual Rule*). It is evaluated before any local workspace repository file.
+2.  **`skills.json` (Auto-Discovery Registry):** Configuration instructing the IDE which external directory paths contain additional skill packages to incorporate into the agent's reasoning scope.
 
 ---
 
-## 🛠️ 3. Passo a Passo do Setup Manual (Alternativa à CLI)
+## 📦 2. Shared Offline Skills Vault (`AG_SKILLS_PATH`)
 
-Se você preferir não utilizar o comando automático `synapse setup --global`, pode realizar todo o setup manualmente seguindo estes passos:
+To keep the ecosystem modular and decoupled, all offline tools and domain guides (e.g., `postgres-best-practices`, `qa`, `senior-architect`) reside in a system-wide shared directory.
 
-### Passo A: Criar a Estrutura de Pastas
-1.  Navegue até `C:\Users\<Seu-Usuario>\` e crie a pasta `.gemini` caso não exista.
-2.  Dentro dela, crie a pasta `config` (caminho final: `C:\Users\<Seu-Usuario>\.gemini\config`).
-3.  Crie a pasta `skills` dentro de `config` (`C:\Users\<Seu-Usuario>\.gemini\config\skills`).
+By default, Synapse evaluates the **`AG_SKILLS_PATH`** environment variable to locate this directory. If unset, standard fallbacks apply:
+*   **Windows:** `C:\ag-skills\`
+*   **Unix/macOS:** `~/ag-skills/`
 
-### Passo B: Injetar Regras Globais (`AGENTS.md`)
-Crie o arquivo `AGENTS.md` dentro de `C:\Users\<Seu-Usuario>\.gemini\config\` com o seguinte conteúdo:
+This directory should be treated as an **independent Git repository**. It can be shared across teams or cloned from a central GitHub skills repository, enabling skill updates and extensions without mutating application codebases.
+
+---
+
+## 🛠️ 3. Manual Setup Step-by-Step (CLI Alternative)
+
+If you prefer not to use the automated `synapse setup --global` command, execute manual setup via the following steps:
+
+### Step A: Directory Structure Creation
+1.  Navigate to `C:\Users\<Your-Username>\` and create `.gemini` if missing.
+2.  Create `config` inside it (`C:\Users\<Your-Username>\.gemini\config`).
+3.  Create `skills` inside `config` (`C:\Users\<Your-Username>\.gemini\config\skills`).
+
+### Step B: Global Rules Injection (`AGENTS.md`)
+Create `AGENTS.md` inside `C:\Users\<Your-Username>\.gemini\config\` with the following content:
 
 ```markdown
 # 🌐 Antigravity Global Agent Rules
@@ -54,17 +54,17 @@ This file contains the global rules and behavioral guidelines for the Antigravit
 </RULE[bmad_core]>
 
 <RULE[bmad_jit_skills_protocol]>
-# Protocolo JIT-Skills (Seleção Inteligente de Habilidades Offline)
-O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa ou nova tarefa complexa:
-1. Diagnóstico Cognitivo: Analisar se a tarefa envolve planejamento, código, testes, etc.
-2. Consulta ao Catálogo: Consultar o catálogo mestre de indexação utilizando a ferramenta correspondente.
-3. Carregamento Offline: Ler o arquivo SKILL.md correspondente a partir do diretório de habilidades globais (ex: C:\ag-skills\<nome-da-skill>\SKILL.md ou caminho configurado pela variável de ambiente AG_SKILLS_PATH).
-4. Transparência: Notificar o usuário sobre quais habilidades offline foram incorporadas.
+# JIT-Skills Protocol (Smart Offline Skill Selection)
+The agent operates under the following cognitive workflow at the start of every session or complex task:
+1. Cognitive Diagnosis: Analyze whether the task involves planning, code, testing, etc.
+2. Catalog Query: Search the master index catalog using the corresponding tool.
+3. Offline Load: Read the target SKILL.md manifest from the global skills directory.
+4. Transparency: Explicitly report which offline skills were loaded in the walkthrough report.
 </RULE[bmad_jit_skills_protocol]>
 ```
 
-### Passo C: Configurar o Mapeador de Skills (`skills.json`)
-Crie o arquivo `skills.json` dentro de `C:\Users\<Seu-Usuario>\.gemini\config\` com o seguinte conteúdo JSON, apontando para o seu diretório de habilidades (exemplo usando o caminho padrão do Windows):
+### Step C: Skill Mapper Configuration (`skills.json`)
+Create `skills.json` inside `C:\Users\<Your-Username>\.gemini\config\` with the following JSON content:
 
 ```json
 {
@@ -74,13 +74,12 @@ Crie o arquivo `skills.json` dentro de `C:\Users\<Seu-Usuario>\.gemini\config\` 
 }
 ```
 
-Isso instruirá a IDE a ler nativamente todas as habilidades armazenadas na pasta indicada.
-
 ---
 
-## 💻 4. Verificação do Setup
+## 💻 4. Setup Verification
 
-Para confirmar que seu setup (manual ou automático via CLI) foi aplicado corretamente, inicie uma nova sessão do chat da IDE e digite:
-> *"Quais habilidades você tem carregadas em seu escopo central?"*
+To confirm setup completion (manual or automated via CLI), start a new IDE chat session and query:
+> *"Which offline skills are registered in your central scope?"*
 
-O agente deverá responder com base nas habilidades registradas no catálogo mestre offline da pasta `C:\ag-skills\ag_master_index\SKILL.md`.
+The agent will respond based on the skills indexed in `C:\ag-skills\ag_master_index\SKILL.md`.
+

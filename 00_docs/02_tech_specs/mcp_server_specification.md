@@ -1,120 +1,120 @@
-# 📄 Especificação Técnica: Servidor MCP Nativo (`synapse-mcp-server`)
+# Technical Specification: Native MCP Server (`synapse-mcp-server`)
 
-## 1. Visão Geral & Arquitetura
-O **Servidor MCP Nativo do Synapse Engine** é uma implementação em Node.js puro e ultraleve do **Model Context Protocol (MCP)**, operando sobre o transporte `stdio` via **JSON-RPC 2.0** sem dependências externas.
+## 1. Overview & Architecture
+The **Synapse Engine Native MCP Server** is a lightweight, zero-dependency Node.js implementation of the **Model Context Protocol (MCP)** operating over `stdio` transport via **JSON-RPC 2.0**.
 
-Seu objetivo é expor capacidades de consulta topológica de AST (**Graphify**), telemetria de governança BMAD (**TDD Gate & State**), validações de segurança OWASP, busca de habilidades JIT e seleção de hardware acelerado para agentes da IDE Antigravity / Claude Desktop / Google Antigravity SDK com consumo residual de tokens.
-
----
-
-## 2. Interface de Comunicação & Protocolo Stdio IPC
-
-* **Transporte:** Stdio (`process.stdin` / `process.stdout`)
-* **Formato:** JSON-RPC 2.0 por linha (newline-delimited JSON)
-* **Executável:** `bin/synapse-mcp-server.js`
-* **Versão do Protocolo MCP:** `2024-11-05`
+It exposes AST graph topology querying (**Graphify**), BMAD governance telemetry (**TDD Gate & State**), OWASP security scanning, JIT skill discovery, and hardware acceleration routing to agents running in Antigravity IDE / Claude Desktop / Google Antigravity SDK with sub-millisecond execution and minimal token overhead.
 
 ---
 
-## 3. Catálogo de Ferramentas Expostas (`tools/list`)
+## 2. Communication Interface & Stdio IPC Protocol
 
-O servidor expõe **13 ferramentas** com anotações comportamentais padronizadas:
+* **Transport:** Stdio (`process.stdin` / `process.stdout`)
+* **Format:** JSON-RPC 2.0 per line (newline-delimited JSON)
+* **Executable:** `bin/synapse-mcp-server.js`
+* **MCP Protocol Version:** `2024-11-05`
+
+---
+
+## 3. Tool Registry Matrix
+
+The server exposes **registered tools** with standardized behavioral annotations:
 
 ### 1. `graphify_get_deps`
-* **Descrição:** Retorna as dependências diretas (módulos importados) e chamadores (módulos que importam) de um arquivo/nó da AST.
-* **Argumentos (`inputSchema`):**
-  * `targetFile` (string, obrigatório): Caminho relativo do arquivo alvo.
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Returns direct dependencies (imported modules) and callers (importing modules) for a given AST file node.
+* **Arguments (`inputSchema`):**
+  * `targetFile` (string, required): Relative path of the target file.
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 2. `graphify_get_impacted_tests`
-* **Descrição:** Retorna os arquivos de teste unitários impactados por alterações no arquivo de produção.
-* **Argumentos (`inputSchema`):**
-  * `targetFile` (string, obrigatório): Caminho relativo do arquivo alterado.
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Resolves unit test files affected by modifications to a target source file.
+* **Arguments (`inputSchema`):**
+  * `targetFile` (string, required): Relative path of the changed file.
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 3. `graphify_check_circular`
-* **Descrição:** Executa algoritmo de detecção de ciclos no grafo AST (`graphify-out/graph.json`) para prevenir dependências circulares.
-* **Argumentos (`inputSchema`):** Nenhum.
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Runs cycle detection on the AST graph (`graphify-out/graph.json`) to prevent circular dependencies.
+* **Arguments (`inputSchema`):** None.
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 4. `synapse_tdd_status`
-* **Descrição:** Consulta o estado de telemetria local (`.agents/state.json`) retornando a persona ativa, alvo cirúrgico de edição e status de validação TDD.
-* **Argumentos (`inputSchema`):** Nenhum.
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Queries local telemetry state (`.agents/state.json`) returning active persona, surgical editing target, and TDD status.
+* **Arguments (`inputSchema`):** None.
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 5. `synapse_shift_persona`
-* **Descrição:** Altera a persona ativa no estado de telemetria local (`.agents/state.json`).
-* **Argumentos (`inputSchema`):**
-  * `active_persona` (string, obrigatório): Nome da persona (`PM`, `ARCHITECT`, `DEVELOPER`, `QA`, `BOSS`).
-* **Anotações:** `readOnlyHint: false`, `idempotentHint: false`, `destructiveHint: false`.
+* **Description:** Updates the active persona in local telemetry state (`.agents/state.json`).
+* **Arguments (`inputSchema`):**
+  * `active_persona` (string, required): Target persona (`PM`, `ARCHITECT`, `DEVELOPER`, `QA`, `BOSS`).
+* **Annotations:** `readOnlyHint: false`, `idempotentHint: false`, `destructiveHint: false`.
 
 ### 6. `synapse_set_target`
-* **Descrição:** Define o escopo do alvo cirúrgico de edição (arquivo e faixa de linhas) em `.agents/state.json`.
-* **Argumentos (`inputSchema`):**
-  * `file_path` (string, obrigatório): Caminho relativo do arquivo alvo.
-  * `line_range_start` (number, opcional): Linha inicial (1-indexed).
-  * `line_range_end` (number, opcional): Linha final (1-indexed).
-* **Anotações:** `readOnlyHint: false`, `idempotentHint: false`, `destructiveHint: false`.
+* **Description:** Defines the active surgical target scope (file path and line range) in `.agents/state.json`.
+* **Arguments (`inputSchema`):**
+  * `file_path` (string, required): Relative path of target file.
+  * `line_range_start` (number, optional): Start line (1-indexed).
+  * `line_range_end` (number, optional): End line (1-indexed).
+* **Annotations:** `readOnlyHint: false`, `idempotentHint: false`, `destructiveHint: false`.
 
 ### 7. `synapse_generate_audit_tables`
-* **Descrição:** Gera o trecho em Markdown com as tabelas de auditoria obrigatórias de personas e skills para inserção em `walkthrough.md`.
-* **Argumentos (`inputSchema`):**
-  * `activePersona` (string, opcional): Nome da persona a ser exibida.
-  * `skillsUsed` (array de strings, opcional): Lista de skills invocadas.
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Generates Markdown audit tables for persona and skill execution compliance in `walkthrough.md`.
+* **Arguments (`inputSchema`):**
+  * `activePersona` (string, optional): Active persona name.
+  * `skillsUsed` (array of strings, optional): List of invoked skills.
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 8. `synapse_scan_secrets`
-* **Descrição:** Varre a árvore do workspace procurando vazamentos de credenciais (chaves AWS, GitHub tokens, senhas) segundo padrões OWASP.
-* **Argumentos (`inputSchema`):**
-  * `response_format` (string, opcional, enum: `['markdown', 'json']`, default: `'markdown'`).
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Scans workspace files for leaked credentials (AWS keys, GitHub tokens, passwords) following OWASP rules.
+* **Arguments (`inputSchema`):**
+  * `response_format` (string, optional, enum: `['markdown', 'json']`, default: `'markdown'`).
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 9. `synapse_get_clean_diff`
-* **Descrição:** Retorna o resumo estatístico limpo das alterações em staging via Git.
-* **Argumentos (`inputSchema`):** Nenhum.
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Returns clean statistical summary of staged Git diff changes.
+* **Arguments (`inputSchema`):** None.
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 10. `synapse_search_skills`
-* **Descrição:** Busca manifestos `SKILL.md` offline no diretório central (`C:\ag-skills`), global (`~/.gemini/config/skills`) e local (`.agents/skills`).
-* **Argumentos (`inputSchema`):**
-  * `query` (string, opcional): Termo de busca ou palavra-chave.
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Searches offline `SKILL.md` manifests across central (`C:\ag-skills`), global (`~/.gemini/config/skills`), and local (`.agents/skills`) vaults.
+* **Arguments (`inputSchema`):**
+  * `query` (string, optional): Search keyword.
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 11. `synapse_context_health_check`
-* **Descrição:** Valida a saúde do contexto (arquivos grandes >500 linhas e integridade do `.gitignore`).
-* **Argumentos (`inputSchema`):**
-  * `response_format` (string, opcional, enum: `['markdown', 'json']`, default: `'markdown'`).
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Validates workspace context health (large files >500 lines and `.gitignore` compliance).
+* **Arguments (`inputSchema`):**
+  * `response_format` (string, optional, enum: `['markdown', 'json']`, default: `'markdown'`).
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 12. `synapse_hardware_status`
-* **Descrição:** Detecta especificações de CPU/GPU e provedor ativo de aceleração de IA (DirectML, NPU, CUDA).
-* **Argumentos (`inputSchema`):** Nenhum.
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Detects CPU/GPU specifications and active hardware acceleration provider (DirectML, NPU, CUDA).
+* **Arguments (`inputSchema`):** None.
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 13. `synapse_select_device`
-* **Descrição:** Seleciona dinamicamente o dispositivo ideal de execução (CPU vs GPU) com base na carga de trabalho e payload.
-* **Argumentos (`inputSchema`):**
-  * `workloadType` (string, opcional): Tipo de workload (`mcp_ipc`, `ast_query`, `batch_embeddings`, `neural_inference`, `auto`).
-  * `payloadSizeKb` (number, opcional): Tamanho estimado do payload em KB.
-  * `override` (string, opcional): Override explícito (`cpu` ou `gpu`).
-* **Anotações:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
+* **Description:** Dynamically selects optimal execution device (CPU vs GPU) based on workload classification and payload.
+* **Arguments (`inputSchema`):**
+  * `workloadType` (string, optional): Workload tier (`mcp_ipc`, `ast_query`, `batch_embeddings`, `neural_inference`, `auto`).
+  * `payloadSizeKb` (number, optional): Estimated payload size in KB.
+  * `override` (string, optional): Explicit override (`cpu` or `gpu`).
+* **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ---
 
-## 4. Protocolo de Recursos (`resources/list` & `resources/read`)
+## 4. Resource Protocol (`resources/list` & `resources/read`)
 
-O servidor expõe recursos estáticos e dinâmicos com minificação de tokens em tempo de execução:
+The server exposes static and dynamic resources minified at runtime for maximum token economy:
 
-### URIs de Recursos Suportados:
-1. `skills://<skill-name>`: Retorna o manifesto `SKILL.md` da habilidade informada (buscando no vault central, global ou local) minificado para economia de tokens.
-2. `state://current`: Retorna o conteúdo JSON da telemetria de estado local (`.agents/state.json`).
-3. `graph://topology`: Retorna um resumo conciso da topologia do grafo AST (`nodesCount`, `edgesCount`, lista de módulos).
+### Supported Resource URIs:
+1. `skills://<skill-name>`: Returns minified `SKILL.md` content for the requested skill.
+2. `state://current`: Returns raw JSON content of local telemetry state (`.agents/state.json`).
+3. `graph://topology`: Returns concise AST graph topology summary (`nodesCount`, `edgesCount`, module list).
 
 ---
 
-## 5. Integração com Google Antigravity SDK
+## 5. Integration with Google Antigravity SDK
 
-Para conectar o `synapse-mcp-server` a robôs autônomos criados com o **Google Antigravity SDK**:
+To connect `synapse-mcp-server` to autonomous agents using the **Google Antigravity SDK**:
 
 ### Python SDK Example:
 ```python
@@ -127,7 +127,7 @@ mcp_servers = [
     )
 ]
 
-# Configuração de permissões estritas (Safety Policy)
+# Strict safety policy configuration
 policies = [
     policy.confirm_run_command(),
     policy.allow("synapse_scan_secrets"),
@@ -138,28 +138,29 @@ policies = [
 config = LocalAgentConfig(mcp_servers=mcp_servers, policies=policies)
 
 async with Agent(config) as agent:
-    response = await agent.chat("Verifique as dependências do arquivo bin/synapse-cli.js via MCP.")
+    response = await agent.chat("Check dependencies for bin/synapse-cli.js via MCP.")
     print(await response.text())
 ```
 
 ---
 
-## 6. Benchmark de Performance & Redução de Tokens
+## 6. Performance Benchmark & Token Savings
 
-| Métrica | Leitura de Arquivo Bruto (`graph.json`) | Servidor MCP Nativo (`stdio`) | Ganho de Eficiência |
+| Metric | Raw File Read (`graph.json`) | Native MCP Server (`stdio`) | Efficiency Gain |
 | :--- | :--- | :--- | :--- |
-| **Tokens Consumidos** | ~59.970 tokens | **58 tokens** | **99.90% de Redução** |
-| **Tamanho do Payload** | 234,26 KB | **0,23 KB** | **1.034x Menor** |
-| **Tempo de Resposta** | Dependente de I/O | **0.810 ms** | **Sub-Milissegundo** |
+| **Token Consumption** | ~59,970 tokens | **58 tokens** | **99.90% Reduction** |
+| **Payload Size** | 234.26 KB | **0.23 KB** | **1,034x Smaller** |
+| **Response Latency** | I/O dependent | **0.810 ms** | **Sub-millisecond** |
 
 ---
 
-## 7. Comandos de Execução e Testes
+## 7. Execution & Testing Commands
 
 ```bash
-# Iniciar o servidor Stdio manualmente
+# Start Stdio server manually
 node bin/synapse-mcp-server.js
 
-# Executar a suíte de testes unitários e benchmark no Jest
+# Execute Jest unit test and benchmark suite
 npx jest tests/synapse_mcp_benchmark.test.js
 ```
+
