@@ -8,7 +8,12 @@
   },
   "scripts": {
     "test": "jest",
-    "harness:graphify": "node bin/synapse-cli.js graphify",
+    "harness:status":          "node bin/synapse-cli.js status",
+    "harness:tdd":             "node bin/synapse-cli.js tdd",
+    "harness:graphify":        "node bin/synapse-cli.js graphify",
+    "harness:graphify:update": "node bin/synapse-cli.js graphify",
+    "harness:mcp":             "node bin/synapse-cli.js mcp",
+    "harness:sync-memory":     "powershell -File ./scripts/sync-memory.ps1",
     "release": "node scripts/release.js"
   },
   "dependencies": {

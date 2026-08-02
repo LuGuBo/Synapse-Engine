@@ -16,9 +16,14 @@ const PYTHON_SCRIPT = path.join(ROOT_DIR, 'src', 'hardware_selector.py');
 function getHardwareStatus(workload = 'auto', payloadSizeKb = 0.0, override = null) {
   const cpuCores = os.cpus().length;
 
-  // Otimização estática: Cargas de ultra-baixa latência rodam localmente na CPU sem spawnar subprocesso Python
-  const staticCpuWorkloads = ['mcp_ipc', 'ast_query', 'json_state', 'secret_scan', 'git_diff'];
-  const isCpuWorkload = staticCpuWorkloads.includes(workload);
+  // Otimização estática: Cargas de ultra-baixa latência e arquivos de texto/código rodam localmente na CPU (Fast-Path SIMD)
+  const staticCpuWorkloads = [
+    'mcp_ipc', 'ast_query', 'json_state', 'secret_scan', 'git_diff',
+    'fast_path_text', 'fast_path_code', 'fast_path'
+  ];
+  const fastPathExts = ['.py', '.ts', '.md', '.json', '.js', '.html', '.css'];
+  const isFastPathFile = fastPathExts.some(ext => workload.toLowerCase().endsWith(ext));
+  const isCpuWorkload = isFastPathFile || staticCpuWorkloads.includes(workload.toLowerCase());
   const isCpuOverride = override && override.toLowerCase() === 'cpu';
 
   if (isCpuWorkload && (!override || isCpuOverride)) {

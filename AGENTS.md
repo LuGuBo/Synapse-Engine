@@ -17,7 +17,13 @@
 ## 4. Codebase Navigation & Context-First Execution
 - **Working Memory Supremacy (Context-First)**: If a file path, context document, or target artifact has been read, modified, or explicitly declared in the current session (or is a recommended active Knowledge Item), you MUST operate directly on it. Discharging global search tools (`grep_search`, `list_dir`) to locate or confirm the existence of these known resources is strictly prohibited.
 - **Exhaustive Scan Ban (Anti-Redundancy)**: Do not initiate broad "safety scans" in parent directories to search for potential duplicate mentions or other occurrences of recently modified files unless explicitly commanded by the user. Trust the active context and the local workspace state.
-- **Map-First Dependency Queries**: For architectural changes or refactoring impacts, query the AST structure via `./graphify-out/graph.json` or `synapse-mcp-server` to trace connections first. Reserve text-based `grep_search` exclusively for untracked references (e.g., string literals, dynamic imports) and restrict its search range strictly to the affected subgraphs.
+- **Map-First Dependency Queries**: For architectural changes or refactoring impacts, query the AST graph FIRST via one of these sources (in priority order):
+  1. **MCP Stdio (preferred):** `npm run harness:mcp` → start the `synapse-graphify` MCP server and query it directly
+  2. **graphify-out/graph.json:** read the static graph file for quick node/edge lookups
+  3. **Obsidian Vault junction:** `.obsidian-vault/graphify-links/` mirrors `graphify-out/` — navigate notes via Wikilinks
+  - Reserve text-based `grep_search` exclusively for untracked string literals or dynamic imports. Always restrict search range to the affected subgraph.
+- **Post-Session Graph Sync:** After completing any implementation phase, run `npm run harness:graphify:update` to keep the AST graph current (AST-only, no LLM/API cost).
+
 
 
 ## 5. Mandatory `walkthrough.md` Audit Structure

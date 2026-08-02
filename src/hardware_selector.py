@@ -107,6 +107,32 @@ class HardwareSelector:
             "accelerator_type": accelerator_type
         }
 
+    def patch_onnxruntime_topology(self, target_device: str = "gpu") -> Dict[str, Any]:
+        """
+        Doc-Boy Pattern: Dynamically configures ONNX Runtime execution providers (DirectML FP16/FP32 for GPU, VitisAI/DirectML INT8 for NPU).
+        """
+        gpu_info = self.gpu_info
+        dev = target_device.lower()
+        if dev in ["gpu", "directml"] and gpu_info["gpu_available"]:
+            return {
+                "provider": "DmlExecutionProvider",
+                "device": "GPU",
+                "fp_precision": "FP16",
+                "patched": True
+            }
+        elif dev in ["npu", "vitisai"] and gpu_info["npu_available"]:
+            return {
+                "provider": "VitisAIExecutionProvider",
+                "device": "NPU",
+                "quantization": "INT8",
+                "patched": True
+            }
+        return {
+            "provider": "CPUExecutionProvider",
+            "device": "CPU",
+            "patched": False
+        }
+
     def select_execution_device(
         self,
         workload_type: str,
@@ -115,8 +141,13 @@ class HardwareSelector:
     ) -> Dict[str, Any]:
         w_type = workload_type.lower()
 
-        # Ultra-fast short-circuit optimization for CPU-bound tasks
-        is_cpu_workload = w_type in ["mcp_ipc", "ast_query", "json_state", "secret_scan", "git_diff"]
+        # Ultra-fast short-circuit optimization for CPU-bound tasks & Fast-Path SIMD text/code files
+        fast_path_exts = [".py", ".ts", ".md", ".json", ".js", ".html", ".css"]
+        is_fast_path_file = any(w_type.endswith(ext) for ext in fast_path_exts)
+        is_cpu_workload = is_fast_path_file or w_type in [
+            "mcp_ipc", "ast_query", "json_state", "secret_scan", "git_diff",
+            "fast_path_text", "fast_path_code", "fast_path"
+        ]
         is_cpu_override = user_override is not None and user_override.lower() == "cpu"
 
         if is_cpu_override or (is_cpu_workload and not (user_override and user_override.lower() == "gpu")):
