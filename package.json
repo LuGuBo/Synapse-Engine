@@ -1,6 +1,6 @@
 {
   "name": "synapse-engine",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Synapse Engine - High-Performance AI Agent Governance Framework and BMAD Lifecycle Orchestrator",
   "main": "index.js",
   "bin": {

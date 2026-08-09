@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-08-09
+
+### Added
+- **Sliding Window Quota Manager**: Added real-time rate limit tracker with 60s/24h sliding window calculations across RPM, TPM, RPD, and 24h token metrics (`src/quota_manager/tracker.py`).
+- **Task Weight Complexity Estimator**: Implemented 1-10 task complexity classification algorithm and model routing based on live GCP availability and quota budgets (`src/quota_manager/estimator.py`).
+- **Quota Interceptor & Dashboard**: Added pro-active 429 error prevention interceptor (`src/quota_manager/interceptor.py`) and local HTTP Quota Dashboard (`src/quota_manager/dashboard.py`).
+- **CLI Quota Commands**: Added `synapse quota status`, `synapse quota estimate`, and `synapse quota dashboard` subcommands (`bin/synapse-cli.js`).
+- **MCP Server Quota Tools**: Integrated `synapse_get_quota_status` and `synapse_estimate_task_weight` endpoints into stdio MCP server (`bin/synapse-mcp-server.js`).
+- **Subagents Workflow Governance**: Implemented strict Clean-Room subagent execution workflow rules (`.agents/rules/subagents_workflow.md` and `AGENTS.md`).
+- **Quota Unit Test Suite**: Added 6 Python test modules (`tests/quota_manager/`) covering tracker, estimator, interceptor, mcp_server, cli, and dashboard components.
+
+### Changed
+- **TDD Quality Gate**: Updated pre-commit TDD validation gate (`bin/tdd-gate.js`) to support Python test naming conventions (`test_*.py`).
+- **MCP Benchmark Test**: Updated expected tool count assertions in `tests/synapse_mcp_benchmark.test.js` to cover 19 active tools.
+
 ## [2.1.0] - 2026-07-31
 
 ### Added
