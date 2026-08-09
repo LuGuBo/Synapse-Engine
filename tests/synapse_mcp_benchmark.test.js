@@ -373,6 +373,62 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
     expect(readMissingRes.result.content[0].text).toContain('not found');
   });
 
+  test('MCP Server handles missing/error graph AST gracefully with valid JSON output', () => {
+    const originalGraphPath = process.env.SYNAPSE_GRAPH_PATH;
+    process.env.SYNAPSE_GRAPH_PATH = path.join(FIXTURES_DIR, 'non_existent_graph.json');
+
+    // 1. graphify_get_path with missing graph
+    const pathReq = {
+      jsonrpc: '2.0',
+      id: 401,
+      method: 'tools/call',
+      params: {
+        name: 'graphify_get_path',
+        arguments: { startFile: 'foo.js', targetFile: 'bar.js' }
+      }
+    };
+    const pathRes = processRPCRequest(pathReq);
+    expect(pathRes.result.content[0].type).toBe('text');
+    const pathData = JSON.parse(pathRes.result.content[0].text);
+    expect(pathData.found).toBe(false);
+    expect(pathData.message).toContain('Graphify AST not generated');
+
+    // 2. graphify_get_subgraph with missing graph
+    const subReq = {
+      jsonrpc: '2.0',
+      id: 402,
+      method: 'tools/call',
+      params: {
+        name: 'graphify_get_subgraph',
+        arguments: { rootFile: 'foo.js' }
+      }
+    };
+    const subRes = processRPCRequest(subReq);
+    expect(subRes.result.content[0].type).toBe('text');
+    const subData = JSON.parse(subRes.result.content[0].text);
+    expect(subData.found).toBe(false);
+    expect(subData.message).toContain('Graphify AST not generated');
+
+    // 3. graphify_get_deps with missing graph
+    const depsReq = {
+      jsonrpc: '2.0',
+      id: 403,
+      method: 'tools/call',
+      params: {
+        name: 'graphify_get_deps',
+        arguments: { targetFile: 'foo.js' }
+      }
+    };
+    const depsRes = processRPCRequest(depsReq);
+    expect(depsRes.result.content[0].type).toBe('text');
+    const depsData = JSON.parse(depsRes.result.content[0].text);
+    expect(depsData.found).toBe(false);
+    expect(depsData.message).toContain('Graphify AST not generated');
+
+    // Restore graph path
+    process.env.SYNAPSE_GRAPH_PATH = originalGraphPath;
+  });
+
   test('🔥 EXPLICIT BENCHMARK: Native File Read vs MCP Stdio Tool Call', () => {
 
     let fullGraphText = '';

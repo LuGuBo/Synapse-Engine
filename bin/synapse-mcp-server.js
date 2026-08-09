@@ -14,13 +14,23 @@ const readline = require('readline');
 const { execSync } = require('child_process');
 const { getHardwareStatus } = require('./hardware-selector');
 
-// Operational paths
-const ROOT_DIR = process.env.SYNAPSE_WORKSPACE_ROOT || process.cwd();
-const GRAPH_PATH = process.env.SYNAPSE_GRAPH_PATH || path.join(ROOT_DIR, 'graphify-out', 'graph.json');
-const STATE_PATH = process.env.SYNAPSE_STATE_PATH || path.join(ROOT_DIR, '.agents', 'state.json');
+// Operational paths dynamic getters
+function getRootDir() {
+  return process.env.SYNAPSE_WORKSPACE_ROOT || process.cwd();
+}
+
+function getGraphPath() {
+  return process.env.SYNAPSE_GRAPH_PATH || path.join(getRootDir(), 'graphify-out', 'graph.json');
+}
+
+function getStatePath() {
+  return process.env.SYNAPSE_STATE_PATH || path.join(getRootDir(), '.agents', 'state.json');
+}
 
 let loadedGraph = null;
+let loadedGraphPath = null;
 let loadedState = null;
+let loadedStatePath = null;
 
 // Variáveis de controle de cache e estado para o auto-update do Graphify
 let lastGitHead = null;
@@ -48,7 +58,7 @@ function detectGraphifyCommand() {
   }
 
   const uvCmd = os.platform() === 'win32' ? '.venv\\Scripts\\uv.exe' : '.venv/bin/uv';
-  const localUv = path.join(ROOT_DIR, uvCmd);
+  const localUv = path.join(getRootDir(), uvCmd);
   if (fs.existsSync(localUv)) {
     detectedGraphifyCmd = `"${localUv}" tool run --from graphifyy graphify`;
     return detectedGraphifyCmd;
@@ -62,13 +72,15 @@ function detectGraphifyCommand() {
  * Reads and parses graphify-out/graph.json safely (cached in memory and auto-updated)
  */
 function loadGraph(forceReload = false) {
+  const rootDir = getRootDir();
+  const graphPath = getGraphPath();
   const now = Date.now();
   
   // Limita verificações de arquivos a no máximo uma vez a cada 10 segundos
-  if (now - lastCheckTime > 10000 || forceReload) {
+  if (now - lastCheckTime > 10000 || forceReload || loadedGraphPath !== graphPath) {
     lastCheckTime = now;
     try {
-      const gitIndexPath = path.join(ROOT_DIR, '.git', 'index');
+      const gitIndexPath = path.join(rootDir, '.git', 'index');
       let indexMtime = 0;
       if (fs.existsSync(gitIndexPath)) {
         indexMtime = fs.statSync(gitIndexPath).mtimeMs;
@@ -77,12 +89,12 @@ function loadGraph(forceReload = false) {
       // Só executa subprocessos git se a data de modificação do index for alterada
       if (indexMtime !== lastGitIndexMtime || forceReload) {
         lastGitIndexMtime = indexMtime;
-        const currentGitHead = execSync('git rev-parse HEAD', { encoding: 'utf8', cwd: ROOT_DIR }).trim();
-        const hasLocalChanges = execSync('git status --porcelain', { encoding: 'utf8', cwd: ROOT_DIR }).trim().length > 0;
+        const currentGitHead = execSync('git rev-parse HEAD', { encoding: 'utf8', cwd: rootDir }).trim();
+        const hasLocalChanges = execSync('git status --porcelain', { encoding: 'utf8', cwd: rootDir }).trim().length > 0;
 
         if (currentGitHead !== lastGitHead || hasLocalChanges || forceReload) {
           const cmd = detectGraphifyCommand();
-          execSync(`${cmd} update .`, { stdio: 'ignore', cwd: ROOT_DIR });
+          execSync(`${cmd} update .`, { stdio: 'ignore', cwd: rootDir });
           lastGitHead = currentGitHead;
           forceReload = true;
         }
@@ -92,15 +104,16 @@ function loadGraph(forceReload = false) {
     }
   }
 
-  if (loadedGraph && !forceReload) {
+  if (loadedGraph && loadedGraphPath === graphPath && !forceReload) {
     return loadedGraph;
   }
-  if (!fs.existsSync(GRAPH_PATH)) {
+  if (!fs.existsSync(graphPath)) {
     return { error: "Graphify AST not generated. Please run 'graphify update .' or ensure graphify-out/ exists.", nodes: [], edges: [] };
   }
   try {
-    const raw = fs.readFileSync(GRAPH_PATH, 'utf8');
+    const raw = fs.readFileSync(graphPath, 'utf8');
     loadedGraph = JSON.parse(raw);
+    loadedGraphPath = graphPath;
     return loadedGraph;
   } catch (err) {
     return { nodes: [], edges: [], error: err.message };
@@ -111,15 +124,17 @@ function loadGraph(forceReload = false) {
  * Reads .agents/state.json safely (cached in memory)
  */
 function loadState(forceReload = false) {
-  if (loadedState && !forceReload) {
+  const statePath = getStatePath();
+  if (loadedState && loadedStatePath === statePath && !forceReload) {
     return loadedState;
   }
-  if (!fs.existsSync(STATE_PATH)) {
+  if (!fs.existsSync(statePath)) {
     return { active_persona: 'DEVELOPER', surgical_target: null };
   }
   try {
-    const raw = fs.readFileSync(STATE_PATH, 'utf8');
+    const raw = fs.readFileSync(statePath, 'utf8');
     loadedState = JSON.parse(raw);
+    loadedStatePath = statePath;
     return loadedState;
   } catch (err) {
     return { active_persona: 'DEVELOPER', error: err.message };
@@ -131,9 +146,25 @@ function loadState(forceReload = false) {
  */
 function handleGetDeps(targetFile) {
   const graph = loadGraph();
-  if (graph.error) return { error: graph.error };
+  if (graph.error) {
+    return {
+      target: targetFile || null,
+      found: false,
+      message: `Error: ${graph.error}`,
+      nodesCount: 0,
+      dependencies: [],
+      callers: []
+    };
+  }
   if (!targetFile) {
-    return { error: 'targetFile argument is required' };
+    return {
+      target: null,
+      found: false,
+      message: 'targetFile argument is required',
+      nodesCount: 0,
+      dependencies: [],
+      callers: []
+    };
   }
 
   const normalizedTarget = path.normalize(targetFile).replace(/\\/g, '/');
@@ -147,7 +178,10 @@ function handleGetDeps(targetFile) {
     return {
       target: targetFile,
       found: false,
-      message: 'Node not found in graphify-out/graph.json. Run synapse init or graphify first.'
+      message: 'Node not found in graphify-out/graph.json. Run synapse init or graphify first.',
+      nodesCount: 0,
+      dependencies: [],
+      callers: []
     };
   }
 
@@ -197,7 +231,14 @@ function handleGetImpactedTests(targetFile) {
  */
 function handleCheckCircular() {
   const graph = loadGraph();
-  if (graph.error) return { error: graph.error };
+  if (graph.error) {
+    return {
+      hasCircular: false,
+      cycleCount: 0,
+      detectedCycles: [],
+      message: `Error: ${graph.error}`
+    };
+  }
   const adj = {};
 
   (graph.nodes || []).forEach(n => {
@@ -252,9 +293,25 @@ function handleCheckCircular() {
  */
 function handleGetPath(startFile, targetFile) {
   const graph = loadGraph();
-  if (graph.error) return { error: graph.error };
+  if (graph.error) {
+    return {
+      found: false,
+      startNode: startFile || null,
+      targetNode: targetFile || null,
+      message: `Error: ${graph.error}`,
+      distance: null,
+      path: []
+    };
+  }
   if (!startFile || !targetFile) {
-    return { error: 'Both startFile and targetFile arguments are required' };
+    return {
+      found: false,
+      startNode: startFile || null,
+      targetNode: targetFile || null,
+      message: 'Both startFile and targetFile arguments are required',
+      distance: null,
+      path: []
+    };
   }
 
   const normStart = path.normalize(startFile).replace(/\\/g, '/').toLowerCase();
@@ -275,7 +332,9 @@ function handleGetPath(startFile, targetFile) {
       found: false,
       startNode: startNode ? (startNode.id || startNode.label) : normStart,
       targetNode: targetNode ? (targetNode.id || targetNode.label) : normTarget,
-      message: 'One or both nodes were not found in graphify AST.'
+      message: 'One or both nodes were not found in graphify AST.',
+      distance: null,
+      path: []
     };
   }
 
@@ -324,7 +383,9 @@ function handleGetPath(startFile, targetFile) {
     found: false,
     startNode: startId,
     targetNode: targetId,
-    message: 'No path found between specified nodes in AST graph.'
+    message: 'No path found between specified nodes in AST graph.',
+    distance: null,
+    path: []
   };
 }
 
@@ -333,9 +394,29 @@ function handleGetPath(startFile, targetFile) {
  */
 function handleGetSubgraph(rootFile, depth = 2) {
   const graph = loadGraph();
-  if (graph.error) return { error: graph.error };
+  if (graph.error) {
+    return {
+      found: false,
+      root: rootFile || null,
+      message: `Error: ${graph.error}`,
+      depth: null,
+      nodesCount: 0,
+      edgesCount: 0,
+      nodes: [],
+      edges: []
+    };
+  }
   if (!rootFile) {
-    return { error: 'rootFile argument is required' };
+    return {
+      found: false,
+      root: null,
+      message: 'rootFile argument is required',
+      depth: null,
+      nodesCount: 0,
+      edgesCount: 0,
+      nodes: [],
+      edges: []
+    };
   }
 
   const normRoot = path.normalize(rootFile).replace(/\\/g, '/').toLowerCase();
@@ -345,7 +426,16 @@ function handleGetSubgraph(rootFile, depth = 2) {
   });
 
   if (!rootNode) {
-    return { found: false, root: rootFile, message: 'Root node not found in graphify AST.' };
+    return {
+      found: false,
+      root: rootFile,
+      message: 'Root node not found in graphify AST.',
+      depth: null,
+      nodesCount: 0,
+      edgesCount: 0,
+      nodes: [],
+      edges: []
+    };
   }
 
   const rootId = rootNode.id || rootNode.label;
@@ -404,7 +494,8 @@ function handleReadMemory(category, noteName) {
     return { error: `Invalid category '${category}'. Valid options: ${validCategories.join(', ')}` };
   }
 
-  const vaultDir = process.env.SYNAPSE_VAULT_PATH ? path.join(process.env.SYNAPSE_VAULT_PATH, targetCategory) : path.join(ROOT_DIR, '.obsidian-vault', targetCategory);
+  const rootDir = getRootDir();
+  const vaultDir = process.env.SYNAPSE_VAULT_PATH ? path.join(process.env.SYNAPSE_VAULT_PATH, targetCategory) : path.join(rootDir, '.obsidian-vault', targetCategory);
   if (!fs.existsSync(vaultDir)) {
     return { error: `Obsidian Vault category directory does not exist: ${vaultDir}` };
   }
@@ -443,14 +534,15 @@ function handleReadMemory(category, noteName) {
  * Tool: Sync declarative memory (Obsidian Vault structure)
  */
 function handleSyncMemory() {
-  const vaultDir = process.env.SYNAPSE_VAULT_PATH || path.join(ROOT_DIR, '.obsidian-vault');
+  const rootDir = getRootDir();
+  const vaultDir = process.env.SYNAPSE_VAULT_PATH || path.join(rootDir, '.obsidian-vault');
   const permDir = path.join(vaultDir, 'permanent');
   const chatsDir = path.join(vaultDir, 'chats');
 
   fs.mkdirSync(permDir, { recursive: true });
   fs.mkdirSync(chatsDir, { recursive: true });
 
-  const graphifyOut = path.join(ROOT_DIR, 'graphify-out');
+  const graphifyOut = path.join(rootDir, 'graphify-out');
   const graphifyLink = path.join(vaultDir, 'graphify-links');
   let junctionStatus = 'not_needed';
 
@@ -502,9 +594,11 @@ function handleShiftPersona(activePersona) {
   state.active_persona = newPersona;
   delete state.persona;
   state.last_updated = new Date().toISOString();
-  fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
-  fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+  const statePath = getStatePath();
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, JSON.stringify(state, null, 2), 'utf8');
   loadedState = state;
+  loadedStatePath = statePath;
   return { success: true, active_persona: newPersona, timestamp: state.last_updated };
 }
 
@@ -523,9 +617,11 @@ function handleSetTarget(filePath, startLine, endLine) {
   };
   delete state.target;
   state.last_updated = new Date().toISOString();
-  fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
-  fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+  const statePath = getStatePath();
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, JSON.stringify(state, null, 2), 'utf8');
   loadedState = state;
+  loadedStatePath = statePath;
   return { success: true, surgical_target: state.surgical_target };
 }
 
@@ -563,6 +659,7 @@ function handleScanSecrets(responseFormat = 'markdown') {
     { name: 'Generic Secret/Key', regex: /(api_key|secret_key|private_key|jwt_secret)\s*[:=]\s*["'][A-Za-z0-9_\-]{16,}["']/gi }
   ];
 
+  const rootDir = getRootDir();
   const violations = [];
   function scanDir(dir) {
     let files;
@@ -590,7 +687,7 @@ function handleScanSecrets(responseFormat = 'markdown') {
             let match;
             while ((match = p.regex.exec(content)) !== null) {
               violations.push({
-                file: path.relative(ROOT_DIR, fullPath),
+                file: path.relative(rootDir, fullPath),
                 type: p.name,
                 snippet: match[0].substring(0, 15) + '...'
               });
@@ -601,7 +698,7 @@ function handleScanSecrets(responseFormat = 'markdown') {
     }
   }
 
-  scanDir(ROOT_DIR);
+  scanDir(rootDir);
 
   const rawResult = {
     clean: violations.length === 0,
@@ -618,7 +715,7 @@ function handleScanSecrets(responseFormat = 'markdown') {
   }
 
   const tableHeader = `### 🚨 OWASP Secret Scan Violations Detected!\n\n| File | Leak Type | Sneak Peek |\n| :--- | :--- | :--- |\n`;
-  const tableRows = rawResult.violations.map(v => `| [${v.file}](file:///${path.resolve(ROOT_DIR, v.file).replace(/\\/g, '/')}) | **${v.type}** | \`${v.snippet}\` |`).join('\n');
+  const tableRows = rawResult.violations.map(v => `| [${v.file}](file:///${path.resolve(rootDir, v.file).replace(/\\/g, '/')}) | **${v.type}** | \`${v.snippet}\` |`).join('\n');
   
   return `${tableHeader}${tableRows}\n\nTotal Violations: **${rawResult.violationCount}** (showing top 10). Please remove these hardcoded secrets immediately and use a \`.env\` file.`;
 }
@@ -627,8 +724,9 @@ function handleScanSecrets(responseFormat = 'markdown') {
  * Tool 9: Get Clean Git Diff
  */
 function handleGetCleanDiff() {
+  const rootDir = getRootDir();
   try {
-    const rawDiff = execSync('git diff --cached --stat', { encoding: 'utf8', cwd: ROOT_DIR });
+    const rawDiff = execSync('git diff --cached --stat', { encoding: 'utf8', cwd: rootDir });
     const lines = rawDiff.trim().split('\n');
     const summary = lines.slice(-1)[0] || 'No changes staged';
     const changedFiles = lines.slice(0, -1).map(l => l.trim());
@@ -647,11 +745,12 @@ function handleGetCleanDiff() {
  * Tool 10: Search Skills JIT
  */
 function handleSearchSkills(query) {
+  const rootDir = getRootDir();
   const searchTerm = (query || '').toLowerCase();
   const searchDirs = [
     'C:\\ag-skills',
     path.join(os.homedir(), '.gemini', 'config', 'skills'),
-    path.join(ROOT_DIR, '.agents', 'skills')
+    path.join(rootDir, '.agents', 'skills')
   ];
 
   const matchedSkills = [];
@@ -690,6 +789,7 @@ function handleSearchSkills(query) {
  * Tool 11: Context Health Check
  */
 function handleContextHealthCheck(responseFormat = 'markdown') {
+  const rootDir = getRootDir();
   const largeFiles = [];
   function checkDir(dir) {
     let files;
@@ -715,7 +815,7 @@ function handleContextHealthCheck(responseFormat = 'markdown') {
           const lineCount = content.split('\n').length;
           if (lineCount > 500) {
             largeFiles.push({
-              file: path.relative(ROOT_DIR, fullPath),
+              file: path.relative(rootDir, fullPath),
               lineCount
             });
           }
@@ -724,9 +824,9 @@ function handleContextHealthCheck(responseFormat = 'markdown') {
     }
   }
 
-  checkDir(ROOT_DIR);
+  scanDir: checkDir(rootDir);
 
-  const gitignorePath = path.join(ROOT_DIR, '.gitignore');
+  const gitignorePath = path.join(rootDir, '.gitignore');
   const hasGitignore = fs.existsSync(gitignorePath);
   let gitignoreCompliant = false;
   if (hasGitignore) {
@@ -760,7 +860,7 @@ function handleContextHealthCheck(responseFormat = 'markdown') {
   if (rawResult.largeFilesCount > 0) {
     md += `| File | Line Count |\n| :--- | :--- |\n`;
     rawResult.largeFiles.forEach(f => {
-      md += `| [${f.file}](file:///${path.resolve(ROOT_DIR, f.file).replace(/\\/g, '/')}) | ${f.lineCount} lines |\n`;
+      md += `| [${f.file}](file:///${path.resolve(rootDir, f.file).replace(/\\/g, '/')}) | ${f.lineCount} lines |\n`;
     });
     md += `\n*Tip: Split these large files to keep agent context window load to a minimum.*`;
   } else {
@@ -815,10 +915,11 @@ function handleListResources() {
     }
   ];
 
+  const rootDir = getRootDir();
   const searchDirs = [
     getGlobalSkillsDir(),
     path.join(os.homedir(), '.gemini', 'config', 'skills'),
-    path.join(ROOT_DIR, '.agents', 'skills')
+    path.join(rootDir, '.agents', 'skills')
   ];
 
   const addedSkills = new Set();
@@ -915,11 +1016,12 @@ function handleReadResource(id, uri) {
   }
 
   if (uri.startsWith('skills://')) {
+    const rootDir = getRootDir();
     const skillName = uri.replace('skills://', '');
     const searchPaths = [
       path.join(getGlobalSkillsDir(), skillName, 'SKILL.md'),
       path.join(os.homedir(), '.gemini', 'config', 'skills', skillName, 'SKILL.md'),
-      path.join(ROOT_DIR, '.agents', 'skills', skillName, 'SKILL.md')
+      path.join(rootDir, '.agents', 'skills', skillName, 'SKILL.md')
     ];
 
     let fileContent = null;

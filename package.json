@@ -1,6 +1,6 @@
 {
   "name": "@lugubo/synapse-engine",
-  "version": "2.2.9",
+  "version": "2.2.10",
   "description": "High-Performance AI Coding Agent Governance & Rate-Limit Harness for Claude Code, Cursor, and Gemini. AST Knowledge Graph MCP Server with sliding-window quota guard and TDD gates.",
   "main": "index.js",
   "bin": {
