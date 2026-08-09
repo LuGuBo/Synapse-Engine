@@ -63,6 +63,43 @@ describe('Synapse Engine CLI Integration Tests', () => {
     expect(fs.existsSync(path.resolve(testProjectDir, '00_docs/04_adrs/0001-template-madr.md'))).toBe(true);
   });
 
+  test('should successfully initialize quota preset with synapse init --preset=quota', () => {
+    const quotaDir = path.resolve(testProjectDir, 'quota_subproject');
+    fs.mkdirSync(quotaDir, { recursive: true });
+
+    execSync(`node "${cliPath}" init --preset=quota`, { cwd: quotaDir, stdio: 'pipe' });
+
+    expect(fs.existsSync(path.resolve(quotaDir, '.agents/state.json'))).toBe(true);
+    const pkg = JSON.parse(fs.readFileSync(path.resolve(quotaDir, 'package.json'), 'utf8'));
+    expect(pkg.scripts['quota:dashboard']).toBe('synapse quota dashboard');
+    expect(pkg.scripts['quota:status']).toBe('synapse quota status');
+    // Ensure full governance files were NOT created in modular preset
+    expect(fs.existsSync(path.resolve(quotaDir, 'GEMINI.md'))).toBe(false);
+  });
+
+  test('should successfully initialize mcp preset with synapse init --preset=mcp', () => {
+    const mcpDir = path.resolve(testProjectDir, 'mcp_subproject');
+    fs.mkdirSync(mcpDir, { recursive: true });
+
+    execSync(`node "${cliPath}" init --preset=mcp`, { cwd: mcpDir, stdio: 'pipe' });
+
+    expect(fs.existsSync(path.resolve(mcpDir, '.cursor/mcp.json'))).toBe(true);
+    expect(fs.existsSync(path.resolve(mcpDir, '.vscode/mcp.json'))).toBe(true);
+    const pkg = JSON.parse(fs.readFileSync(path.resolve(mcpDir, 'package.json'), 'utf8'));
+    expect(pkg.scripts['harness:mcp']).toBe('synapse mcp');
+  });
+
+  test('should successfully initialize tdd preset with synapse init --preset=tdd', () => {
+    const tddDir = path.resolve(testProjectDir, 'tdd_subproject');
+    fs.mkdirSync(tddDir, { recursive: true });
+
+    execSync(`node "${cliPath}" init --preset=tdd`, { cwd: tddDir, stdio: 'pipe' });
+
+    expect(fs.existsSync(path.resolve(tddDir, '.agents/state.json'))).toBe(true);
+    const pkg = JSON.parse(fs.readFileSync(path.resolve(tddDir, 'package.json'), 'utf8'));
+    expect(pkg.scripts['harness:tdd']).toBe('synapse tdd');
+  });
+
   test('should successfully execute synapse doctor diagnostic command', () => {
     let output = '';
     try {

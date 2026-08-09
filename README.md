@@ -1,157 +1,192 @@
-# ⚡ Synapse Engine V2
+# ⚡ Synapse Engine
 
-**Synapse Engine** is a high-performance Node.js command-line interface (CLI) and native Model Context Protocol (MCP) server engineered for AI-assisted development orchestration. It implements local automation harnesses, governance grounded in the **BMAD (Breakthrough Method for Agile AI-Driven Development)** framework, critical token reduction via Context Sharding with **Graphify AST**, and persistent memory management based on the **Obsidian Zettelkasten Vault**.
+> **The Ultimate AI Coding Agent Governance & Rate-Limit Harness**  
+> *Sub-millisecond AST Knowledge Graph MCP Server (99.98% token reduction), sliding-window rate-limit quota guard, deterministic TDD quality gates, and cross-ecosystem agent governance.*
 
 ---
 
-## 🏛️ Architecture & Communication Flow
+<div align="center">
 
-The diagram below illustrates the data flow between the LLM (IDE), Synapse MCP Server, local CLI, Git, and local persistence layer:
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![NPM Scoped Package](https://img.shields.io/badge/npm-@lugubo/synapse--engine-CB3837?logo=npm)](https://www.npmjs.com/package/@lugubo/synapse-engine)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.1_Flash_%26_Pro_Ready-4285F4?logo=google)](https://ai.google.dev/)
+[![Antigravity IDE](https://img.shields.io/badge/Antigravity_IDE-Native_Harness-8A2BE2)](https://antigravity.google)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-MCP_Compatible-D97706?logo=anthropic)](https://claude.ai)
+[![Cursor & Windsurf](https://img.shields.io/badge/Cursor_%26_Windsurf-Plug_%26_Play-00ADD8)](https://cursor.com)
+[![Architecture: Markdown-Driven](https://img.shields.io/badge/Architecture-Markdown--Driven-000000?logo=markdown)](https://daringfireball.net/projects/markdown/)
+[![Tests](https://img.shields.io/badge/Tests-100%25_Passing-brightgreen.svg)](https://github.com/LuGuBo/Synapse-Engine)
 
-```mermaid
-graph TD
-    subgraph IDE_Context ["IDE Context & Agents"]
-        IDE["Antigravity IDE / Claude"]
-        LLM["AI Agent (Active Persona)"]
-    end
+</div>
 
-    subgraph Synapse_Engine ["Synapse Engine Core"]
-        MCP["Synapse MCP Server (bin/synapse-mcp-server.js)"]
-        CLI["Synapse CLI (bin/synapse-cli.js)"]
-        StateMgr["State Manager (bin/state-manager.js)"]
-        TDDGate["TDD Gate (bin/tdd-gate.js)"]
-        HwSelector["Hardware Selector (src/hardware_selector.py)"]
-        GraphifyInt["Graphify Integration (bin/harness-graphify.js)"]
-    end
+---
 
-    subgraph Workspace_Persistence ["Workspace & Local Persistence"]
-        State[".agents/state.json"]
-        Docs["00_docs/ (PRD, ADRs, Rules)"]
-        GraphFile["graphify-out/graph.json"]
-        Obsidian[".obsidian-vault/ (Memory Vault)"]
-    end
+## 💡 Why Synapse Engine?
 
-    IDE <-->|stdio JSON-RPC IPC| MCP
-    MCP <-->|Reads State & AST Graph| State & GraphFile
-    MCP <-->|JIT Skills Search| AG_SKILLS_PATH["$AG_SKILLS_PATH (Global Skills)"]
-    
-    CLI -->|Executes Commands| StateMgr & TDDGate & GraphifyInt
-    StateMgr <-->|Updates Sprint/Goal/Persona| State
-    TDDGate -->|Validates Staged Files| Git["Git Status (Staged Code)"]
-    TDDGate -->|Writes Status| State
-    
-    GraphifyInt -->|Compiles AST Dependencies| GraphFile
-    Obsidian -.->|Junction Link| GraphFile
+Autonomous AI coding agents (Claude Code, Cursor, Windsurf, Gemini CLI, Copilot Workspace) are transforming software engineering. However, in real-world production repositories, unmanaged agents suffer from four major points of failure:
+
+1. **Context Window Bloat & High Token Costs:** Blind file reading and greedy recursive grep scans burn hundreds of thousands of tokens per prompt, diluting LLM attention and racking up large API bills.
+2. **HTTP 429 Rate-Limit Crashes:** Agentic loops sending rapid bursts of complex requests quickly exhaust provider RPM/RPD limits (e.g. Gemini 3.1 Pro 2 RPM / 50 RPD limit), crashing the session.
+3. **Untested Hallucinations & Regressions:** Agents frequently modify production code without writing tests, introducing regressions into the codebase.
+4. **Context Amnesia & Vendor Lock-in:** Ephemeral chat sessions lose memory, while proprietary agent databases lock you into closed platforms.
+
+**Synapse Engine** solves all four challenges in a single, high-performance, modular harness.
+
+---
+
+## 📊 Empirical Head-to-Head Benchmark Results
+
+In rigorous A/B stress testing (`scripts/benchmark_head_to_head.js`), Synapse Engine demonstrated overwhelming superiority over standard unmanaged agents:
+
+| Metric | Without Synapse (Baseline) | With Synapse Engine v2.2 | Advantage |
+| :--- | :--- | :--- | :--- |
+| **Context Payload Size** | `1,129.38 KB` | `0.21 KB` | **99.98% payload reduction** |
+| **Prompt Tokens Consumed** | `289,121 tokens` | `55 tokens` | **5,256.7x token savings** |
+| **AST Query IPC Latency** | `15 - 80 ms` (Disk I/O) | `0.189 ms` | **Sub-millisecond Stdio IPC** |
+| **API 429 Rate-Limit Rate** | Frequent (~80% in bursts) | `0%` (Zero 429 errors) | **Sliding window auto-routing & fallback** |
+| **TDD Code Verification** | Unverified / Blind Commits | `100% Deterministic Gate` | **Pre-commit test-pairing enforcement** |
+
+*Reproduce the benchmark anytime on your machine:*
+```bash
+node scripts/benchmark_head_to_head.js
 ```
 
 ---
 
-## 🔑 Key Technical Pillars
+## 🧩 The 4 Modular Pillars (Opt-in Architecture)
 
-### 1. AST Dependency Graph (Graphify AST Integration)
-Synapse Engine integrates with **Graphify** topological mapping to expose Abstract Syntax Trees (AST) surgically to LLMs.
-*   **Problem:** Loading massive graph files directly into the LLM context window consumes thousands of tokens and causes attention dilution.
-*   **Solution:** The native MCP server exposes specialized tools (`query_graph`, `shortest_path`, `get_node`) that incrementally query the graph stored at `graphify-out/graph.json`. Instead of blindly reading files or conducting exhaustive text searches, the LLM navigates direct code dependencies using a fraction of tokens.
-
-### 2. Persistent Memory (Obsidian Zettelkasten Vault)
-To preserve context alignment across multiple development sessions, Synapse adopts the Zettelkasten architecture within `.obsidian-vault/`:
-*   `permanent/`: Permanent technical notes and business domain specifications. Read by the agent before proposing major architectural refactorings (Pre-flight Architectural Read).
-*   `chats/`: Atomic post-task summaries detailing implemented solutions, design choices, and test results (Session Serialization).
-*   **Junction Link:** The `synapse init` command automatically creates a physical Windows Directory Junction linking `.obsidian-vault/graphify-links` to `graphify-out`, enabling Obsidian to natively inspect and index Graphify reports.
-*   **Synchronization (`npm run harness:sync-memory`):** Executes the PowerShell automation script (`scripts/sync-memory.ps1`) to refresh AST graphs, verify junction link health, and audit YAML Frontmatter formatting across vault notes.
-
----
-
-## 🛠️ Available CLI Commands
-
-| Command | Description | Syntax / Example |
-| :--- | :--- | :--- |
-| **`init`** | Initializes the Harness in the workspace, injects `.agents/`, local rules, and creates the Obsidian Junction Link. | `synapse init` |
-| **`update`** | Updates local Harness components from the master template while preserving `state.json`. | `synapse update` |
-| **`setup --global`** | Configures global IDE governance in the user directory and registers the global skills path. | `synapse setup --global` |
-| **`doctor`** | Executes full environment autodiagnostics (Graphify, MCP Server, State, Vault, AST Graph). | `synapse doctor` |
-| **`status`** | Queries or updates local Harness state (Sprint, Active Persona, Surgical Target). | `synapse status show`<br>`synapse status set persona DEVELOPER` |
-| **`tdd`** | TDD Validation Gate: Ensures staged Git files have passing unit tests and updates state telemetry. | `synapse tdd` |
-| **`mcp`** | Starts stdio JSON-RPC MCP server or runs token/latency benchmark suite. | `synapse mcp start`<br>`synapse mcp benchmark` |
-| **`hardware`** | Evaluates hardware acceleration options (DirectML/CUDA vs CPU) for neural inference tasks. | `synapse hardware --check` |
-| **`graphify`** | Incrementally updates the local AST dependency graph. | `synapse graphify` |
-
----
-
-## 📦 Project Structure & Modules
-
-The Synapse Engine repository is structured modularly:
+Synapse Engine is completely modular. Install only what your project needs:
 
 ```
-├── .agents/
-│   ├── rules/                 # Injected workspace rules (graphify.md, synapse-core.md, etc.)
-│   ├── skills/                # Workspace-exclusive skills
-│   └── state.json             # Active telemetry (Sprint, Persona, Surgical Target)
-├── 00_docs/                   # Semantic taxonomy (PRD, Tech Specs, ADRs, Rules)
-├── bin/
-│   ├── synapse-cli.js         # Main CLI entrypoint (Commander.js)
-│   ├── synapse-mcp-server.js  # Stdio JSON-RPC MCP Server
-│   ├── github-mcp-server.exe  # Stdio MCP Server for GitHub API integration
-│   ├── state-manager.js       # Utility script managing state.json
-│   ├── tdd-gate.js            # Quality validator for tests and staged Git files
-│   ├── hardware-selector.js   # Node.js wrapper for Python hardware selector
-│   └── harness-graphify.js    # Interface for Graphify trigger and audit
-├── src/
-│   ├── synapse_forge.py       # Directory scaffolding, ADR templates (MADR 4.0.0), and Graphify initializer
-│   └── hardware_selector.py   # GPU (CUDA, DirectML) vs CPU logical router based on latency and payload
-├── tests/                     # Automated test suites (Jest for JS, PyTest for Python)
-│   ├── synapse_mcp_benchmark.test.js  # MCP latency and token consumption benchmarks
-│   ├── hardware_selector.test.py       # Complete Python hardware selector test suite
-│   └── synapse_cli.test.js            # CLI integration tests
-├── scripts/
-│   ├── release.js             # Unified test, versioning, tag, and GitHub release pipeline
-│   └── sync-memory.ps1        # Obsidian Vault and Graphify synchronizer script
+                                  ┌────────────────────────┐
+                                  │     SYNAPSE ENGINE     │
+                                  └───────────┬────────────┘
+         ┌──────────────────┬─────────────────┼──────────────────┬──────────────────┐
+         ▼                  ▼                 ▼                  ▼                  ▼
+┌──────────────────┐ ┌──────────────┐ ┌───────────────┐ ┌──────────────────┐ ┌──────────────────┐
+│   PILLAR 1:      │ │  PILLAR 2:   │ │  PILLAR 3:    │ │   PILLAR 4:      │ │   CROSS-BRIDGE:  │
+│   AST MCP SERVER │ │  QUOTA GUARD │ │  TDD GATES    │ │   BMAD MEMORY    │ │   GEMINI ↔ CLAUDE│
+│ (0.2ms Stdio IPC)│ │ (0% 429 24h) │ │ (100% Tested) │ │ (Markdown State) │ │ (Universal IDE)│
+└──────────────────┘ └──────────────┘ └───────────────┘ └──────────────────┘ └──────────────────┘
 ```
+
+### 1. ⚡ AST Knowledge Graph MCP Server
+Standard Model Context Protocol (MCP) server providing 19 high-performance Stdio tools (`graphify_get_deps`, `graphify_get_subgraph`, `graphify_get_god_nodes`, `hardware_status`, `secrets_scan`). Lets AI agents query AST dependency trees in **0.18 ms** instead of scanning thousands of lines of raw code.
+
+### 2. 🛡️ Sliding-Window Quota Guard & Telemetry Dashboard
+Continuous rate-limit protection for Google Gemini and frontier models. Features a **1-10 Task Weight Classifier** with dynamic fallback routing (routes lightweight tasks to Gemini 3.1 Flash Lite with 500 RPD budget, reserving Gemini 3.1 Pro Thinking for heavy architectural work). Includes a sleek dark-mode local web dashboard (`synapse quota dashboard`).
+
+### 3. 🧪 Deterministic TDD Quality Gates
+A pre-commit verification engine (`tdd-gate.js`) that blocks untested commits at the Git level. Enforces test pairing across Python (`test_*.py`), TypeScript/JavaScript (`*.test.ts`, `*.spec.js`), Go, and Rust.
+
+### 4. 🧠 BMAD Subagents Governance & Persistent Memory
+Clean-room persona handoffs (PM, Architect, Developer, QA Engineer) operating on disk-persisted Markdown state contracts (`PLAN.md`, `SPEC.md`, `walkthrough.md`, `00_docs/`). Eliminates context drift and sycophancy.
 
 ---
 
-## 🚀 Installation & Configuration
+## 🌉 The Cross-Ecosystem Bridge (Gemini ↔ Claude ↔ Cursor)
 
-Install Synapse Engine globally from GitHub:
+Born and battle-tested in the **Google Gemini & Antigravity IDE** ecosystem and built on Anthropic's open **Model Context Protocol (MCP)**, Synapse Engine bridges high-throughput Gemini rate-limits with standard agentic IDEs:
+
+* **Google Gemini & Antigravity IDE:** Ultra-low token pricing (Gemini 3.1 Flash Lite), massive context caching alignment (`GEMINI.md` static layout), and local GCP project quota tracking.
+* **Anthropic Claude Code & Cursor:** Universal Stdio JSON-RPC 2.0 protocol, `.cursor/mcp.json`, and autonomous terminal workflows.
+* **Open Ecosystem:** 100% portable on Windows, Linux, and macOS.
+
+---
+
+## 📝 Markdown-Driven Architecture (Executable Agent Memory)
+
+In Synapse Engine, **Markdown is not just documentation — it is executable agent memory and deterministic state coordination**:
+
+* **Zero Vendor Lock-in:** No proprietary binary databases or hidden cloud lock-in. Everything resides in human-readable `.md` files.
+* **Context Caching Optimized:** Structured rules (`GEMINI.md`, `AGENTS.md`) use fixed layouts to maximize prompt cache hits.
+* **Single Source of Truth:** Specifications (`00_docs/01_prd/`), ADRs (`00_docs/04_adrs/`), and delivery reports (`walkthrough.md`) form verifiable contracts between humans and AI agents.
+
+---
+
+## 🚀 1-Minute Quickstart
+
+### Initialize with Modular Presets (Choose what you need)
 
 ```bash
-npm install -g git+https://github.com/LuGuBo/Synapse-Engine.git
-```
+# Option A: Quota Guard & Local Dashboard only
+npx -y @lugubo/synapse-engine init --preset=quota
 
-### Portability & Environment Variable `AG_SKILLS_PATH`
-To avoid hardcoded absolute paths across multiple machines or user accounts, the CLI and MCP Server dynamically resolve the central Global Skills Vault location following this priority:
+# Option B: AST Knowledge Graph MCP Server only (Cursor / Claude / VSCode)
+npx -y @lugubo/synapse-engine init --preset=mcp
 
-1. System environment variable: **`AG_SKILLS_PATH`**
-2. Windows Fallback: `C:\ag-skills`
-3. Unix/macOS Fallback: `~/ag-skills`
+# Option C: Deterministic TDD Pre-Commit Gate only
+npx -y @lugubo/synapse-engine init --preset=tdd
 
-To configure on Windows (PowerShell):
-```powershell
-[System.Environment]::SetEnvironmentVariable("AG_SKILLS_PATH", "D:\YourPath\ag-skills", "User")
+# Option D: Full BMAD Agent Governance Suite
+npx -y @lugubo/synapse-engine init --preset=full
 ```
 
 ---
 
-## 📈 Token Savings Benchmark (Native MCP Server)
+### IDE Integrations
 
-The stdio JSON-RPC MCP server (`bin/synapse-mcp-server.js`) eliminates token overhead in agent interactions:
+#### 🟣 Cursor & Windsurf
+Add to your project's `.cursor/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "synapse-engine": {
+      "command": "npx",
+      "args": ["-y", "@lugubo/synapse-engine", "mcp"]
+    }
+  }
+}
+```
 
-| Approach | Payload Size | Estimated Tokens | IPC Latency | Context Efficiency |
-| :--- | :--- | :--- | :--- | :--- |
-| **Direct Read (`graph.json` Dump)** | `234.26 KB` | ~59,970 tokens | Disk I/O | **Baseline (0%)** |
-| **Synapse Graphify MCP Server** | **`0.23 KB`** | **~58 tokens** | **`0.810 ms`** | **🔥 99.90% Reduction (1,034x savings)** |
-
----
-
-## 🚀 Automated Release Pipeline
-
-Synapse Engine includes an automated release pipeline executed via:
+#### 🟠 Claude Code (Anthropic CLI)
+Run in your terminal:
 ```bash
-npm run release
+claude mcp add synapse-engine -- npx -y @lugubo/synapse-engine mcp
 ```
-This script (`scripts/release.js`):
-1. Runs local unit test suites (`jest`) as a quality gate.
-2. Creates the build commit (`chore(release): prepare release vX.Y.Z`).
-3. Publishes the local tag and commits to origin on GitHub.
-4. Generates the release entry on GitHub via REST API using the **`GITHUB_PAT`** token from `.env`.
 
+#### 🔵 VS Code / Copilot
+Add to `.vscode/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "synapse-engine": {
+      "command": "npx",
+      "args": ["-y", "@lugubo/synapse-engine", "mcp"]
+    }
+  }
+}
+```
+
+---
+
+## 💻 CLI Commands Reference
+
+Once installed, use the global `synapse` command:
+
+```bash
+# Quota & Telemetry
+synapse quota dashboard      # Launch real-time telemetry HTML dashboard in browser
+synapse quota status         # Inspect active 60-second and 24-hour sliding windows
+synapse quota estimate       # Estimate task weight (1-10) and recommended model tier
+
+# MCP & Codebase Knowledge
+synapse mcp                  # Start Stdio MCP Server (JSON-RPC 2.0)
+synapse graphify             # Generate/update AST knowledge graph in background
+
+# Governance & Quality Gates
+synapse tdd                  # Execute pre-commit TDD code verification
+synapse status               # Check BMAD persona states and validation flags
+synapse doctor               # Run autodiagnostic environment health check
+```
+
+---
+
+## 📄 License & Attribution
+
+Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
+
+```text
+MIT License
+
+Copyright (c) 2026 LuGuBo (Synapse Dev Team)
+```

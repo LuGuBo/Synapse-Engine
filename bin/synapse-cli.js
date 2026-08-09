@@ -101,13 +101,116 @@ function createJunctionLink(target, linkPath) {
 
 program
   .command('init')
-  .description('Initializes Synapse Engine framework in the current directory')
-  .action(() => {
-    console.log('Initiating Synapse Engine initialization in current directory...');
+  .option('-p, --preset <type>', 'Modular preset to install: quota | mcp | tdd | full', 'full')
+  .description('Initializes Synapse Engine framework (Modular presets: quota, mcp, tdd, or full)')
+  .action((options) => {
+    const preset = (options.preset || 'full').toLowerCase();
+    console.log(`Initiating Synapse Engine initialization (Preset: '${preset}')...`);
     const projectDir = process.cwd();
     const projectName = path.basename(projectDir);
     const dateStr = new Date().toISOString().split('T')[0];
 
+    // Helper: Ensure package.json exists and inject scripts
+    function injectNpmScripts(scriptsObj) {
+      const packageJsonPath = path.resolve(projectDir, 'package.json');
+      let pkg = { name: projectName.toLowerCase(), version: "1.0.0", scripts: {} };
+      if (fs.existsSync(packageJsonPath)) {
+        try {
+          pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+          pkg.scripts = pkg.scripts || {};
+        } catch (err) {
+          console.warn('⚠️ Warning: Failed to parse package.json:', err.message);
+        }
+      }
+      Object.assign(pkg.scripts, scriptsObj);
+      fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2), 'utf8');
+      console.log('✅ Injected npm scripts into local package.json');
+    }
+
+    // =========================================================================
+    // PRESET: QUOTA (Sliding-Window Rate Limit Guard & Dashboard)
+    // =========================================================================
+    if (preset === 'quota') {
+      const agentsDir = path.resolve(projectDir, '.agents');
+      fs.mkdirSync(agentsDir, { recursive: true });
+      const stateFile = path.resolve(agentsDir, 'state.json');
+      if (!fs.existsSync(stateFile)) {
+        const stateObj = { project: projectName, initialized_at: dateStr, preset: 'quota', harness_mode: 'standalone' };
+        fs.writeFileSync(stateFile, JSON.stringify(stateObj, null, 2), 'utf8');
+      }
+      injectNpmScripts({
+        'quota:dashboard': 'synapse quota dashboard',
+        'quota:status': 'synapse quota status',
+        'quota:estimate': 'synapse quota estimate'
+      });
+      console.log('\n🎉 Synapse Quota Guard initialized successfully!');
+      console.log('👉 Run "synapse quota dashboard" to launch your local real-time telemetry dashboard.');
+      console.log('👉 Run "synapse quota status" to inspect active 60s/24h sliding windows.\n');
+      return;
+    }
+
+    // =========================================================================
+    // PRESET: MCP (AST Knowledge Graph & MCP Server for Cursor/Claude/VSCode)
+    // =========================================================================
+    if (preset === 'mcp') {
+      const cursorDir = path.resolve(projectDir, '.cursor');
+      const vscodeDir = path.resolve(projectDir, '.vscode');
+      fs.mkdirSync(cursorDir, { recursive: true });
+      fs.mkdirSync(vscodeDir, { recursive: true });
+
+      const mcpConfig = {
+        mcpServers: {
+          "synapse-graphify": {
+            command: "npx",
+            args: ["-y", "@lugubo/synapse-engine", "mcp"]
+          }
+        }
+      };
+
+      const cursorMcpFile = path.resolve(cursorDir, 'mcp.json');
+      if (!fs.existsSync(cursorMcpFile)) {
+        fs.writeFileSync(cursorMcpFile, JSON.stringify(mcpConfig, null, 2), 'utf8');
+        console.log('✅ Created .cursor/mcp.json for Cursor & Windsurf');
+      }
+
+      const vscodeMcpFile = path.resolve(vscodeDir, 'mcp.json');
+      if (!fs.existsSync(vscodeMcpFile)) {
+        fs.writeFileSync(vscodeMcpFile, JSON.stringify(mcpConfig, null, 2), 'utf8');
+        console.log('✅ Created .vscode/mcp.json for VS Code');
+      }
+
+      injectNpmScripts({
+        'harness:mcp': 'synapse mcp',
+        'harness:graphify': 'synapse graphify'
+      });
+      console.log('\n🎉 Synapse MCP Server preset initialized successfully!');
+      console.log('👉 For Cursor / Windsurf: .cursor/mcp.json is ready.');
+      console.log('👉 For Claude Code: run "claude mcp add synapse-graphify -- npx -y @lugubo/synapse-engine mcp".\n');
+      return;
+    }
+
+    // =========================================================================
+    // PRESET: TDD (Deterministic Quality Gates & Pre-Commit Test Enforcement)
+    // =========================================================================
+    if (preset === 'tdd') {
+      const agentsDir = path.resolve(projectDir, '.agents');
+      fs.mkdirSync(agentsDir, { recursive: true });
+      const stateFile = path.resolve(agentsDir, 'state.json');
+      if (!fs.existsSync(stateFile)) {
+        const stateObj = { project: projectName, initialized_at: dateStr, preset: 'tdd', harness_mode: 'standalone' };
+        fs.writeFileSync(stateFile, JSON.stringify(stateObj, null, 2), 'utf8');
+      }
+      injectNpmScripts({
+        'harness:tdd': 'synapse tdd'
+      });
+      console.log('\n🎉 Synapse TDD Quality Gate initialized successfully!');
+      console.log('👉 Run "synapse tdd" to execute deterministic pre-commit code integrity verification.\n');
+      return;
+    }
+
+    // =========================================================================
+    // PRESET: FULL (Complete BMAD Lifecycle Governance Harness)
+    // =========================================================================
     // 1. Criar pasta .agents/ e subpastas
     const agentsDir = path.resolve(projectDir, '.agents');
     const localAgentsDir = path.resolve(agentsDir, 'agents');
@@ -130,8 +233,11 @@ program
 
     if (!fs.existsSync(stateFile)) {
       const stateTemplatePath = path.resolve(TEMPLATES_DIR, 'state.template.json');
-      const stateObj = JSON.parse(fs.readFileSync(stateTemplatePath, 'utf8'));
-      stateObj.harness_mode = harnessMode;
+      let stateObj = { project: projectName, initialized_at: dateStr, harness_mode: harnessMode };
+      if (fs.existsSync(stateTemplatePath)) {
+        stateObj = JSON.parse(fs.readFileSync(stateTemplatePath, 'utf8'));
+        stateObj.harness_mode = harnessMode;
+      }
       fs.writeFileSync(stateFile, JSON.stringify(stateObj, null, 2), 'utf8');
       console.log(`✅ Created .agents/state.json in '${harnessMode}' mode`);
     } else {
@@ -144,7 +250,6 @@ program
         console.log('[INFO] .agents/state.json already exists. Skipping.');
       }
     }
-
 
     // 3. Copiar as personas core de agents para .agents/agents/
     if (fs.existsSync(CORE_AGENTS_DIR)) {
@@ -183,35 +288,16 @@ program
     }
 
     // 5. Injetar scripts no package.json local
-    const packageJsonPath = path.resolve(projectDir, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      try {
-        const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-        pkg.scripts = pkg.scripts || {};
-        pkg.scripts['harness:tdd'] = 'synapse tdd';
-        pkg.scripts['harness:status'] = 'synapse status';
-        pkg.scripts['harness:graphify'] = 'synapse graphify';
-        pkg.scripts['harness:sync-memory'] = 'powershell -File ./scripts/sync-memory.ps1';
-        fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2), 'utf8');
-        console.log('✅ Injected npm scripts into local package.json');
-      } catch (err) {
-        console.warn('⚠️ Warning: Failed to parse or write package.json:', err.message);
-      }
-    } else {
-      // Se não existir package.json, criar um básico
-      const basePkg = {
-        name: projectName.toLowerCase(),
-        version: "1.0.0",
-        scripts: {
-          "harness:tdd": "synapse tdd",
-          "harness:status": "synapse status",
-          "harness:graphify": "synapse graphify",
-          "harness:sync-memory": "powershell -File ./scripts/sync-memory.ps1"
-        }
-      };
-      fs.writeFileSync(packageJsonPath, JSON.stringify(basePkg, null, 2), 'utf8');
-      console.log('✅ Generated new package.json with Synapse scripts');
-    }
+    injectNpmScripts({
+      'harness:tdd': 'synapse tdd',
+      'harness:status': 'synapse status',
+      'harness:graphify': 'synapse graphify',
+      'harness:mcp': 'synapse mcp',
+      'harness:sync-memory': 'powershell -File ./scripts/sync-memory.ps1',
+      'quota:dashboard': 'synapse quota dashboard',
+      'quota:status': 'synapse quota status',
+      'quota:estimate': 'synapse quota estimate'
+    });
 
     // 6. Criar estrutura de documentação (00_docs/)
     const folders = ['01_prd', '02_tech_specs', '03_rules', '04_adrs'];
@@ -256,7 +342,6 @@ decision_maker: AI Agent & Tech Lead
       graphifyInstalled = true;
     } catch (e) {}
 
-    // Check local bin fallback
     const homeDir = require('os').homedir();
     const localBinGraphify = path.resolve(homeDir, '.local/bin', process.platform === 'win32' ? 'graphify.exe' : 'graphify');
     let graphifyCmd = 'graphify';
@@ -271,23 +356,10 @@ decision_maker: AI Agent & Tech Lead
         execSync('pip install graphify', { stdio: 'inherit' });
         graphifyInstalled = true;
       } catch (err) {
-        console.warn('⚠️ pip install failed. Attempting install via uv...');
-        try {
-          const uvCmd = process.platform === 'win32' ? '.venv\\Scripts\\uv.exe' : '.venv/bin/uv';
-          if (fs.existsSync(path.resolve(projectDir, uvCmd))) {
-            execSync(`"${path.resolve(projectDir, uvCmd)}" tool install graphifyy`, { stdio: 'inherit' });
-            if (fs.existsSync(localBinGraphify)) {
-              graphifyCmd = localBinGraphify;
-              graphifyInstalled = true;
-            }
-          }
-        } catch (ex) {
-          console.error('❌ Failed to install graphify via uv. Please install manually using: uv tool install graphifyy');
-        }
+        console.warn('⚠️ pip install failed.');
       }
     }
 
-    // Rodar primeiro map
     if (graphifyInstalled) {
       console.log(`[INFO] Running first graphify update using cmd '${graphifyCmd}'...`);
       try {
@@ -319,7 +391,6 @@ decision_maker: AI Agent & Tech Lead
     fs.mkdirSync(permDir, { recursive: true });
     fs.mkdirSync(chatsDir, { recursive: true });
 
-    // Criar READMEs explicativos no Vault do projeto consumidor
     const permReadme = path.resolve(permDir, 'README.md');
     if (!fs.existsSync(permReadme)) {
       fs.writeFileSync(permReadme, '# Permanent Notes\n\nThis directory contains immutable business rules, specifications, and long-term concepts.\n', 'utf8');
@@ -329,14 +400,12 @@ decision_maker: AI Agent & Tech Lead
       fs.writeFileSync(chatsReadme, '# Chat Logs & Session Memory\n\nThis directory holds Markdown summaries of development sessions to fight context amnesia.\n', 'utf8');
     }
 
-    // Criar Directory Junction apontando para graphify-out
     const linkPath = path.resolve(vaultDir, 'graphify-links');
     const targetPath = path.resolve(projectDir, 'graphify-out');
     if (fs.existsSync(targetPath)) {
       createJunctionLink(targetPath, linkPath);
     }
 
-    // Copiar o script de sincronização de memória
     const scriptsFolder = path.resolve(projectDir, 'scripts');
     fs.mkdirSync(scriptsFolder, { recursive: true });
     const syncScriptDest = path.resolve(scriptsFolder, 'sync-memory.ps1');
@@ -346,7 +415,6 @@ decision_maker: AI Agent & Tech Lead
       console.log('✅ Deployed sync-memory.ps1 automation script to ./scripts/');
     }
 
-    // Blindagem no .gitignore local
     if (!gitignoreContent.includes('.obsidian-vault/')) {
       gitignoreContent += '\n# Obsidian Vault (Local Persistent Memory)\n.obsidian-vault/\n';
       fs.writeFileSync(gitignorePath, gitignoreContent, 'utf8');

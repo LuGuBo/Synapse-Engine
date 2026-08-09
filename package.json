@@ -1,5 +1,5 @@
 {
-  "name": "synapse-engine",
+  "name": "@lugubo/synapse-engine",
   "version": "2.2.0",
   "description": "Synapse Engine - High-Performance AI Agent Governance Framework and BMAD Lifecycle Orchestrator",
   "main": "index.js",
