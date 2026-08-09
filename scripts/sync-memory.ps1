@@ -46,7 +46,7 @@ foreach ($file in $mdFiles) {
         $frontmatterText = $Matches[1]
         $lines = $frontmatterText -split "\r?\n"
         foreach ($line in $lines) {
-            if ($line.Trim() -ne "" -and $line -notmatch "^[a-zA-Z0-9_\-]+:\s*.*") {
+            if ($line.Trim() -ne "" -and $line -notmatch "^[a-zA-Z0-9_\-]+:\s*.*" -and $line -notmatch "^\s*-\s+.*") {
                 Write-Host "[FAIL] Invalid Frontmatter YAML formatting in file: $($file.FullName) at line: '$line'" -ForegroundColor Red
                 $valid = $false
             }
