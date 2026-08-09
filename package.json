@@ -1,37 +1,50 @@
 {
   "name": "@lugubo/synapse-engine",
   "version": "2.2.0",
-  "description": "Synapse Engine - High-Performance AI Agent Governance Framework and BMAD Lifecycle Orchestrator",
+  "description": "High-Performance AI Coding Agent Governance & Rate-Limit Harness for Claude Code, Cursor, and Gemini. AST Knowledge Graph MCP Server with sliding-window quota guard and TDD gates.",
   "main": "index.js",
   "bin": {
-    "synapse": "./bin/synapse-cli.js"
+    "synapse": "bin/synapse-cli.js"
   },
   "author": "LuGuBo (Synapse Dev Team)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LuGuBo/Synapse-Engine.git"
+    "url": "git+https://github.com/LuGuBo/Synapse-Engine.git"
   },
   "homepage": "https://github.com/LuGuBo/Synapse-Engine#readme",
   "bugs": {
     "url": "https://github.com/LuGuBo/Synapse-Engine/issues"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
+    "ai-agents",
+    "anthropic-mcp",
     "antigravity",
     "antigravity-ide",
-    "google-gemini",
-    "gemini",
-    "mcp",
-    "model-context-protocol",
+    "ast-knowledge-graph",
     "claude-code",
     "cursor",
-    "windsurf",
-    "ai-agents",
+    "cursor-ai",
+    "cursor-mcp",
+    "gemini",
+    "google-gemini",
+    "harness",
+    "markdown",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
     "rate-limit",
+    "skills",
+    "tdd",
     "tdd-harness",
-    "ast-knowledge-graph"
+    "token-optimization",
+    "windsurf"
   ],
   "files": [
+    "index.js",
     "bin/*.js",
     "src/**/*.py",
     "src/**/*.html",
@@ -43,12 +56,12 @@
   ],
   "scripts": {
     "test": "jest",
-    "harness:status":          "node bin/synapse-cli.js status",
-    "harness:tdd":             "node bin/synapse-cli.js tdd",
-    "harness:graphify":        "node bin/synapse-cli.js graphify",
+    "harness:status": "node bin/synapse-cli.js status",
+    "harness:tdd": "node bin/synapse-cli.js tdd",
+    "harness:graphify": "node bin/synapse-cli.js graphify",
     "harness:graphify:update": "node bin/synapse-cli.js graphify",
-    "harness:mcp":             "node bin/synapse-cli.js mcp",
-    "harness:sync-memory":     "powershell -File ./scripts/sync-memory.ps1",
+    "harness:mcp": "node bin/synapse-cli.js mcp",
+    "harness:sync-memory": "powershell -File ./scripts/sync-memory.ps1",
     "release": "node scripts/release.js"
   },
   "dependencies": {

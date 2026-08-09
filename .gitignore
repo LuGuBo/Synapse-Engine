@@ -17,6 +17,8 @@ venv/
 .playground/
 tmp/
 coverage/
+tests/temp_test_project/
+tests/temp_*/
 *.log
 *.sqlite3
 *.db
