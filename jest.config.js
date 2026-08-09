@@ -6,8 +6,7 @@ module.exports = {
   ],
   testPathIgnorePatterns: [
     '/node_modules/',
-    '/tests/temp_test_project/',
-    '/tests/temp_'
+    '/tests/temp_test_project/'
   ],
   verbose: true
 };

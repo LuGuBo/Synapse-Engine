@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.11] - 2026-08-09
+
+### Fixed
+- **NPM Publish Workflow**: Updated quality gate test step in `.github/workflows/npm-publish.yml` to run full test suite with `npx jest --verbose --runInBand`, removing obsolete references to deprecated test files.
+- **Jest Configuration**: Refined `testPathIgnorePatterns` in `jest.config.js` to ensure clean discovery of all test modules across CI runner environments.
+
 ## [2.2.10] - 2026-08-09
 
 ### Fixed
