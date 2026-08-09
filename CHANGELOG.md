@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.10] - 2026-08-09
+
+### Fixed
+- **MCP Server Dynamic Paths**: Replaced static file path constants with runtime environment getters (`getGraphPath`, `getRootDir`, `getStatePath`) to fix CI path resolution in isolated runner environments.
+- **Structured JSON RPC Error Formatting**: Standardized `graphify_get_path`, `graphify_get_subgraph`, and `graphify_get_deps` to always return structured JSON objects (`found: false`, `message`) preventing `SyntaxError` during JSON parsing.
+- **CI Test Suite Stability**: Added regression test cases in `tests/synapse_mcp_benchmark.test.js` validating MCP server robustness when AST graph files are absent.
+
 ## [2.2.0] - 2026-08-09
 
 ### Added
