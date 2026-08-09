@@ -6,6 +6,41 @@
   "bin": {
     "synapse": "./bin/synapse-cli.js"
   },
+  "author": "LuGuBo (Synapse Dev Team)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LuGuBo/Synapse-Engine.git"
+  },
+  "homepage": "https://github.com/LuGuBo/Synapse-Engine#readme",
+  "bugs": {
+    "url": "https://github.com/LuGuBo/Synapse-Engine/issues"
+  },
+  "keywords": [
+    "antigravity",
+    "antigravity-ide",
+    "google-gemini",
+    "gemini",
+    "mcp",
+    "model-context-protocol",
+    "claude-code",
+    "cursor",
+    "windsurf",
+    "ai-agents",
+    "rate-limit",
+    "tdd-harness",
+    "ast-knowledge-graph"
+  ],
+  "files": [
+    "bin/*.js",
+    "src/**/*.py",
+    "src/**/*.html",
+    "src/**/*.js",
+    "templates/",
+    "00_docs/",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "test": "jest",
     "harness:status":          "node bin/synapse-cli.js status",

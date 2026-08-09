@@ -1,0 +1,15 @@
+# Development & Test folders
+tests/
+.playground/
+.pytest_cache/
+.venv/
+__pycache__/
+*.pyc
+
+# Local binary executables
+bin/github-mcp-server.exe
+
+# Local session files
+.obsidian-vault/
+graphify-out/
+*.log
