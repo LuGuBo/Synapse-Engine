@@ -35,7 +35,7 @@ jobs:
         run: npm ci
 
       - name: 🛡️ Run Quality Gate Tests
-        run: npm test
+        run: npx jest --verbose --runInBand
 
       - name: 🚀 Publish to NPM
         run: npm publish --access public --provenance
