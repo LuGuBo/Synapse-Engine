@@ -1253,7 +1253,7 @@ function handleGetQuotaStatus() {
   const localVenvPython = os.platform() === 'win32'
     ? path.resolve(__dirname, '../.venv/Scripts/python.exe')
     : path.resolve(__dirname, '../.venv/bin/python');
-  const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : 'python';
+  const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : (process.platform === 'win32' ? 'python' : 'python3');
   try {
     const srcDir = path.resolve(__dirname, '../src');
     const output = execSync(`"${pythonCmd}" -c "from quota_manager.mcp_server import QuotaMCPServer; import json; print(json.dumps(QuotaMCPServer().get_quota_status()))"`, { encoding: 'utf8', cwd: srcDir });
@@ -1269,7 +1269,7 @@ function handleEstimateTaskWeight(taskDescription, activePersona = 'DEVELOPER', 
   const localVenvPython = os.platform() === 'win32'
     ? path.resolve(__dirname, '../.venv/Scripts/python.exe')
     : path.resolve(__dirname, '../.venv/bin/python');
-  const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : 'python';
+  const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : (process.platform === 'win32' ? 'python' : 'python3');
   try {
     const srcDir = path.resolve(__dirname, '../src');
     const taskEscaped = (taskDescription || '').replace(/"/g, '\\"');

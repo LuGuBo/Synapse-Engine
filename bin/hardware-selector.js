@@ -47,7 +47,7 @@ function getHardwareStatus(workload = 'auto', payloadSizeKb = 0.0, override = nu
   }
 
   // Detecta interpretador python local da virtualenv para evitar o python global lento/quebrado do Windows
-  let pythonCmd = 'python';
+  let pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
   const localVenvPython = os.platform() === 'win32'
     ? path.join(ROOT_DIR, '.venv', 'Scripts', 'python.exe')
     : path.join(ROOT_DIR, '.venv', 'bin', 'python');

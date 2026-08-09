@@ -687,7 +687,7 @@ quotaCmd
     const localVenvPython = os.platform() === 'win32'
       ? path.resolve(__dirname, '../.venv/Scripts/python.exe')
       : path.resolve(__dirname, '../.venv/bin/python');
-    const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : 'python';
+    const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : (process.platform === 'win32' ? 'python' : 'python3');
     try {
       execSync(`"${pythonCmd}" "${pythonScript}" status`, { stdio: 'inherit' });
     } catch (e) {
@@ -706,7 +706,7 @@ quotaCmd
     const localVenvPython = os.platform() === 'win32'
       ? path.resolve(__dirname, '../.venv/Scripts/python.exe')
       : path.resolve(__dirname, '../.venv/bin/python');
-    const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : 'python';
+    const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : (process.platform === 'win32' ? 'python' : 'python3');
     try {
       execSync(`"${pythonCmd}" "${pythonScript}" estimate "${task.replace(/"/g, '\\"')}" --persona ${options.persona} --nodes ${options.nodes}`, { stdio: 'inherit' });
     } catch (e) {
@@ -724,7 +724,7 @@ quotaCmd
     const localVenvPython = os.platform() === 'win32'
       ? path.resolve(__dirname, '../.venv/Scripts/python.exe')
       : path.resolve(__dirname, '../.venv/bin/python');
-    const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : 'python';
+    const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : (process.platform === 'win32' ? 'python' : 'python3');
     try {
       console.log(`🚀 Iniciando Quota Dashboard na porta ${options.port}...`);
       execSync(`"${pythonCmd}" "${pythonScript}" dashboard --port ${options.port}`, { stdio: 'inherit' });
