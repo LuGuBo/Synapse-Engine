@@ -18,7 +18,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
     expect(response.result.serverInfo.name).toBe('synapse-mcp-server');
   });
 
-  test('MCP Server lists available tools (17 tools)', () => {
+  test('MCP Server lists available tools (19 tools)', () => {
     const request = {
       jsonrpc: '2.0',
       id: 2,
@@ -26,7 +26,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
       params: {}
     };
     const response = processRPCRequest(request);
-    expect(response.result.tools).toHaveLength(17);
+    expect(response.result.tools).toHaveLength(19);
     const toolNames = response.result.tools.map(t => t.name);
     expect(toolNames).toContain('graphify_get_deps');
     expect(toolNames).toContain('graphify_get_path');
@@ -39,6 +39,8 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
     expect(toolNames).toContain('synapse_search_skills');
     expect(toolNames).toContain('synapse_hardware_status');
     expect(toolNames).toContain('synapse_select_device');
+    expect(toolNames).toContain('synapse_get_quota_status');
+    expect(toolNames).toContain('synapse_estimate_task_weight');
 
     // Verify annotations are present
     const depsTool = response.result.tools.find(t => t.name === 'graphify_get_deps');

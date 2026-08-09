@@ -606,6 +606,65 @@ program
     console.log(JSON.stringify(result, null, 2));
   });
 
+const quotaCmd = program
+  .command('quota')
+  .description('AI Model Rate Limit Tracking, Quota Control & Task Weight Estimation');
+
+quotaCmd
+  .command('status')
+  .description('Displays model rate limits, GCP status, and sliding window quota usage')
+  .action(() => {
+    const os = require('os');
+    const pythonScript = path.resolve(__dirname, '../src/quota_manager/cli.py');
+    const localVenvPython = os.platform() === 'win32'
+      ? path.resolve(__dirname, '../.venv/Scripts/python.exe')
+      : path.resolve(__dirname, '../.venv/bin/python');
+    const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : 'python';
+    try {
+      execSync(`"${pythonCmd}" "${pythonScript}" status`, { stdio: 'inherit' });
+    } catch (e) {
+      console.error('❌ Error executing quota status:', e.message);
+    }
+  });
+
+quotaCmd
+  .command('estimate <task>')
+  .description('Estimates task complexity weight (Score 1-10) and recommends an AI model')
+  .option('-p, --persona <name>', 'Active BMAD persona', 'DEVELOPER')
+  .option('-n, --nodes <count>', 'AST connected nodes count', parseInt, 0)
+  .action((task, options) => {
+    const os = require('os');
+    const pythonScript = path.resolve(__dirname, '../src/quota_manager/cli.py');
+    const localVenvPython = os.platform() === 'win32'
+      ? path.resolve(__dirname, '../.venv/Scripts/python.exe')
+      : path.resolve(__dirname, '../.venv/bin/python');
+    const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : 'python';
+    try {
+      execSync(`"${pythonCmd}" "${pythonScript}" estimate "${task.replace(/"/g, '\\"')}" --persona ${options.persona} --nodes ${options.nodes}`, { stdio: 'inherit' });
+    } catch (e) {
+      console.error('❌ Error executing task weight estimate:', e.message);
+    }
+  });
+
+quotaCmd
+  .command('dashboard')
+  .description('Launches local HTTP server and automatically opens Quota Dashboard in browser')
+  .option('--port <number>', 'Server port', parseInt, 8050)
+  .action((options) => {
+    const os = require('os');
+    const pythonScript = path.resolve(__dirname, '../src/quota_manager/cli.py');
+    const localVenvPython = os.platform() === 'win32'
+      ? path.resolve(__dirname, '../.venv/Scripts/python.exe')
+      : path.resolve(__dirname, '../.venv/bin/python');
+    const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : 'python';
+    try {
+      console.log(`🚀 Iniciando Quota Dashboard na porta ${options.port}...`);
+      execSync(`"${pythonCmd}" "${pythonScript}" dashboard --port ${options.port}`, { stdio: 'inherit' });
+    } catch (e) {
+      console.error('❌ Error launching dashboard:', e.message);
+    }
+  });
+
 program
   .command('graphify')
   .description('Executes incremental AST dependency graph update via Graphify')

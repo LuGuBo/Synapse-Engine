@@ -92,14 +92,17 @@ function main() {
       const subDirPath = `${dir}/${relativeDir}`.replace(/\/+/g, '/');
       candidates.push(`${subDirPath}/${baseName}.test.${ext}`);
       candidates.push(`${subDirPath}/${baseName}.spec.${ext}`);
+      candidates.push(`${subDirPath}/test_${baseName}.${ext}`);
       
       candidates.push(`${dir}/${baseName}.test.${ext}`);
       candidates.push(`${dir}/${baseName}.spec.${ext}`);
+      candidates.push(`${dir}/test_${baseName}.${ext}`);
     }
 
     const exactDir = path.dirname(prodFile);
     candidates.push(`${exactDir}/${baseName}.test.${ext}`);
     candidates.push(`${exactDir}/${baseName}.spec.${ext}`);
+    candidates.push(`${exactDir}/test_${baseName}.${ext}`);
 
     const uniqueCandidates = Array.from(new Set(candidates.map(p => p.replace(/\\/g, '/'))));
 

@@ -1224,8 +1224,62 @@ const TOOLS = [
       destructiveHint: false,
       openWorldHint: false
     }
+  },
+  {
+    name: 'synapse_get_quota_status',
+    description: 'Get real-time model rate limits, GCP status, and sliding window quota usage metrics.',
+    inputSchema: { type: 'object', properties: {} },
+    annotations: { readOnlyHint: true, idempotentHint: true, destructiveHint: false, openWorldHint: false }
+  },
+  {
+    name: 'synapse_estimate_task_weight',
+    description: 'Estimates software task complexity weight (Score 1-10) and recommends optimal available AI model based on quotas and GCP model availability.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskDescription: { type: 'string', description: 'Description of task to perform' },
+        activePersona: { type: 'string', default: 'DEVELOPER', description: 'Active BMAD persona' },
+        astConnectedNodes: { type: 'integer', default: 0, description: 'Count of connected AST graph nodes' }
+      },
+      required: ['taskDescription']
+    },
+    annotations: { readOnlyHint: true, idempotentHint: true, destructiveHint: false, openWorldHint: false }
   }
 ];
+
+function handleGetQuotaStatus() {
+  const os = require('os');
+  const pythonScript = path.resolve(__dirname, '../src/quota_manager/cli.py');
+  const localVenvPython = os.platform() === 'win32'
+    ? path.resolve(__dirname, '../.venv/Scripts/python.exe')
+    : path.resolve(__dirname, '../.venv/bin/python');
+  const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : 'python';
+  try {
+    const srcDir = path.resolve(__dirname, '../src');
+    const output = execSync(`"${pythonCmd}" -c "from quota_manager.mcp_server import QuotaMCPServer; import json; print(json.dumps(QuotaMCPServer().get_quota_status()))"`, { encoding: 'utf8', cwd: srcDir });
+    return JSON.parse(output.trim());
+  } catch (err) {
+    return { status: 'error', message: err.message };
+  }
+}
+
+function handleEstimateTaskWeight(taskDescription, activePersona = 'DEVELOPER', astConnectedNodes = 0) {
+  const os = require('os');
+  const pythonScript = path.resolve(__dirname, '../src/quota_manager/cli.py');
+  const localVenvPython = os.platform() === 'win32'
+    ? path.resolve(__dirname, '../.venv/Scripts/python.exe')
+    : path.resolve(__dirname, '../.venv/bin/python');
+  const pythonCmd = fs.existsSync(localVenvPython) ? localVenvPython : 'python';
+  try {
+    const srcDir = path.resolve(__dirname, '../src');
+    const taskEscaped = (taskDescription || '').replace(/"/g, '\\"');
+    const cmdStr = `from quota_manager.mcp_server import QuotaMCPServer; import json; print(json.dumps(QuotaMCPServer().estimate_task_weight(\\"${taskEscaped}\\", \\"${activePersona}\\", ${astConnectedNodes})))`;
+    const output = execSync(`"${pythonCmd}" -c "${cmdStr}"`, { encoding: 'utf8', cwd: srcDir });
+    return JSON.parse(output.trim());
+  } catch (err) {
+    return { status: 'error', message: err.message };
+  }
+}
 
 
 /**
@@ -1317,6 +1371,12 @@ function processRPCRequest(request) {
           break;
         case 'synapse_select_device':
           resultData = handleSelectDevice(args?.workloadType, args?.payloadSizeKb, args?.override);
+          break;
+        case 'synapse_get_quota_status':
+          resultData = handleGetQuotaStatus();
+          break;
+        case 'synapse_estimate_task_weight':
+          resultData = handleEstimateTaskWeight(args?.taskDescription, args?.activePersona, args?.astConnectedNodes);
           break;
         case 'graphify_get_path':
           resultData = handleGetPath(args?.startFile, args?.targetFile);
