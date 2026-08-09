@@ -40,10 +40,9 @@ class QuotaDashboardHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         # Servidor de arquivo estático para HTML do Dashboard
-        dashboard_html_path = os.path.join(os.path.dirname(__file__), "..", "..", "quota_dashboard.html")
+        dashboard_html_path = os.path.join(os.path.dirname(__file__), "quota_dashboard.html")
         if not os.path.exists(dashboard_html_path):
-            # Procura no ag-lab se não estiver no diretório raiz do synapse-engine
-            dashboard_html_path = r"C:\ag-projetos\ag-lab\quota_dashboard.html"
+            dashboard_html_path = os.path.join(os.path.dirname(__file__), "..", "..", "quota_dashboard.html")
 
         if os.path.exists(dashboard_html_path):
             self.send_response(200)

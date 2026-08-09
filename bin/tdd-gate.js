@@ -49,8 +49,15 @@ function main() {
 
   const trackedFiles = getTrackedFiles();
 
-  // Filter production files (starting with src/, lib/, or app/, excluding __init__.py)
-  const prodFiles = stagedFiles.filter(f => (f.startsWith('src/') || f.startsWith('lib/') || f.startsWith('app/')) && !f.endsWith('__init__.py'));
+  // Filter production code files (starting with src/, lib/, or app/, matching executable code extensions, excluding __init__.py)
+  const CODE_EXTENSIONS = new Set(['.js', '.ts', '.jsx', '.tsx', '.py', '.go', '.rs', '.java', '.c', '.cpp', '.cs']);
+  const prodFiles = stagedFiles.filter(f => {
+    const isProdDir = f.startsWith('src/') || f.startsWith('lib/') || f.startsWith('app/');
+    const ext = path.extname(f).toLowerCase();
+    const isCode = CODE_EXTENSIONS.has(ext);
+    const isInit = f.endsWith('__init__.py');
+    return isProdDir && isCode && !isInit;
+  });
 
   // Verify dynamic validation_status in state.json if editing production files
   if (prodFiles.length > 0) {

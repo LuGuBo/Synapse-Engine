@@ -1,18 +1,36 @@
+# Dependencies
 node_modules/
+.venv/
+venv/
+
+# Environment Variables & Secrets (CRITICAL SECURITY)
 .env
 .env.*
+*.pem
+*.key
+*.pfx
+*.p12
+*.crt
+*.cer
+
+# Sandboxes & Temporary Dumps
 .playground/
 tmp/
 coverage/
 *.log
-.venv/
-venv/
+*.sqlite3
+*.db
 
-# Python
+# Python Caches & Bytecode
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
 
-# Graphify outputs
+# Graphify AST Knowledge Graph outputs
 graphify-out/
 
 # Autoresearch local framework files (local dev environment only)
@@ -28,8 +46,14 @@ baseline_output.json
 # Gemini Local IDE config
 .gemini/
 
-# Obsidian Vault (Local Persistent Memory)
+# Obsidian Vault (Local Session Persistent Memory)
 .obsidian-vault/
 
-# Local Session Walkthrough Report (telemetria de sessão do agente)
+# Local Session Walkthrough Report (agent telemetry)
 walkthrough.md
+
+# Operating System Metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db

@@ -184,8 +184,8 @@ class DynamicQuotaRegistry:
             search_paths = [
                 os.path.join(self.workspace_root, "*.md"),
                 os.path.join(self.workspace_root, "00_docs", "*.md"),
-                os.path.expanduser(r"~\.gemini\antigravity-ide\knowledge\05_GEMINI_API_LIMITS\artifacts\*.md"),
-                r"C:\ag-projetos\gemini_api_limits.md"
+                os.path.join(self.workspace_root, "00_docs", "**", "*.md"),
+                os.path.expanduser(r"~/.gemini/antigravity-ide/knowledge/05_GEMINI_API_LIMITS/artifacts/*.md")
             ]
 
             for pattern in search_paths:

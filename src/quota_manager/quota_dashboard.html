@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse Quota Manager - Real-Time Telemetry Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --bg-gradient: radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.45) 0%, rgba(9, 13, 22, 1) 75%);
+            --card-bg: rgba(17, 24, 39, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-hover-border: rgba(56, 189, 248, 0.3);
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent: #38bdf8;
+            --accent-subtle: rgba(56, 189, 248, 0.12);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.12);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.12);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.12);
+            --progress-bg: rgba(255, 255, 255, 0.06);
+        }
+        * { box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            background-image: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 32px 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            width: 100%;
+            max-width: 1180px;
+        }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+        }
+        .brand h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+        .brand p {
+            margin: 2px 0 0 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .account-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .kpi-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            transition: all 0.2s ease;
+        }
+        .kpi-card:hover {
+            border-color: var(--card-hover-border);
+            transform: translateY(-2px);
+        }
+        .kpi-label {
+            font-size: 0.775rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .kpi-value {
+            font-size: 1.7rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+        .kpi-subtext {
+            font-size: 0.775rem;
+            color: var(--text-muted);
+        }
+        .section-title {
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .models-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th {
+            padding: 14px 24px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--card-border);
+        }
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.875rem;
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        .model-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .model-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .tier-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.04em;
+        }
+        .tier-flash { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.25); }
+        .tier-pro { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.25); }
+        .tier-lite { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.25); }
+        .numeric { font-family: 'JetBrains Mono', monospace; }
+        .dim { color: var(--text-muted); font-size: 0.8em; }
+        .metric-metric {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .progress-bg {
+            width: 100%;
+            max-width: 110px;
+            height: 4px;
+            background: var(--progress-bg);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        .progress-bar.bar-warn { background: var(--warning); }
+        .progress-bar.bar-danger { background: var(--danger); }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.725rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .badge-active { background: var(--success-bg); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.25); }
+        .badge-exhausted { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.25); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <div>
+                    <h1>Synapse Quota Manager</h1>
+                    <p>Live Sliding Window Telemetry & Rate-Limit Guard</p>
+                </div>
+            </div>
+            <div class="account-pill">
+                <div class="live-dot"></div>
+                <span>Live Sliding Window Telemetry (Auto-Refresh 5s)</span>
+            </div>
+        </header>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">
+                    <span>Tokens (24h Window)</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="kpi-value" id="kpi-total-tokens">0</div>
+                <div class="kpi-subtext" id="kpi-active-models">0 active models</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">
+                    <span>Requests (24h Window)</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div class="kpi-value" id="kpi-total-requests">0</div>
+                <div class="kpi-subtext">Sliding 24-hour log buffer</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">
+                    <span>Active Provider Models</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div class="kpi-value" id="kpi-registered-models">5</div>
+                <div class="kpi-subtext">Gemini & Vertex Matrix</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">
+                    <span>Quota Health State</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div class="kpi-value" style="color: var(--success)" id="kpi-health-status">100%</div>
+                <div class="kpi-subtext">0 Exhausted | 0 429 Errors</div>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <span>Model Sliding Window Quota Usage</span>
+            <span style="font-size: 0.75rem; text-transform: none; color: var(--text-muted);" id="last-updated-text">Updating...</span>
+        </div>
+
+        <div class="models-card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Model Canonical ID</th>
+                            <th>RPM (60s Window)</th>
+                            <th>RPD (24h Window)</th>
+                            <th>TPM (60s Window)</th>
+                            <th>Tokens (24h)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="models-table-body">
+                        <tr><td colspan="6" style="text-align:center; color: var(--text-muted);">Loading live quota metrics...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchQuotaStatus() {
+            try {
+                const res = await fetch('/api/status');
+                if (!res.ok) return;
+                const data = await res.json();
+                renderDashboard(data);
+            } catch (err) {
+                console.error("Failed to fetch quota metrics:", err);
+            }
+        }
+
+        function formatNumber(num) {
+            return (num || 0).toLocaleString();
+        }
+
+        function getTierTag(modelId) {
+            if (modelId.includes('lite')) return '<span class="tier-tag tier-lite">LITE</span>';
+            if (modelId.includes('pro')) return '<span class="tier-tag tier-pro">PRO</span>';
+            return '<span class="tier-tag tier-flash">FLASH</span>';
+        }
+
+        function renderDashboard(data) {
+            const models = data.models || {};
+            const tbody = document.getElementById('models-table-body');
+            let rowsHtml = '';
+            let totalTokens = 0;
+            let totalRequests = 0;
+            let activeModelsCount = 0;
+            let totalRegistered = 0;
+
+            for (const [modelId, item] of Object.entries(models)) {
+                totalRegistered++;
+                const info = item.info || {};
+                const usage = item.usage || {};
+
+                const rpmLimit = info.rpm_limit || 15;
+                const rpdLimit = info.rpd_limit || 250;
+                const tpmLimit = info.tpm_limit || 1000000;
+
+                const rpmUsage = usage.rpm_60s || 0;
+                const rpdUsage = usage.rpd_24h || 0;
+                const tpmUsage = usage.tpm_60s || 0;
+                const tokens24h = usage.total_tokens_24h || 0;
+
+                totalTokens += tokens24h;
+                totalRequests += rpdUsage;
+                if (rpdUsage > 0 || rpmUsage > 0) activeModelsCount++;
+
+                const rpmPct = Math.min(100, Math.round((rpmUsage / rpmLimit) * 100));
+                const rpdPct = Math.min(100, Math.round((rpdUsage / rpdLimit) * 100));
+                const tpmPct = Math.min(100, Math.round((tpmUsage / tpmLimit) * 100));
+
+                const rpmClass = rpmPct > 80 ? 'bar-danger' : (rpmPct > 50 ? 'bar-warn' : '');
+                const rpdClass = rpdPct > 80 ? 'bar-danger' : (rpdPct > 50 ? 'bar-warn' : '');
+
+                rowsHtml += `
+                    <tr>
+                        <td>
+                            <div class="model-cell">
+                                <span class="model-name">${info.raw_name || modelId}</span>
+                                ${getTierTag(modelId)}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-metric">
+                                <span class="numeric">${rpmUsage} <span class="dim">/ ${rpmLimit}</span></span>
+                                <div class="progress-bg"><div class="progress-bar ${rpmClass}" style="width: ${Math.max(rpmPct, 2)}%"></div></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-metric">
+                                <span class="numeric">${rpdUsage} <span class="dim">/ ${formatNumber(rpdLimit)}</span></span>
+                                <div class="progress-bg"><div class="progress-bar ${rpdClass}" style="width: ${Math.max(rpdPct, 1)}%"></div></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-metric">
+                                <span class="numeric">${formatNumber(tpmUsage)} <span class="dim">/ ${formatNumber(tpmLimit)}</span></span>
+                                <div class="progress-bg"><div class="progress-bar" style="width: ${Math.max(tpmPct, 1)}%"></div></div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="numeric font-medium" style="color: var(--accent); font-weight: 600;">${formatNumber(tokens24h)}</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-active">● ACTIVE</span>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = rowsHtml || '<tr><td colspan="6" style="text-align:center;">No active models registered.</td></tr>';
+            document.getElementById('kpi-total-tokens').textContent = formatNumber(totalTokens);
+            document.getElementById('kpi-total-requests').textContent = formatNumber(totalRequests);
+            document.getElementById('kpi-active-models').textContent = `${activeModelsCount} active model(s) in current window`;
+            document.getElementById('kpi-registered-models').textContent = totalRegistered;
+            document.getElementById('last-updated-text').textContent = `Last synced: ${new Date().toLocaleTimeString()}`;
+        }
+
+        fetchQuotaStatus();
+        setInterval(fetchQuotaStatus, 5000);
+    </script>
+</body>
+</html>
