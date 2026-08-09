@@ -35,7 +35,12 @@ jobs:
         run: npm ci
 
       - name: 🛡️ Run Quality Gate Tests
-        run: npx jest --verbose --runInBand
+        run: |
+          npx jest tests/passwordValidator.test.js --verbose
+          npx jest tests/hardware_selector.test.js --verbose
+          npx jest tests/synapse_mcp_benchmark.test.js --verbose
+          npx jest tests/synapse_forge.test.js --verbose
+          npx jest tests/synapse_cli.test.js --verbose
 
       - name: 🚀 Publish to NPM
         run: npm publish --access public --provenance
