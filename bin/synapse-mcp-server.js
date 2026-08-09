@@ -15,9 +15,9 @@ const { execSync } = require('child_process');
 const { getHardwareStatus } = require('./hardware-selector');
 
 // Operational paths
-const ROOT_DIR = process.cwd();
-const GRAPH_PATH = path.join(ROOT_DIR, 'graphify-out', 'graph.json');
-const STATE_PATH = path.join(ROOT_DIR, '.agents', 'state.json');
+const ROOT_DIR = process.env.SYNAPSE_WORKSPACE_ROOT || process.cwd();
+const GRAPH_PATH = process.env.SYNAPSE_GRAPH_PATH || path.join(ROOT_DIR, 'graphify-out', 'graph.json');
+const STATE_PATH = process.env.SYNAPSE_STATE_PATH || path.join(ROOT_DIR, '.agents', 'state.json');
 
 let loadedGraph = null;
 let loadedState = null;
@@ -96,7 +96,7 @@ function loadGraph(forceReload = false) {
     return loadedGraph;
   }
   if (!fs.existsSync(GRAPH_PATH)) {
-    return { nodes: [], edges: [] };
+    return { error: "Graphify AST not generated. Please run 'graphify update .' or ensure graphify-out/ exists.", nodes: [], edges: [] };
   }
   try {
     const raw = fs.readFileSync(GRAPH_PATH, 'utf8');
@@ -131,6 +131,7 @@ function loadState(forceReload = false) {
  */
 function handleGetDeps(targetFile) {
   const graph = loadGraph();
+  if (graph.error) return { error: graph.error };
   if (!targetFile) {
     return { error: 'targetFile argument is required' };
   }
@@ -196,6 +197,7 @@ function handleGetImpactedTests(targetFile) {
  */
 function handleCheckCircular() {
   const graph = loadGraph();
+  if (graph.error) return { error: graph.error };
   const adj = {};
 
   (graph.nodes || []).forEach(n => {
@@ -250,6 +252,7 @@ function handleCheckCircular() {
  */
 function handleGetPath(startFile, targetFile) {
   const graph = loadGraph();
+  if (graph.error) return { error: graph.error };
   if (!startFile || !targetFile) {
     return { error: 'Both startFile and targetFile arguments are required' };
   }
@@ -330,6 +333,7 @@ function handleGetPath(startFile, targetFile) {
  */
 function handleGetSubgraph(rootFile, depth = 2) {
   const graph = loadGraph();
+  if (graph.error) return { error: graph.error };
   if (!rootFile) {
     return { error: 'rootFile argument is required' };
   }
@@ -400,7 +404,7 @@ function handleReadMemory(category, noteName) {
     return { error: `Invalid category '${category}'. Valid options: ${validCategories.join(', ')}` };
   }
 
-  const vaultDir = path.join(ROOT_DIR, '.obsidian-vault', targetCategory);
+  const vaultDir = process.env.SYNAPSE_VAULT_PATH ? path.join(process.env.SYNAPSE_VAULT_PATH, targetCategory) : path.join(ROOT_DIR, '.obsidian-vault', targetCategory);
   if (!fs.existsSync(vaultDir)) {
     return { error: `Obsidian Vault category directory does not exist: ${vaultDir}` };
   }
@@ -439,7 +443,7 @@ function handleReadMemory(category, noteName) {
  * Tool: Sync declarative memory (Obsidian Vault structure)
  */
 function handleSyncMemory() {
-  const vaultDir = path.join(ROOT_DIR, '.obsidian-vault');
+  const vaultDir = process.env.SYNAPSE_VAULT_PATH || path.join(ROOT_DIR, '.obsidian-vault');
   const permDir = path.join(vaultDir, 'permanent');
   const chatsDir = path.join(vaultDir, 'chats');
 
