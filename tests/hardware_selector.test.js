@@ -28,7 +28,13 @@ describe('⚡ Hardware Selector (CPU vs GPU) Test Suite', () => {
 
   test('Python script hardware_selector.py executes correctly via CLI --json', () => {
     const pythonScript = path.join(__dirname, '..', 'src', 'hardware_selector.py');
-    const output = execFileSync('python', [pythonScript, '--json', 'ast_query', '50.0'], { encoding: 'utf8' });
+    let pythonCmd = 'python';
+    try {
+      execFileSync('python', ['--version'], { stdio: 'ignore' });
+    } catch (e) {
+      pythonCmd = 'python3';
+    }
+    const output = execFileSync(pythonCmd, [pythonScript, '--json', 'ast_query', '50.0'], { encoding: 'utf8' });
     const parsed = JSON.parse(output.trim());
     expect(parsed.selected_device).toBe('CPU');
   });
