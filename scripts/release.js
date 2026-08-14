@@ -44,7 +44,7 @@ log(`Detected target release version: v${version}`);
 
 // 3. Extract release notes from CHANGELOG.md
 const changelogPath = path.resolve(process.cwd(), 'CHANGELOG.md');
-let releaseBody = `Official release for version v${version} of Synapse Engine.`;
+let releaseBody = `Official release for version v${version} of Aevum Kyber.`;
 
 if (fs.existsSync(changelogPath)) {
   log('Extracting release notes from CHANGELOG.md...');
@@ -128,7 +128,7 @@ try {
 // 9. Create GitHub Release entry via REST API using native HTTPS
 log('Initiating HTTP request for GitHub Release creation...');
 const repoOwner = 'LuGuBo';
-const repoName = 'Synapse-Engine';
+const repoName = 'aevum-kyber';
 
 const postData = JSON.stringify({
   tag_name: tag,
@@ -146,7 +146,7 @@ const options = {
   method: 'POST',
   headers: {
     'Authorization': `token ${githubPat}`,
-    'User-Agent': 'Synapse-Engine-Release-Agent',
+    'User-Agent': 'Aevum-Kyber-Release-Agent',
     'Content-Type': 'application/json',
     'Content-Length': Buffer.byteLength(postData),
     'Accept': 'application/vnd.github+json'
