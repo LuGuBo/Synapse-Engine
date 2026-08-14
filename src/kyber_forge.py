@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-class SynapseEngineHybridEngine:
+class KyberHybridEngine:
     def __init__(
         self,
         global_config_dir: str = "~/.gemini/config/skills",
@@ -241,9 +241,10 @@ decision_maker: AI Agent & Tech Lead
             else:
                 self._deploy_skill_isolated(self.local_dir, role, content_body, metadata)
 
+# Backwards compatibility alias
+SynapseEngineHybridEngine = KyberHybridEngine
+
 if __name__ == "__main__":
-    print("Initiating Synapse Engine Hybrid Compilation in Antigravity Context...")
-    forge = SynapseEngineHybridEngine()
+    print("Initiating Aevum Kyber Hybrid Compilation in Antigravity Context...")
+    forge = KyberHybridEngine()
     forge.forge_hybrid_skills(["bmad-master", "local-guardrails-policy"])
-
-

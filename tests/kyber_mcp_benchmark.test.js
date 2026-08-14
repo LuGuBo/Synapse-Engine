@@ -2,14 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const { processRPCRequest, TOOLS } = require('../bin/synapse-mcp-server');
 
-describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
+describe('⚡ Aevum Kyber - MCP Server & Benchmark Test Suite', () => {
   const FIXTURES_DIR = path.join(__dirname, 'fixtures');
   const GRAPH_PATH = path.join(FIXTURES_DIR, 'graphify-out', 'graph.json');
   const VAULT_PATH = path.join(FIXTURES_DIR, '.obsidian-vault');
 
   beforeAll(() => {
+    process.env.KYBER_WORKSPACE_ROOT = FIXTURES_DIR;
     process.env.SYNAPSE_WORKSPACE_ROOT = FIXTURES_DIR;
+    process.env.KYBER_GRAPH_PATH = GRAPH_PATH;
     process.env.SYNAPSE_GRAPH_PATH = GRAPH_PATH;
+    process.env.KYBER_VAULT_PATH = VAULT_PATH;
     process.env.SYNAPSE_VAULT_PATH = VAULT_PATH;
     
     fs.mkdirSync(path.join(FIXTURES_DIR, 'graphify-out'), { recursive: true });
@@ -18,13 +21,13 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
     
     fs.writeFileSync(GRAPH_PATH, JSON.stringify({
       nodes: [
-        { id: 'synapse-cli.js', label: 'synapse-cli.js', name: 'synapse-cli.js' },
+        { id: 'kyber-cli.js', label: 'kyber-cli.js', name: 'kyber-cli.js' },
         { id: 'hardware-selector.js', label: 'hardware-selector.js', name: 'hardware-selector.js' },
-        { id: 'bin_synapse_cli', label: 'bin_synapse_cli', name: 'bin_synapse_cli' }
+        { id: 'bin_kyber_cli', label: 'bin_kyber_cli', name: 'bin_kyber_cli' }
       ],
       edges: [
-        { source: 'synapse-cli.js', target: 'hardware-selector.js' },
-        { source: 'synapse-cli.js', target: 'bin_synapse_cli' }
+        { source: 'kyber-cli.js', target: 'hardware-selector.js' },
+        { source: 'kyber-cli.js', target: 'bin_kyber_cli' }
       ]
     }));
     
@@ -255,7 +258,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
       method: 'tools/call',
       params: {
         name: 'graphify_get_path',
-        arguments: { startFile: 'synapse-cli.js', targetFile: 'hardware-selector.js' }
+        arguments: { startFile: 'kyber-cli.js', targetFile: 'hardware-selector.js' }
       }
     };
     const pathRes = processRPCRequest(pathReq);
@@ -270,7 +273,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
       method: 'tools/call',
       params: {
         name: 'graphify_get_path',
-        arguments: { startFile: 'synapse-cli.js', targetFile: 'synapse-cli.js' }
+        arguments: { startFile: 'kyber-cli.js', targetFile: 'kyber-cli.js' }
       }
     };
     const sameRes = processRPCRequest(sameReq);
@@ -286,7 +289,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
       method: 'tools/call',
       params: {
         name: 'graphify_get_path',
-        arguments: { startFile: 'non_existent_file_xyz.js', targetFile: 'synapse-cli.js' }
+        arguments: { startFile: 'non_existent_file_xyz.js', targetFile: 'kyber-cli.js' }
       }
     };
     const invalidRes = processRPCRequest(invalidReq);
@@ -303,7 +306,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
       method: 'tools/call',
       params: {
         name: 'graphify_get_subgraph',
-        arguments: { rootFile: 'synapse-cli.js', depth: 1 }
+        arguments: { rootFile: 'kyber-cli.js', depth: 1 }
       }
     };
     const sub1Res = processRPCRequest(sub1Req);
@@ -311,8 +314,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
     const sub1Data = JSON.parse(sub1Res.result.content[0].text);
     expect(sub1Data.found).toBe(true);
     expect(sub1Data.depth).toBe(1);
-    expect(sub1Data.nodes).toContain('bin_synapse_cli');
-
+    expect(sub1Data.nodes).toContain('bin_kyber_cli');
 
     // Vector B: Subgraph with missing root node
     const missingSubReq = {
@@ -374,7 +376,8 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
   });
 
   test('MCP Server handles missing/error graph AST gracefully with valid JSON output', () => {
-    const originalGraphPath = process.env.SYNAPSE_GRAPH_PATH;
+    const originalGraphPath = process.env.KYBER_GRAPH_PATH || process.env.SYNAPSE_GRAPH_PATH;
+    process.env.KYBER_GRAPH_PATH = path.join(FIXTURES_DIR, 'non_existent_graph.json');
     process.env.SYNAPSE_GRAPH_PATH = path.join(FIXTURES_DIR, 'non_existent_graph.json');
 
     // 1. graphify_get_path with missing graph
@@ -426,6 +429,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
     expect(depsData.message).toContain('Graphify AST not generated');
 
     // Restore graph path
+    process.env.KYBER_GRAPH_PATH = originalGraphPath;
     process.env.SYNAPSE_GRAPH_PATH = originalGraphPath;
   });
 
@@ -451,7 +455,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
       method: 'tools/call',
       params: {
         name: 'graphify_get_deps',
-        arguments: { targetFile: 'synapse-cli.js' }
+        arguments: { targetFile: 'kyber-cli.js' }
       }
     };
     const response = processRPCRequest(request);
@@ -466,7 +470,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
     const costFactorReduction = (nativeEstimatedTokens / Math.max(mcpEstimatedTokens, 1)).toFixed(1);
 
     console.log('\n================================================================================');
-    console.log('📊 SYNAPSE ENGINE V2 - MCP BENCHMARK COMPARISON TABLE');
+    console.log('📊 AEVUM KYBER - MCP BENCHMARK COMPARISON TABLE');
     console.log('================================================================================');
     console.table([
       {
@@ -477,7 +481,7 @@ describe('⚡ Synapse Engine V2 - MCP Server & Benchmark Test Suite', () => {
         Eficiência: 'Baseline (0%)'
       },
       {
-        Abordagem: 'Synapse Graphify MCP Server',
+        Abordagem: 'Kyber Graphify MCP Server',
         Tamanho_Payload: `${(mcpSizeBytes / 1024).toFixed(2)} KB`,
         Tokens_Estimados: mcpEstimatedTokens,
         Latência_IPC: `${mcpLatencyMs.toFixed(3)} ms`,

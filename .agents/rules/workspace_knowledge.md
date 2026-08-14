@@ -5,7 +5,7 @@ description: "Local workspace rules for documenting changes and creating walkthr
 
 # Workspace Knowledge & Documentation Enforcement
 
-This file establishes the rules for workspace-level documentation persistence and reporting for the **Synapse Engine** project.
+This file establishes the rules for workspace-level documentation persistence and reporting for the **Aevum Kyber** project.
 
 ## 1. Documentation Integrity
 - All project documentation must reside under the `./00_docs/` directory.

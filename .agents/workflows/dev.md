@@ -1,6 +1,6 @@
 # Workflow: Software Developer (/dev)
 
-Esse workflow aciona a persona de **Software Developer (Dev)** no ecossistema BMAD / Synapse Engine.
+Esse workflow aciona a persona de **Software Developer (Dev)** no ecossistema BMAD / Aevum Kyber.
 
 ## Diretrizes Operacionais
 1. **Foco**: Desenvolvimento de funcionalidade e refatoração cirúrgica com TDD (Test-Driven Development).

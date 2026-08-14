@@ -1,16 +1,16 @@
 ---
-name: synapse-core
-description: "Local domain rules for Synapse Engine (Harness). Establishes stack rules, python environment targets, and local testing routines."
+name: kyber-core
+description: "Local domain rules for Aevum Kyber (Harness). Establishes stack rules, python environment targets, and local testing routines."
 always_on: true
 ---
 
-# Synapse Engine - Local Core Rules
+# Aevum Kyber - Local Core Rules
 
-This file defines the project-specific rules for the **Synapse Engine (Harness)** repository. These rules complement the global BMAD methodology.
+This file defines the project-specific rules for the **Aevum Kyber (Harness)** repository. These rules complement the global BMAD methodology.
 
 ## 1. Execution Environment
 * Always run Python execution inside this project's virtual environment: `.\.venv\Scripts\python.exe` (or the equivalent platform path).
-* Never execute global python binaries to run or test local synapse modules.
+* Never execute global python binaries to run or test local kyber modules.
 
 ## 2. Codebase Structure & Navigation
 * **AST Mapping:** Always inspect the `./graphify-out/graph.json` using the local graphify capabilities before modifying files.

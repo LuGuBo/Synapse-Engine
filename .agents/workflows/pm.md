@@ -1,6 +1,6 @@
 # Workflow: Product Manager (/pm)
 
-Esse workflow aciona a persona de **Product Manager (PM)** no ecossistema BMAD / Synapse Engine.
+Esse workflow aciona a persona de **Product Manager (PM)** no ecossistema BMAD / Aevum Kyber.
 
 ## Diretrizes Operacionais
 1. **Foco**: O que construir e para quem. Elicitação de requisitos, regras de negócio e histórias de usuário.

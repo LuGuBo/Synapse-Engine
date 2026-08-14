@@ -1,9 +1,9 @@
-# Technical Specification: Native MCP Server (`synapse-mcp-server`)
+# Technical Specification: Native MCP Server (`kyber-mcp-server`)
 
 ## 1. Overview & Architecture
-The **Synapse Engine Native MCP Server** is a lightweight, zero-dependency Node.js implementation of the **Model Context Protocol (MCP)** operating over `stdio` transport via **JSON-RPC 2.0**.
+The **Aevum Kyber Native MCP Server** is a lightweight, zero-dependency Node.js implementation of the **Model Context Protocol (MCP)** operating over `stdio` transport via **JSON-RPC 2.0**.
 
-It exposes AST graph topology querying (**Graphify**), BMAD governance telemetry (**TDD Gate & State**), OWASP security scanning, JIT skill discovery, and hardware acceleration routing to agents running in Antigravity IDE / Claude Desktop / Google Antigravity SDK with sub-millisecond execution and minimal token overhead.
+It exposes AST graph topology querying (**Graphify**), BMAD governance telemetry (**TDD Gate & State**), OWASP security scanning, JIT skill discovery, rate-limit quota monitoring, and hardware acceleration routing to agents running in Antigravity IDE / Claude Desktop / Google Antigravity SDK with sub-millisecond execution and minimal token overhead.
 
 ---
 
@@ -11,7 +11,7 @@ It exposes AST graph topology querying (**Graphify**), BMAD governance telemetry
 
 * **Transport:** Stdio (`process.stdin` / `process.stdout`)
 * **Format:** JSON-RPC 2.0 per line (newline-delimited JSON)
-* **Executable:** `bin/synapse-mcp-server.js`
+* **Executable:** `bin/synapse-mcp-server.js` (CLI command: `kyber mcp`)
 * **MCP Protocol Version:** `2024-11-05`
 
 ---
@@ -87,7 +87,7 @@ The server exposes **registered tools** with standardized behavioral annotations
 * **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
 ### 12. `synapse_hardware_status`
-* **Description:** Detects CPU/GPU specifications and active hardware acceleration provider (DirectML, NPU, CUDA).
+* **Description:** Detects CPU/GPU specifications and active hardware acceleration provider (DirectML, CUDA).
 * **Arguments (`inputSchema`):** None.
 * **Annotations:** `readOnlyHint: true`, `idempotentHint: true`, `destructiveHint: false`.
 
@@ -114,7 +114,7 @@ The server exposes static and dynamic resources minified at runtime for maximum 
 
 ## 5. Integration with Google Antigravity SDK
 
-To connect `synapse-mcp-server` to autonomous agents using the **Google Antigravity SDK**:
+To connect `aevum-kyber` MCP server to autonomous agents using the **Google Antigravity SDK**:
 
 ### Python SDK Example:
 ```python
@@ -138,7 +138,7 @@ policies = [
 config = LocalAgentConfig(mcp_servers=mcp_servers, policies=policies)
 
 async with Agent(config) as agent:
-    response = await agent.chat("Check dependencies for bin/synapse-cli.js via MCP.")
+    response = await agent.chat("Check dependencies for bin/kyber-cli.js via MCP.")
     print(await response.text())
 ```
 
@@ -158,9 +158,10 @@ async with Agent(config) as agent:
 
 ```bash
 # Start Stdio server manually
+kyber mcp
+# or
 node bin/synapse-mcp-server.js
 
 # Execute Jest unit test and benchmark suite
 npx jest tests/synapse_mcp_benchmark.test.js
 ```
-

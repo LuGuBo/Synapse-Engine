@@ -4,7 +4,7 @@ This workflow defines the operational steps for using the **GitHub MCP Server** 
 
 ## Prerequisites
 - A valid `GITHUB_TOKEN` or `GITHUB_PERSONAL_ACCESS_TOKEN` must be available in the OS environment.
-- The repository must be configured on GitHub (e.g., `LuGuBo/Aevum-Oikos` or `LuGuBo/Synapse-Engine`).
+- The repository must be configured on GitHub (e.g., `LuGuBo/Aevum-Oikos` or `LuGuBo/aevum-kyber`).
 
 ---
 

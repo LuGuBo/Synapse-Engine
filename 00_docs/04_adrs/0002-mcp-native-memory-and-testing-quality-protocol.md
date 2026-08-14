@@ -14,7 +14,7 @@ decision_maker: AI Agent & Software Architect
 
 ## Decision Outcome
 
-* **Chosen Option**: Expand `bin/synapse-mcp-server.js` with 4 new tools (`graphify_get_path`, `graphify_get_subgraph`, `synapse_read_memory`, `synapse_sync_memory`), implement `synapse doctor` in `bin/synapse-cli.js`, and enforce `<RULE[anti_tautological_testing_protocol]>` across all project templates and global IDE rules.
+* **Chosen Option**: Expand `bin/synapse-mcp-server.js` with structured tools (`graphify_get_path`, `graphify_get_subgraph`, `synapse_read_memory`, `synapse_sync_memory`), implement `kyber doctor` / `synapse doctor` in CLI, and enforce `<RULE[anti_tautological_testing_protocol]>` across all project templates and global IDE rules.
 
 ### Consequences
 

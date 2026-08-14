@@ -49,9 +49,9 @@ The developer will create and work on the following file locations:
   * *Positive*: Integrated into the project's existing Node/Jest pipeline, allowing automatic TDD verification.
   * *Negative*: Relies on a local Python 3 interpreter being available in the testing path.
 
-### ADR-003: Native Stdio MCP Server (`synapse-mcp-server`)
+### ADR-003: Native Stdio MCP Server (`kyber-mcp-server`)
 * **Context**: Context inflation degrades AI performance. Reading full file dumps creates token overhead.
-* **Decision**: Provide 13 structured tools over JSON-RPC 2.0 via `stdio` using Node.js for sub-millisecond local IPC (<1ms).
+* **Decision**: Provide 19 structured tools over JSON-RPC 2.0 via `stdio` using Node.js for sub-millisecond local IPC (<1ms).
 * **Consequences**:
   * *Positive*: >99.9% token reduction for Graphify AST lookups and state management. Zero external web dependencies.
 
@@ -60,4 +60,3 @@ The developer will create and work on the following file locations:
 * **Decision**: Ultra-low latency IPC/AST/JSON operations route strictly to CPU (<0.5ms startup), while heavy batch/neural operations route to GPU (DirectML/CUDA) with automatic CPU fallback.
 * **Consequences**:
   * *Positive*: Prevents PCIe copy overhead on light tasks while preserving high parallel throughput for heavy workloads.
-

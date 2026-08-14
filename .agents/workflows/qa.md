@@ -1,6 +1,6 @@
 # Workflow: QA Engineer (/qa)
 
-Esse workflow aciona a persona de **QA Engineer (QA)** no ecossistema BMAD / Synapse Engine.
+Esse workflow aciona a persona de **QA Engineer (QA)** no ecossistema BMAD / Aevum Kyber.
 
 ## Diretrizes Operacionais
 1. **Foco**: Validação rigorosa dos Quality Gates (Gate 0: Sintaxe, Gate 1: Testes de Unidade/TDD, Gate 2: Integração).

@@ -1,4 +1,4 @@
-# 📊 Synapse Engine - Empirical Head-to-Head Benchmark Report
+# 📊 Aevum Kyber - Empirical Head-to-Head Benchmark Report
 
 **Version:** 2.2.0  
 **Test Suite:** `scripts/benchmark_head_to_head.js`  
@@ -8,13 +8,13 @@
 
 ## 🎯 Executive Summary
 
-This report documents the empirical performance, token context efficiency, IPC latency, and rate-limit prevention metrics of **Synapse Engine v2.2** compared against the traditional unmanaged baseline approach used by standard AI coding assistants.
+This report documents the empirical performance, token context efficiency, IPC latency, and rate-limit prevention metrics of **Aevum Kyber v2.2** compared against the traditional unmanaged baseline approach used by standard AI coding assistants.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                      HEAD-TO-HEAD EMPIRICAL BENCHMARK SUMMARY                          │
 ├───────────────────────────┬────────────────────────────┬───────────────────────────────┤
-│ Metric                    │ Without Synapse (Baseline) │ With Synapse Engine v2.2      │
+│ Metric                    │ Without Kyber (Baseline)   │ With Aevum Kyber v2.2         │
 ├───────────────────────────┼────────────────────────────┼───────────────────────────────┤
 │ Context Payload Size      │ 1,129.38 KB                │ 0.21 KB (99.98% reduction)    │
 │ Prompt Tokens Consumed    │ 289,121 tokens             │ 55 tokens (5,256.7x savings)  │
@@ -30,11 +30,11 @@ This report documents the empirical performance, token context efficiency, IPC l
 
 ### Methodology
 - **Scenario A (Baseline - Naive Dump / Recursive Grep):** The AI assistant ingests the full codebase context or parses entire files sequentially to map dependencies.
-- **Scenario B (Synapse Engine - Stdio AST MCP):** The AI assistant queries the Synapse MCP Server (`graphify_get_deps` / `graphify_get_subgraph`), which resolves AST nodes and call trees in memory.
+- **Scenario B (Aevum Kyber - Stdio AST MCP):** The AI assistant queries the Kyber MCP Server (`graphify_get_deps` / `graphify_get_subgraph`), which resolves AST nodes and call trees in memory.
 
 ### Empirical Results
 - **Baseline Context Size:** `1,129.38 KB` (~289,121 prompt tokens).
-- **Synapse MCP Response Size:** `0.21 KB` (55 prompt tokens).
+- **Kyber MCP Response Size:** `0.21 KB` (55 prompt tokens).
 - **Context Reduction:** **99.98%** (5,256.7x token savings).
 - **Roundtrip IPC Latency:** **0.189 milliseconds** over standard Stdio JSON-RPC 2.0.
 
@@ -45,7 +45,7 @@ This report documents the empirical performance, token context efficiency, IPC l
 ### Methodology
 A simulated burst of 10 mixed software development tasks (ranging from single-line linter fixes to multi-node database refactoring and Socratic architecture reviews) was executed under both paradigms:
 - **Scenario A (Unmanaged):** All requests hit flagship frontier models blindly. In burst conditions, requests quickly exceed provider RPM/RPD limits (e.g. Gemini 3.1 Pro 2 RPM / 50 RPD limit), resulting in HTTP 429 errors and interrupted sessions.
-- **Scenario B (Synapse Quota Guard):** The `TaskWeightEstimator` classifies each task's complexity on a 1-10 scale and dynamically selects the optimal model based on sliding window consumption (60s / 24h).
+- **Scenario B (Kyber Quota Guard):** The `TaskWeightEstimator` classifies each task's complexity on a 1-10 scale and dynamically selects the optimal model based on sliding window consumption (60s / 24h).
 
 ### Empirical Results
 - **Total Burst Tasks:** 10
@@ -61,7 +61,7 @@ A simulated burst of 10 mixed software development tasks (ranging from single-li
 ### Methodology
 Attempting to commit modified production code in `src/` without corresponding unit tests:
 - **Baseline:** Commit is accepted without verification. Unverified regressions enter the codebase.
-- **Synapse Engine:** The pre-commit hook (`bin/tdd-gate.js`) blocks the commit deterministically with exit code 1, requiring paired test files (`test_*.py`, `*.test.js`) and verifying state machine flags before Git commits are authorized.
+- **Aevum Kyber:** The pre-commit hook (`bin/tdd-gate.js` / `kyber tdd`) blocks the commit deterministically with exit code 1, requiring paired test files (`test_*.py`, `*.test.js`) and verifying state machine flags before Git commits are authorized.
 
 ---
 

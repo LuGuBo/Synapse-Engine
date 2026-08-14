@@ -1,6 +1,6 @@
 # Specification: Custom Skill "grill-and-evolve"
 
-This document defines the functional requirements for the custom skill `grill-and-evolve` under the BMAD Harness framework.
+This document defines the functional requirements for the custom skill `grill-and-evolve` under the Aevum Kyber Harness framework.
 
 ## 🎯 Product Goals
 * Extend agent capabilities in the Antigravity 2.0 ecosystem to perform project codebase audits, evaluate strategic niche viability, and enforce Andrej Karpathy's software design simplicity guidelines.

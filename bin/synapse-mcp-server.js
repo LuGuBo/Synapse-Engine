@@ -16,15 +16,15 @@ const { getHardwareStatus } = require('./hardware-selector');
 
 // Operational paths dynamic getters
 function getRootDir() {
-  return process.env.SYNAPSE_WORKSPACE_ROOT || process.cwd();
+  return process.env.KYBER_WORKSPACE_ROOT || process.env.SYNAPSE_WORKSPACE_ROOT || process.cwd();
 }
 
 function getGraphPath() {
-  return process.env.SYNAPSE_GRAPH_PATH || path.join(getRootDir(), 'graphify-out', 'graph.json');
+  return process.env.KYBER_GRAPH_PATH || process.env.SYNAPSE_GRAPH_PATH || path.join(getRootDir(), 'graphify-out', 'graph.json');
 }
 
 function getStatePath() {
-  return process.env.SYNAPSE_STATE_PATH || path.join(getRootDir(), '.agents', 'state.json');
+  return process.env.KYBER_STATE_PATH || process.env.SYNAPSE_STATE_PATH || path.join(getRootDir(), '.agents', 'state.json');
 }
 
 let loadedGraph = null;
@@ -495,7 +495,8 @@ function handleReadMemory(category, noteName) {
   }
 
   const rootDir = getRootDir();
-  const vaultDir = process.env.SYNAPSE_VAULT_PATH ? path.join(process.env.SYNAPSE_VAULT_PATH, targetCategory) : path.join(rootDir, '.obsidian-vault', targetCategory);
+  const rawVault = process.env.KYBER_VAULT_PATH || process.env.SYNAPSE_VAULT_PATH;
+  const vaultDir = rawVault ? path.join(rawVault, targetCategory) : path.join(rootDir, '.obsidian-vault', targetCategory);
   if (!fs.existsSync(vaultDir)) {
     return { error: `Obsidian Vault category directory does not exist: ${vaultDir}` };
   }
@@ -535,7 +536,7 @@ function handleReadMemory(category, noteName) {
  */
 function handleSyncMemory() {
   const rootDir = getRootDir();
-  const vaultDir = process.env.SYNAPSE_VAULT_PATH || path.join(rootDir, '.obsidian-vault');
+  const vaultDir = process.env.KYBER_VAULT_PATH || process.env.SYNAPSE_VAULT_PATH || path.join(rootDir, '.obsidian-vault');
   const permDir = path.join(vaultDir, 'permanent');
   const chatsDir = path.join(vaultDir, 'chats');
 

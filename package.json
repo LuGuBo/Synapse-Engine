@@ -1,20 +1,20 @@
 {
-  "name": "@lugubo/synapse-engine",
+  "name": "@lugubo/aevum-kyber",
   "version": "2.2.12",
   "description": "High-Performance AI Coding Agent Governance & Rate-Limit Harness for Claude Code, Cursor, and Gemini. AST Knowledge Graph MCP Server with sliding-window quota guard and TDD gates.",
   "main": "index.js",
   "bin": {
-    "synapse": "bin/synapse-cli.js"
+    "kyber": "bin/kyber-cli.js"
   },
   "author": "LuGuBo (Synapse Dev Team)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LuGuBo/Synapse-Engine.git"
+    "url": "https://github.com/LuGuBo/aevum-kyber.git"
   },
-  "homepage": "https://github.com/LuGuBo/Synapse-Engine#readme",
+  "homepage": "https://github.com/LuGuBo/aevum-kyber#readme",
   "bugs": {
-    "url": "https://github.com/LuGuBo/Synapse-Engine/issues"
+    "url": "https://github.com/LuGuBo/aevum-kyber/issues"
   },
   "publishConfig": {
     "access": "public"
@@ -56,11 +56,11 @@
   ],
   "scripts": {
     "test": "jest",
-    "harness:status": "node bin/synapse-cli.js status",
-    "harness:tdd": "node bin/synapse-cli.js tdd",
-    "harness:graphify": "node bin/synapse-cli.js graphify",
-    "harness:graphify:update": "node bin/synapse-cli.js graphify",
-    "harness:mcp": "node bin/synapse-cli.js mcp",
+    "harness:status": "node bin/kyber-cli.js status",
+    "harness:tdd": "node bin/kyber-cli.js tdd",
+    "harness:graphify": "node bin/kyber-cli.js graphify",
+    "harness:graphify:update": "node bin/kyber-cli.js graphify",
+    "harness:mcp": "node bin/kyber-cli.js mcp",
     "harness:sync-memory": "powershell -File ./scripts/sync-memory.ps1",
     "release": "node scripts/release.js"
   },

@@ -6,7 +6,7 @@ from typing import Dict, Any, Optional
 
 class HardwareSelector:
     """
-    Dynamic Hardware Selector for Synapse Engine.
+    Dynamic Hardware Selector for Aevum Kyber.
     Routes execution to CPU, GPU, or NPU based on workload classification, payload size,
     and available hardware acceleration providers (DirectML, CUDA, OpenVINO, VitisAI, etc.).
     """

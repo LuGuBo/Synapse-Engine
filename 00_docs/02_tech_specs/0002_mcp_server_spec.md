@@ -1,16 +1,16 @@
-# Tech Spec 0002: Synapse MCP Server & Anti-Tautological Testing Harness
+# Tech Spec 0002: Aevum Kyber MCP Server & Anti-Tautological Testing Harness
 
 ## 1. Executive Summary
 
-This technical specification details the architecture, stdio JSON-RPC tool interfaces, memory synchronization layer, and testing quality protocols of the **Synapse Engine MCP Server** (`bin/synapse-mcp-server.js`).
+This technical specification details the architecture, stdio JSON-RPC tool interfaces, memory synchronization layer, and testing quality protocols of the **Aevum Kyber MCP Server** (`bin/synapse-mcp-server.js` / `aevum-kyber mcp`).
 
 ## 2. Architecture & Stdio Transport
 
-The Synapse MCP Server runs as a zero-dependency lightweight stdio process (`JSON-RPC 2.0`). It exposes AST graph navigation, persona state management, secret scanning, skill search, hardware device selection, and declarative memory access directly to AI agents.
+The Aevum Kyber MCP Server runs as a zero-dependency lightweight stdio process (`JSON-RPC 2.0`). It exposes AST graph navigation, persona state management, secret scanning, skill search, hardware device selection, and declarative memory access directly to AI agents.
 
 ```
 +-------------------+        stdio JSON-RPC IPC       +-----------------------------+
-| AI Agent / IDE    | <=============================> | bin/synapse-mcp-server.js   |
+| AI Agent / IDE    | <=============================> | Aevum Kyber MCP Server      |
 +-------------------+                                 +-----------------------------+
                                                                   |
                                        +--------------------------+--------------------------+
@@ -19,7 +19,7 @@ The Synapse MCP Server runs as a zero-dependency lightweight stdio process (`JSO
                            graphify-out/graph.json        .agents/state.json       .obsidian-vault/
 ```
 
-## 3. Tool Registry Matrix (17 Registered Tools)
+## 3. Tool Registry Matrix (19 Registered Tools)
 
 | Tool Name | Scope | Description |
 | :--- | :--- | :--- |
@@ -40,10 +40,12 @@ The Synapse MCP Server runs as a zero-dependency lightweight stdio process (`JSO
 | `synapse_select_device` | Compute | Selects optimal execution device (CPU vs GPU) dynamically. |
 | `synapse_read_memory` | Vault Memory | Reads or lists declarative memory notes from `.obsidian-vault/`. |
 | `synapse_sync_memory` | Vault Memory | Synchronizes Obsidian Vault folders and graphify directory junction links. |
+| `synapse_get_quota_status` | Quota Guard | Returns sliding-window RPM/RPD consumption and headroom. |
+| `synapse_estimate_task_weight` | Quota Guard | Classifies task complexity (1-10) and recommends optimal model tier. |
 
 ## 4. Anti-Tautological Quality Protocol (`<RULE[anti_tautological_testing_protocol]>`)
 
-All tests written for the Synapse Engine must strictly adhere to the Triple Vector Validation Directive:
+All tests written for Aevum Kyber must strictly adhere to the Triple Vector Validation Directive:
 - **Vector A (Real Positive Flow)**: Production-like structured payloads, real graph connections, real disk file persistence.
 - **Vector B (Edge & Error Handling)**: Null/empty inputs, non-existent files, disconnected nodes, asserting controlled `isError: true` without process crashes.
 - **Vector C (State Integrity Verification)**: Verifying physical file mutations on disk (`.agents/state.json`, `.obsidian-vault/`).

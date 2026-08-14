@@ -2,8 +2,8 @@
 name: local-guardrails-policy
 description: Local coding style guardrails and quality policies. Enforces strict exception handling audits and TDD loop compliance.
 scope: local
-project: synapse-engine
-author: Synapse Dev Team
+project: aevum-kyber
+author: Aevum Dev Team
 origin: proprietary
 watermark: lugubo:proprietary
 always_on: true

@@ -1,4 +1,4 @@
-# ⚡ Synapse Engine
+# ⚡ Aevum Kyber (@lugubo/aevum-kyber)
 
 > **The Ultimate AI Coding Agent Governance & Rate-Limit Harness**  
 > *Sub-millisecond AST Knowledge Graph MCP Server (99.98% token reduction), sliding-window rate-limit quota guard, deterministic TDD quality gates, and cross-ecosystem agent governance.*
@@ -8,19 +8,19 @@
 <div align="center">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![NPM Scoped Package](https://img.shields.io/badge/npm-@lugubo/synapse--engine-CB3837?logo=npm)](https://www.npmjs.com/package/@lugubo/synapse-engine)
+[![NPM Scoped Package](https://img.shields.io/badge/npm-@lugubo/aevum--kyber-CB3837?logo=npm)](https://www.npmjs.com/package/@lugubo/aevum-kyber)
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.1_Flash_%26_Pro_Ready-4285F4?logo=google)](https://ai.google.dev/)
 [![Antigravity IDE](https://img.shields.io/badge/Antigravity_IDE-Native_Harness-8A2BE2)](https://antigravity.google)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-MCP_Compatible-D97706?logo=anthropic)](https://claude.ai)
 [![Cursor & Windsurf](https://img.shields.io/badge/Cursor_%26_Windsurf-Plug_%26_Play-00ADD8)](https://cursor.com)
 [![Architecture: Markdown-Driven](https://img.shields.io/badge/Architecture-Markdown--Driven-000000?logo=markdown)](https://daringfireball.net/projects/markdown/)
-[![Tests](https://img.shields.io/badge/Tests-100%25_Passing-brightgreen.svg)](https://github.com/LuGuBo/Synapse-Engine)
+[![Tests](https://img.shields.io/badge/Tests-100%25_Passing-brightgreen.svg)](https://github.com/LuGuBo/aevum-kyber)
 
 </div>
 
 ---
 
-## 💡 Why Synapse Engine?
+## 💡 Why Aevum Kyber?
 
 Autonomous AI coding agents (Claude Code, Cursor, Windsurf, Gemini CLI, Copilot Workspace) are transforming software engineering. However, in real-world production repositories, unmanaged agents suffer from four major points of failure:
 
@@ -29,15 +29,15 @@ Autonomous AI coding agents (Claude Code, Cursor, Windsurf, Gemini CLI, Copilot 
 3. **Untested Hallucinations & Regressions:** Agents frequently modify production code without writing tests, introducing regressions into the codebase.
 4. **Context Amnesia & Vendor Lock-in:** Ephemeral chat sessions lose memory, while proprietary agent databases lock you into closed platforms.
 
-**Synapse Engine** solves all four challenges in a single, high-performance, modular harness.
+**Aevum Kyber** solves all four challenges in a single, high-performance, modular harness.
 
 ---
 
 ## 📊 Empirical Head-to-Head Benchmark Results
 
-In rigorous A/B stress testing (`scripts/benchmark_head_to_head.js`), Synapse Engine demonstrated overwhelming superiority over standard unmanaged agents:
+In rigorous A/B stress testing (`scripts/benchmark_head_to_head.js`), Aevum Kyber demonstrated overwhelming superiority over standard unmanaged agents:
 
-| Metric | Without Synapse (Baseline) | With Synapse Engine v2.2 | Advantage |
+| Metric | Without Kyber (Baseline) | With Aevum Kyber v2.2 | Advantage |
 | :--- | :--- | :--- | :--- |
 | **Context Payload Size** | `1,129.38 KB` | `0.21 KB` | **99.98% payload reduction** |
 | **Prompt Tokens Consumed** | `289,121 tokens` | `55 tokens` | **5,256.7x token savings** |
@@ -54,11 +54,11 @@ node scripts/benchmark_head_to_head.js
 
 ## 🧩 The 4 Modular Pillars (Opt-in Architecture)
 
-Synapse Engine is completely modular. Install only what your project needs:
+Aevum Kyber is completely modular. Install only what your project needs:
 
 ```
                                   ┌────────────────────────┐
-                                  │     SYNAPSE ENGINE     │
+                                  │      AEVUM KYBER       │
                                   └───────────┬────────────┘
          ┌──────────────────┬─────────────────┼──────────────────┬──────────────────┐
          ▼                  ▼                 ▼                  ▼                  ▼
@@ -73,7 +73,7 @@ Synapse Engine is completely modular. Install only what your project needs:
 Standard Model Context Protocol (MCP) server providing 19 high-performance Stdio tools (`graphify_get_deps`, `graphify_get_subgraph`, `graphify_get_god_nodes`, `hardware_status`, `secrets_scan`). Lets AI agents query AST dependency trees in **0.18 ms** instead of scanning thousands of lines of raw code.
 
 ### 2. 🛡️ Sliding-Window Quota Guard & Telemetry Dashboard
-Continuous rate-limit protection for Google Gemini and frontier models. Features a **1-10 Task Weight Classifier** with dynamic fallback routing (routes lightweight tasks to Gemini 3.1 Flash Lite with 500 RPD budget, reserving Gemini 3.1 Pro Thinking for heavy architectural work). Includes a sleek dark-mode local web dashboard (`synapse quota dashboard`).
+Continuous rate-limit protection for Google Gemini and frontier models. Features a **1-10 Task Weight Classifier** with dynamic fallback routing (routes lightweight tasks to Gemini 3.1 Flash Lite with 500 RPD budget, reserving Gemini 3.1 Pro Thinking for heavy architectural work). Includes a sleek dark-mode local web dashboard (`kyber quota dashboard`).
 
 ### 3. 🧪 Deterministic TDD Quality Gates
 A pre-commit verification engine (`tdd-gate.js`) that blocks untested commits at the Git level. Enforces test pairing across Python (`test_*.py`), TypeScript/JavaScript (`*.test.ts`, `*.spec.js`), Go, and Rust.
@@ -85,7 +85,7 @@ Clean-room persona handoffs (PM, Architect, Developer, QA Engineer) operating on
 
 ## 🌉 The Cross-Ecosystem Bridge (Gemini ↔ Claude ↔ Cursor)
 
-Born and battle-tested in the **Google Gemini & Antigravity IDE** ecosystem and built on Anthropic's open **Model Context Protocol (MCP)**, Synapse Engine bridges high-throughput Gemini rate-limits with standard agentic IDEs:
+Born and battle-tested in the **Google Gemini & Antigravity IDE** ecosystem and built on Anthropic's open **Model Context Protocol (MCP)**, Aevum Kyber bridges high-throughput Gemini rate-limits with standard agentic IDEs:
 
 * **Google Gemini & Antigravity IDE:** Ultra-low token pricing (Gemini 3.1 Flash Lite), massive context caching alignment (`GEMINI.md` static layout), and local GCP project quota tracking.
 * **Anthropic Claude Code & Cursor:** Universal Stdio JSON-RPC 2.0 protocol, `.cursor/mcp.json`, and autonomous terminal workflows.
@@ -95,7 +95,7 @@ Born and battle-tested in the **Google Gemini & Antigravity IDE** ecosystem and 
 
 ## 📝 Markdown-Driven Architecture (Executable Agent Memory)
 
-In Synapse Engine, **Markdown is not just documentation — it is executable agent memory and deterministic state coordination**:
+In Aevum Kyber, **Markdown is not just documentation — it is executable agent memory and deterministic state coordination**:
 
 * **Zero Vendor Lock-in:** No proprietary binary databases or hidden cloud lock-in. Everything resides in human-readable `.md` files.
 * **Context Caching Optimized:** Structured rules (`GEMINI.md`, `AGENTS.md`) use fixed layouts to maximize prompt cache hits.
@@ -109,16 +109,16 @@ In Synapse Engine, **Markdown is not just documentation — it is executable age
 
 ```bash
 # Option A: Quota Guard & Local Dashboard only
-npx -y @lugubo/synapse-engine init --preset=quota
+npx -y @lugubo/aevum-kyber init --preset=quota
 
 # Option B: AST Knowledge Graph MCP Server only (Cursor / Claude / VSCode)
-npx -y @lugubo/synapse-engine init --preset=mcp
+npx -y @lugubo/aevum-kyber init --preset=mcp
 
 # Option C: Deterministic TDD Pre-Commit Gate only
-npx -y @lugubo/synapse-engine init --preset=tdd
+npx -y @lugubo/aevum-kyber init --preset=tdd
 
 # Option D: Full BMAD Agent Governance Suite
-npx -y @lugubo/synapse-engine init --preset=full
+npx -y @lugubo/aevum-kyber init --preset=full
 ```
 
 ---
@@ -130,9 +130,9 @@ Add to your project's `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "synapse-engine": {
+    "aevum-kyber": {
       "command": "npx",
-      "args": ["-y", "@lugubo/synapse-engine", "mcp"]
+      "args": ["-y", "@lugubo/aevum-kyber", "mcp"]
     }
   }
 }
@@ -141,7 +141,7 @@ Add to your project's `.cursor/mcp.json`:
 #### 🟠 Claude Code (Anthropic CLI)
 Run in your terminal:
 ```bash
-claude mcp add synapse-engine -- npx -y @lugubo/synapse-engine mcp
+claude mcp add aevum-kyber -- npx -y @lugubo/aevum-kyber mcp
 ```
 
 #### 🔵 VS Code / Copilot
@@ -149,9 +149,9 @@ Add to `.vscode/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "synapse-engine": {
+    "aevum-kyber": {
       "command": "npx",
-      "args": ["-y", "@lugubo/synapse-engine", "mcp"]
+      "args": ["-y", "@lugubo/aevum-kyber", "mcp"]
     }
   }
 }
@@ -161,22 +161,22 @@ Add to `.vscode/mcp.json`:
 
 ## 💻 CLI Commands Reference
 
-Once installed, use the global `synapse` command:
+Once installed, use the global `kyber` command:
 
 ```bash
 # Quota & Telemetry
-synapse quota dashboard      # Launch real-time telemetry HTML dashboard in browser
-synapse quota status         # Inspect active 60-second and 24-hour sliding windows
-synapse quota estimate       # Estimate task weight (1-10) and recommended model tier
+kyber quota dashboard      # Launch real-time telemetry HTML dashboard in browser
+kyber quota status         # Inspect active 60-second and 24-hour sliding windows
+kyber quota estimate       # Estimate task weight (1-10) and recommended model tier
 
 # MCP & Codebase Knowledge
-synapse mcp                  # Start Stdio MCP Server (JSON-RPC 2.0)
-synapse graphify             # Generate/update AST knowledge graph in background
+kyber mcp                  # Start Stdio MCP Server (JSON-RPC 2.0)
+kyber graphify             # Generate/update AST knowledge graph in background
 
 # Governance & Quality Gates
-synapse tdd                  # Execute pre-commit TDD code verification
-synapse status               # Check BMAD persona states and validation flags
-synapse doctor               # Run autodiagnostic environment health check
+kyber tdd                  # Execute pre-commit TDD code verification
+kyber status               # Check BMAD persona states and validation flags
+kyber doctor               # Run autodiagnostic environment health check
 ```
 
 ---
@@ -188,5 +188,5 @@ Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
 ```text
 MIT License
 
-Copyright (c) 2026 LuGuBo (Synapse Dev Team)
+Copyright (c) 2026 LuGuBo (Aevum Dev Team)
 ```

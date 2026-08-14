@@ -11,7 +11,7 @@ module.exports = {
   version: packageJson.version,
   name: packageJson.name,
   paths: {
-    cli: require.resolve('./bin/synapse-cli.js'),
+    cli: require.resolve('./bin/kyber-cli.js'),
     mcpServer: require.resolve('./bin/synapse-mcp-server.js'),
     tddGate: require.resolve('./bin/tdd-gate.js'),
     stateManager: require.resolve('./bin/state-manager.js'),

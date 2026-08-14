@@ -1,4 +1,4 @@
-# 🌐 Synapse Engine Global Setup Guide
+# 🌐 Aevum Kyber Global Setup Guide
 
 This guide describes the operation of the global IDE governance system and details how to manually configure the ecosystem, ensuring full control over machine configurations.
 
@@ -20,7 +20,7 @@ The AI agent (Antigravity) manages global rules loaded upon the **first context 
 
 To keep the ecosystem modular and decoupled, all offline tools and domain guides (e.g., `postgres-best-practices`, `qa`, `senior-architect`) reside in a system-wide shared directory.
 
-By default, Synapse evaluates the **`AG_SKILLS_PATH`** environment variable to locate this directory. If unset, standard fallbacks apply:
+By default, Kyber evaluates the **`AG_SKILLS_PATH`** environment variable to locate this directory. If unset, standard fallbacks apply:
 *   **Windows:** `C:\ag-skills\`
 *   **Unix/macOS:** `~/ag-skills/`
 
@@ -30,7 +30,7 @@ This directory should be treated as an **independent Git repository**. It can be
 
 ## 🛠️ 3. Manual Setup Step-by-Step (CLI Alternative)
 
-If you prefer not to use the automated `synapse setup --global` command, execute manual setup via the following steps:
+If you prefer not to use the automated `kyber init --preset=full` command, execute manual setup via the following steps:
 
 ### Step A: Directory Structure Creation
 1.  Navigate to `C:\Users\<Your-Username>\` and create `.gemini` if missing.
@@ -82,4 +82,3 @@ To confirm setup completion (manual or automated via CLI), start a new IDE chat 
 > *"Which offline skills are registered in your central scope?"*
 
 The agent will respond based on the skills indexed in `C:\ag-skills\ag_master_index\SKILL.md`.
-

@@ -5,15 +5,15 @@ import sys
 # Ensure src directory is in path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
-from synapse_forge import SynapseEngineHybridEngine
+from kyber_forge import KyberHybridEngine
 
-class TestSynapseForge(unittest.TestCase):
+class TestKyberForge(unittest.TestCase):
     def test_hybrid_engine_init(self):
-        engine = SynapseEngineHybridEngine()
+        engine = KyberHybridEngine()
         self.assertEqual(engine.local_dir.name, "skills")
 
     def test_parse_frontmatter_complex(self):
-        engine = SynapseEngineHybridEngine()
+        engine = KyberHybridEngine()
         yaml_sample = """---
 name: test-skill
 url: https://github.com/test/repo:v1 # repo url
@@ -30,5 +30,3 @@ scope: global
 
 if __name__ == '__main__':
     unittest.main()
-
-

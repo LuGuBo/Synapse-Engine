@@ -2,8 +2,8 @@ const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-describe('synapse_forge.py integration tests', () => {
-  const scriptPath = path.join(__dirname, '..', 'src', 'synapse_forge.py');
+describe('kyber_forge.py integration tests', () => {
+  const scriptPath = path.join(__dirname, '..', 'src', 'kyber_forge.py');
 
   const runPythonScript = (args = '') => {
     // Try virtual environment python executable first
@@ -36,8 +36,8 @@ describe('synapse_forge.py integration tests', () => {
     }
   };
 
-  test('should execute synapse_forge.py successfully and generate all scaffolding', () => {
-    // Run the synapse_forge.py provisioner
+  test('should execute kyber_forge.py successfully and generate all scaffolding', () => {
+    // Run the kyber_forge.py provisioner
     const result = runPythonScript();
     
     // It should run without error (exit code 0)

@@ -12,7 +12,7 @@ To eliminate sycophancy, identity-driven confirmation bias, and context bloat ac
 ## 3. Clean-Room Persona Handoffs (Zero Context Leakage)
 Every persona invocation MUST operate with an isolated, fresh context window:
 1. **PM Phase (Product Manager):** Dispatches subagent with user requirements and `workspace_knowledge.md` to produce `SPEC.md`.
-2. **Architect Phase:** Dispatches subagent with `SPEC.md` and AST graph context (`graphify query`) to produce `implementation_plan.md` with explicit `surgical_targets`.
+2. **Architect Phase:** Dispatches subagent with `SPEC.md` and AST graph context (`graphify query` / `kyber graphify`) to produce `implementation_plan.md` with explicit `surgical_targets`.
 3. **Developer Phase:** Dispatches subagent with `PLAN.md` to write source code and passing unit tests in `.playground/` or surgical target files.
 4. **QA Engineer Phase (Adversarial):** Dispatches subagent with source code, tests, `SPEC.md`, and the `anti-sycophancy` skill. The QA subagent MUST NOT inherit the Developer's conversation history or `PLAN.md` rascunhos. It evaluates the implementation against `SPEC.md` with zero performative validation.
 

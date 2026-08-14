@@ -9,9 +9,9 @@ madr_version: 4.0.0
 
 AI-governed software engineering is passing through a critical inflection point. The industry has evolved beyond stochastic code generation—characterized by models operating as simple autocomplete assistants—entering the architectural era of Agent Orchestration and Harness Engineering. In this new paradigm, the central bottleneck of software development no longer resides in the typing speed of syntactic implementations, but rather in system design sophistication, relentless token context window management, operational guardrail definition, automated review cycles, and environment practices allowing foundation models to operate with reliable, repeatable autonomy.
 
-This document constitutes an exhaustive technical report dissecting the Breakthrough Method for AI-Driven Development (BMAD) ecosystem, tracing its maturation from early methodological foundations under restrictive CCDAF systems, through the iterative heuristics of the `grill-and-evolve` skill, up to its current consolidated state in the **Synapse Engine** project (formerly known as `bmadharness`). The purpose of this report is to provide a high-density conceptual and practical framework—an infrastructural "metaprompt"—designed for direct ingestion by Agentic IDEs, with deliberate focus on Google Antigravity and Claude Code integration capabilities.
+This document constitutes an exhaustive technical report dissecting the Breakthrough Method for AI-Driven Development (BMAD) ecosystem, tracing its maturation from early methodological foundations under restrictive CCDAF systems, through the iterative heuristics of the `grill-and-evolve` skill, up to its current consolidated state in the **Aevum Kyber** project (formerly known as `Synapse Engine` / `bmadharness`). The purpose of this report is to provide a high-density conceptual and practical framework—an infrastructural "metaprompt"—designed for direct ingestion by Agentic IDEs, with deliberate focus on Google Antigravity and Claude Code integration capabilities.
 
-The following in-depth analysis resolves a pressing architectural dilemma: balancing a global Harness configuration—applied universally and economically across all user projects—with the vast knowledge base of the core reference repository (Synapse Engine). The goal is preventing this repository from becoming context bloatware, transforming it instead into a dynamic, continuous-state skill forge orchestrated to ensure maximum coding efficiency and radical rework mitigation.
+The following in-depth analysis resolves a pressing architectural dilemma: balancing a global Harness configuration—applied universally and economically across all user projects—with the vast knowledge base of the core reference repository (Aevum Kyber). The goal is preventing this repository from becoming context bloatware, transforming it instead into a dynamic, continuous-state skill forge orchestrated to ensure maximum coding efficiency and radical rework mitigation.
 
 ## **1. Paradigm and Philosophy of Harness Engineering**
 
@@ -43,8 +43,8 @@ To combat CCDAF rigidity, prompt engineering evolved the `grill-and-evolve` skil
 ### **2.3. Phase 3: BMAD Method Consolidation**
 The BMAD Method abandoned single infinite prompts, transforming software development into a structured, asynchronous assembly line based on specialized roles (Product Manager, Architect, Developer, QA, UX Expert, Scrum Master) with explicit handoffs. State persistence was moved outside the LLM into local filesystem Markdown files (`.agents/`), eliminating prompt drift. `AGENTS.md` became the long-term memory of the unified agent.
 
-### **2.4. Phase 4: Conceptual Crossroads & Synapse Engine**
-The evolution culminated in the **Synapse Engine** repository. Google Antigravity introduced granular Skills Management (Global vs Workspace scoping). Synapse Engine resolves the conceptual crossroads by operating as a **Parametric Skill Forge**: acting globally as a lightweight behavioral router while injecting heavy domain skills and quality gates into target local workspaces on demand.
+### **2.4. Phase 4: Conceptual Crossroads & Aevum Kyber**
+The evolution culminated in the **Aevum Kyber** repository. Google Antigravity introduced granular Skills Management (Global vs Workspace scoping). Aevum Kyber resolves the conceptual crossroads by operating as a **Parametric Skill Forge**: acting globally as a lightweight behavioral router while injecting heavy domain skills and quality gates into target local workspaces on demand.
 
 ## **3. Hybrid Architecture: Global Routing & Local Injection**
 
@@ -76,10 +76,10 @@ Project-specific business constraints live in `.agents/skills/` with `always_on:
 
 ## **5. Topological Graph Optimization: Graphify Integration**
 
-Synapse Engine mandates deep integration with **Graphify**. Graphify parses codebase files locally using Tree-sitter (zero API cost), constructing persistent 3D Knowledge Graph files in `graphify-out/graph.json`. Instead of reading whole files, agents navigate AST subgraphs, yielding up to 70x token cost reductions.
+Aevum Kyber mandates deep integration with **Graphify**. Graphify parses codebase files locally using Tree-sitter (zero API cost), constructing persistent 3D Knowledge Graph files in `graphify-out/graph.json`. Instead of reading whole files, agents navigate AST subgraphs, yielding up to 70x token cost reductions.
 
 ## **6. Execution & Compliance Routines**
 
-For existing or legacy projects, Synapse Engine provides a non-destructive retrofit routine:
+For existing or legacy projects, Aevum Kyber provides a non-destructive retrofit routine:
 1. **Phase 1: Non-Destructive Audit (Read-Only)**: Scans directory structures and identifies missing taxonomy, MADR frontmatter, or unisolated guardrails.
 2. **Phase 2: Surgical Retrofit**: Creates numbered `00_docs/` taxonomy, injects local policy skills, and verifies system integrity via test suites.

@@ -7,11 +7,24 @@ const { execSync, fork } = require('child_process');
 const program = new Command();
 
 program
-  .name('synapse')
-  .description('Synapse Engine CLI - Governance Management, TDD Harness & Offline Skills')
-  .version('2.0.0');
+  .name('kyber')
+  .description('Aevum Kyber CLI - Governance Management, TDD Harness & Offline Skills')
+  .version('2.2.12');
 
-// Localização dos templates dentro do pacote synapse-engine instalado
+// Operational paths dynamic getters
+function getRootDir() {
+  return process.env.KYBER_WORKSPACE_ROOT || process.env.SYNAPSE_WORKSPACE_ROOT || process.cwd();
+}
+
+function getGraphPath() {
+  return process.env.KYBER_GRAPH_PATH || process.env.SYNAPSE_GRAPH_PATH || path.join(getRootDir(), 'graphify-out', 'graph.json');
+}
+
+function getStatePath() {
+  return process.env.KYBER_STATE_PATH || process.env.SYNAPSE_STATE_PATH || path.join(getRootDir(), '.agents', 'state.json');
+}
+
+// Localização dos templates dentro do pacote aevum-kyber instalado
 const TEMPLATES_DIR = path.resolve(__dirname, '../templates');
 const CORE_AGENTS_DIR = path.resolve(__dirname, '../core/agents');
 
@@ -50,7 +63,7 @@ function mergeRulesContent(existingContent, templateContent) {
   let updatedContent = existingContent;
 
   const defaultOldRules = {
-    local_governance: `\n# Local Governance Rules\n- All codebase file changes must be validated by the \`synapse tdd\` gate tool.\n- All work progress and active persona state transitions are tracked in \`.agents/state.json\`.\n- Every task delivery must include a \`walkthrough.md\` in Portuguese containing the **Agent & Skill Trace** audit table matching the agents/personas used and the skills loaded from the repository/workspace catalog.\n`,
+    local_governance: `\n# Local Governance Rules\n- All codebase file changes must be validated by the \`kyber tdd\` gate tool.\n- All work progress and active persona state transitions are tracked in \`.agents/state.json\`.\n- Every task delivery must include a \`walkthrough.md\` in Portuguese containing the **Agent & Skill Trace** audit table matching the agents/personas used and the skills loaded from the repository/workspace catalog.\n`,
     bmad_core: `\n# BMAD Core Methodology (Global AI Agent Rule)\n- Zero-Pollution: Your primary source of truth is the project's documentation. Do NOT rely on ephemeral chat history.\n- Read Before Coding: Before altering source code, you MUST actively search for and read the relevant specifications.\n- The Bilingual Rule: Chat with USER, walkthrough.md, implementation_plan.md in Portuguese (PT-BR). Code and everything else in English (EN-US).\n- Privacy & Security: NEVER hardcode API keys, passwords, or tokens in logs or code. All secrets reside in .env files.\n- Persona Shift Loop: PM -> Architect -> Developer -> QA using state.json local telemetry.\n`,
     bmad_jit_skills_protocol: `\n# Protocolo JIT-Skills (Seleção Inteligente de Habilidades Offline)\nO agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa ou nova tarefa complexa:\n1. Diagnóstico Cognitivo: Analisar se a tarefa envolve planejamento, código, testes, etc.\n2. Consulta ao Catálogo: Consultar o catálogo mestre de indexação utilizando a ferramenta correspondente.\n3. Carregamento Offline: Ler o arquivo SKILL.md correspondente de C:\\ag-skills\\<nome-da-skill>\\SKILL.md.\n4. Transparência: Notificar o usuário sobre quais habilidades offline foram incorporadas.\n`
   };
@@ -102,10 +115,10 @@ function createJunctionLink(target, linkPath) {
 program
   .command('init')
   .option('-p, --preset <type>', 'Modular preset to install: quota | mcp | tdd | full', 'full')
-  .description('Initializes Synapse Engine framework (Modular presets: quota, mcp, tdd, or full)')
+  .description('Initializes Aevum Kyber framework (Modular presets: quota, mcp, tdd, or full)')
   .action((options) => {
     const preset = (options.preset || 'full').toLowerCase();
-    console.log(`Initiating Synapse Engine initialization (Preset: '${preset}')...`);
+    console.log(`Initiating Aevum Kyber initialization (Preset: '${preset}')...`);
     const projectDir = process.cwd();
     const projectName = path.basename(projectDir);
     const dateStr = new Date().toISOString().split('T')[0];
@@ -139,13 +152,13 @@ program
         fs.writeFileSync(stateFile, JSON.stringify(stateObj, null, 2), 'utf8');
       }
       injectNpmScripts({
-        'quota:dashboard': 'synapse quota dashboard',
-        'quota:status': 'synapse quota status',
-        'quota:estimate': 'synapse quota estimate'
+        'quota:dashboard': 'kyber quota dashboard',
+        'quota:status': 'kyber quota status',
+        'quota:estimate': 'kyber quota estimate'
       });
-      console.log('\n🎉 Synapse Quota Guard initialized successfully!');
-      console.log('👉 Run "synapse quota dashboard" to launch your local real-time telemetry dashboard.');
-      console.log('👉 Run "synapse quota status" to inspect active 60s/24h sliding windows.\n');
+      console.log('\n🎉 Aevum Kyber Quota Guard initialized successfully!');
+      console.log('👉 Run "kyber quota dashboard" to launch your local real-time telemetry dashboard.');
+      console.log('👉 Run "kyber quota status" to inspect active 60s/24h sliding windows.\n');
       return;
     }
 
@@ -160,9 +173,9 @@ program
 
       const mcpConfig = {
         mcpServers: {
-          "synapse-graphify": {
+          "kyber-graphify": {
             command: "npx",
-            args: ["-y", "@lugubo/synapse-engine", "mcp"]
+            args: ["-y", "@lugubo/aevum-kyber", "mcp"]
           }
         }
       };
@@ -180,12 +193,12 @@ program
       }
 
       injectNpmScripts({
-        'harness:mcp': 'synapse mcp',
-        'harness:graphify': 'synapse graphify'
+        'harness:mcp': 'kyber mcp',
+        'harness:graphify': 'kyber graphify'
       });
-      console.log('\n🎉 Synapse MCP Server preset initialized successfully!');
+      console.log('\n🎉 Aevum Kyber MCP Server preset initialized successfully!');
       console.log('👉 For Cursor / Windsurf: .cursor/mcp.json is ready.');
-      console.log('👉 For Claude Code: run "claude mcp add synapse-graphify -- npx -y @lugubo/synapse-engine mcp".\n');
+      console.log('👉 For Claude Code: run "claude mcp add kyber-graphify -- npx -y @lugubo/aevum-kyber mcp".\n');
       return;
     }
 
@@ -201,10 +214,10 @@ program
         fs.writeFileSync(stateFile, JSON.stringify(stateObj, null, 2), 'utf8');
       }
       injectNpmScripts({
-        'harness:tdd': 'synapse tdd'
+        'harness:tdd': 'kyber tdd'
       });
-      console.log('\n🎉 Synapse TDD Quality Gate initialized successfully!');
-      console.log('👉 Run "synapse tdd" to execute deterministic pre-commit code integrity verification.\n');
+      console.log('\n🎉 Aevum Kyber TDD Quality Gate initialized successfully!');
+      console.log('👉 Run "kyber tdd" to execute deterministic pre-commit code integrity verification.\n');
       return;
     }
 
@@ -289,14 +302,14 @@ program
 
     // 5. Injetar scripts no package.json local
     injectNpmScripts({
-      'harness:tdd': 'synapse tdd',
-      'harness:status': 'synapse status',
-      'harness:graphify': 'synapse graphify',
-      'harness:mcp': 'synapse mcp',
+      'harness:tdd': 'kyber tdd',
+      'harness:status': 'kyber status',
+      'harness:graphify': 'kyber graphify',
+      'harness:mcp': 'kyber mcp',
       'harness:sync-memory': 'powershell -File ./scripts/sync-memory.ps1',
-      'quota:dashboard': 'synapse quota dashboard',
-      'quota:status': 'synapse quota status',
-      'quota:estimate': 'synapse quota estimate'
+      'quota:dashboard': 'kyber quota dashboard',
+      'quota:status': 'kyber quota status',
+      'quota:estimate': 'kyber quota estimate'
     });
 
     // 6. Criar estrutura de documentação (00_docs/)
@@ -363,7 +376,7 @@ decision_maker: AI Agent & Tech Lead
     if (graphifyInstalled) {
       console.log(`[INFO] Running first graphify update using cmd '${graphifyCmd}'...`);
       try {
-        execSync(`"${graphifyCmd}" update .`, { stdio: 'inherit' });
+        execSync(`"${graphifyCmd}" update .`, { stdio: 'inherit', cwd: projectDir });
         console.log('✅ Graphify mapping generated successfully.');
       } catch (e) {
         console.warn('⚠️ Graphify update run failed:', e.message);
@@ -421,19 +434,19 @@ decision_maker: AI Agent & Tech Lead
       console.log('✅ Added .obsidian-vault/ to .gitignore');
     }
 
-    console.log('🎉 Synapse Engine initialized successfully!');
+    console.log('🎉 Aevum Kyber initialized successfully!');
   });
 
 program
   .command('update')
   .description('Updates local Harness executables and core personas to latest version')
   .action(() => {
-    console.log('Updating Synapse Engine local components...');
-    const projectDir = process.cwd();
+    console.log('Updating Aevum Kyber local components...');
+    const projectDir = getRootDir();
     const localAgentsDir = path.resolve(projectDir, '.agents/agents');
     
     if (!fs.existsSync(localAgentsDir)) {
-      console.error('❌ Error: Synapse is not initialized in this project. Run "synapse init" first.');
+      console.error('❌ Error: Kyber is not initialized in this project. Run "kyber init" first.');
       process.exit(1);
     }
 
@@ -506,7 +519,7 @@ program
       }
     }
 
-    console.log('🎉 Synapse Engine local Harness updated successfully!');
+    console.log('🎉 Aevum Kyber local Harness updated successfully!');
   });
 
 program
@@ -515,7 +528,7 @@ program
   .option('--global', 'Executa o setup global na pasta do usuário')
   .action((options) => {
     if (!options.global) {
-      console.log('Please specify --global flag. Usage: synapse setup --global');
+      console.log('Please specify --global flag. Usage: kyber setup --global');
       process.exit(0);
     }
 
@@ -585,7 +598,7 @@ O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa 
       console.log(`[INFO] ${skillsDir} registry already exists in global skills.json. Skipping.`);
     }
 
-    // 3. Configurar mcp_config.json global para registrar o Synapse MCP Server
+    // 3. Configurar mcp_config.json global para registrar o Kyber MCP Server
     const geminiIdeDir = path.resolve(homeDir, '.gemini/antigravity-ide');
     fs.mkdirSync(geminiIdeDir, { recursive: true });
     const mcpConfigPath = path.resolve(geminiIdeDir, 'mcp_config.json');
@@ -599,12 +612,16 @@ O agente deve operar sob o seguinte fluxo cognitivo em cada início de conversa 
     }
     mcpConfig.mcpServers = mcpConfig.mcpServers || {};
     const mcpServerScript = path.resolve(__dirname, 'synapse-mcp-server.js');
+    mcpConfig.mcpServers['kyber-graphify'] = {
+      command: 'node',
+      args: [mcpServerScript]
+    };
     mcpConfig.mcpServers['synapse-graphify'] = {
       command: 'node',
       args: [mcpServerScript]
     };
     fs.writeFileSync(mcpConfigPath, JSON.stringify(mcpConfig, null, 2), 'utf8');
-    console.log('✅ Added synapse-graphify MCP server to global mcp_config.json.');
+    console.log('✅ Added kyber-graphify MCP server to global mcp_config.json.');
 
     console.log('🎉 Global IDE configurations successfully deployed!');
   });
@@ -615,8 +632,8 @@ program
   .action((action) => {
     const mcpScript = path.resolve(__dirname, 'synapse-mcp-server.js');
     if (action === 'benchmark') {
-      console.log('🚀 Running Synapse Engine MCP Token Savings Benchmark...');
-      const benchmarkTest = path.resolve(__dirname, '../tests/synapse_mcp_benchmark.test.js');
+      console.log('🚀 Running Aevum Kyber MCP Token Savings Benchmark...');
+      const benchmarkTest = path.resolve(__dirname, '../tests/kyber_mcp_benchmark.test.js');
       const relPath = path.relative(process.cwd(), benchmarkTest).replace(/\\/g, '/');
       try {
         execSync(`npx jest "${relPath}"`, { stdio: 'inherit' });
@@ -628,11 +645,10 @@ program
       try {
         fork(mcpScript, [], { stdio: 'inherit' });
       } catch (err) {
-        console.error('❌ Failed to start Synapse MCP Server:', err.message);
+        console.error('❌ Failed to start Kyber MCP Server:', err.message);
       }
     }
   });
-
 
 program
   .command('status')
@@ -670,7 +686,7 @@ program
   .action((options) => {
     const { getHardwareStatus } = require('./hardware-selector');
     const result = getHardwareStatus(options.workload, options.size, options.override);
-    console.log('⚡ Synapse Engine - Hardware Diagnostics & Selection:');
+    console.log('⚡ Aevum Kyber - Hardware Diagnostics & Selection:');
     console.log(JSON.stringify(result, null, 2));
   });
 
@@ -747,12 +763,12 @@ program
 
 program
   .command('doctor')
-  .description('Executes full environment autodiagnostics for Synapse Engine')
+  .description('Executes full environment autodiagnostics for Aevum Kyber')
   .action(() => {
-    console.log('🩺 Executing full Synapse Engine autodiagnostics...\n');
+    console.log('🩺 Executing full Aevum Kyber autodiagnostics...\n');
     const os = require('os');
     const homeDir = os.homedir();
-    const cwd = process.cwd();
+    const cwd = getRootDir();
 
     // 1. Graphify CLI Check
     let graphifyOk = false;
@@ -778,33 +794,33 @@ program
     if (fs.existsSync(mcpConfigPath)) {
       try {
         const mcpConf = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf8'));
-        if (mcpConf.mcpServers && mcpConf.mcpServers['synapse-graphify']) {
+        if (mcpConf.mcpServers && (mcpConf.mcpServers['kyber-graphify'] || mcpConf.mcpServers['synapse-graphify'])) {
           mcpOk = true;
-          mcpMsg = 'synapse-graphify server registered in mcp_config.json';
+          mcpMsg = 'kyber-graphify server registered in mcp_config.json';
         } else {
-          mcpMsg = 'mcp_config.json exists, but synapse-graphify server is not registered. Run: synapse setup --global';
+          mcpMsg = 'mcp_config.json exists, but kyber-graphify server is not registered. Run: kyber setup --global';
         }
       } catch (e) {
         mcpMsg = `Error reading mcp_config.json: ${e.message}`;
       }
     } else {
-      mcpMsg = `mcp_config.json file not found at ${mcpConfigPath}. Run: synapse setup --global`;
+      mcpMsg = `mcp_config.json file not found at ${mcpConfigPath}. Run: kyber setup --global`;
     }
 
     // 3. State & Persona Telemetry Check
-    const statePath = path.join(cwd, '.agents', 'state.json');
+    const statePath = getStatePath();
     const stateOk = fs.existsSync(statePath);
-    const stateMsg = stateOk ? 'Present and tracking local persona state' : 'Missing. Run: synapse init';
+    const stateMsg = stateOk ? 'Present and tracking local persona state' : 'Missing. Run: kyber init';
 
     // 4. Obsidian Vault Check
-    const vaultPath = path.join(cwd, '.obsidian-vault');
+    const vaultPath = process.env.KYBER_VAULT_PATH || process.env.SYNAPSE_VAULT_PATH || path.join(cwd, '.obsidian-vault');
     const vaultOk = fs.existsSync(vaultPath);
-    const vaultMsg = vaultOk ? 'Local memory structure configured' : 'Missing. Run: synapse init or synapse update';
+    const vaultMsg = vaultOk ? 'Local memory structure configured' : 'Missing. Run: kyber init or kyber update';
 
     // 5. AST Topology Check
-    const graphPath = path.join(cwd, 'graphify-out', 'graph.json');
+    const graphPath = getGraphPath();
     const graphOk = fs.existsSync(graphPath);
-    const graphMsg = graphOk ? 'AST map generated at graphify-out/graph.json' : 'Unavailable. Run: synapse graphify';
+    const graphMsg = graphOk ? `AST map generated at ${path.relative(cwd, graphPath).replace(/\\/g, '/') || graphPath}` : 'Unavailable. Run: kyber graphify';
 
     console.table([
       { Component: 'Graphify CLI', Status: graphifyOk ? '🟢 OK' : '🔴 Failed', Detail: graphifyMsg },
@@ -819,6 +835,3 @@ program
   });
 
 program.parse(process.argv);
-
-
-
